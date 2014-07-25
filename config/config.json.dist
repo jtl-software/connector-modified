@@ -1,0 +1,5 @@
+{
+    "platform_root": "\/var\/www",
+    "connector_root": "\/var\/www\/xtc",
+    "auth_token": ""
+}

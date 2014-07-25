@@ -1,0 +1,505 @@
+{
+    "version": "1.0",
+    "container": {
+        "category": {
+            "comment": "",
+            "supported": true,
+            "transactional": true,
+            "objects": {
+                "category": {
+                    "push": {
+                        "supported": true,
+                        "comment": ""
+                    },
+                    "pull": {
+                        "supported": true,
+                        "comment": "",
+                        "properties": [
+                            "Id",
+                            "ParentCategoryId",
+                            "Sort"
+                        ]
+                    }
+                },
+                "categoryAttrI18n": {
+                    "push": {
+                        "supported": true,
+                        "comment": ""
+                    },
+                    "pull": {
+                        "supported": true,
+                        "comment": "",
+                        "properties": [
+                            "LocaleName",
+                            "CategoryAttrId",
+                            "Key",
+                            "Value"
+                        ]
+                    }
+                },
+                "categoryI18n": {
+                    "push": {
+                        "supported": true,
+                        "comment": ""
+                    },
+                    "pull": {
+                        "supported": true,
+                        "comment": "",
+                        "properties": [
+                            "LocaleName",
+                            "CategoryId",
+                            "Name",
+                            "Description",
+                            "MetaDescription",
+                            "MetaKeywords",
+                            "TitleTag"
+                        ]
+                    }
+                },
+                "categoryInvisibility": {
+                    "push": {
+                        "supported": true,
+                        "comment": ""
+                    },
+                    "pull": {
+                        "supported": true,
+                        "comment": "",
+                        "properties": [
+                            "CustomerGroupId",
+                            "CategoryId"
+                        ]
+                    }
+                }
+            }
+        },
+        "customer": {
+            "comment": "",
+            "supported": true,
+            "transactional": true,
+            "objects": {
+                "customer": {
+                    "push": {
+                        "supported": true,
+                        "comment": ""
+                    },
+                    "pull": {
+                        "supported": true,
+                        "comment": "",
+                        "properties": [
+                            "Id",
+                            "CustomerGroupId",
+                            "LocaleName",
+                            "CustomerNumber",
+                            "Password",
+                            "Salutation",
+                            "FirstName",
+                            "LastName",
+                            "Company",
+                            "Street",
+                            "ExtraAddressLine",
+                            "ZipCode",
+                            "City",
+                            "State",
+                            "CountryIso",
+                            "Phone",
+                            "Fax",
+                            "EMail",
+                            "VatNumber",
+                            "HasNewsletterSubscription",
+                            "Birthday",
+                            "Created",
+                            "Modified"
+                        ]
+                    }
+                }
+            }
+        },
+        "customerOrder": {
+            "comment": "",
+            "supported": true,
+            "transactional": true,
+            "objects": {
+                "customerOrder": {
+                    "push": {
+                        "supported": true,
+                        "comment": ""
+                    },
+                    "pull": {
+                        "supported": true,
+                        "comment": "",
+                        "properties": [
+                            "Id",
+                            "CustomerId",
+                            "ShippingAddressId",
+                            "BillingAddressId",
+                            "ShippingMethodId",
+                            "LocaleName",
+                            "CurrencyIso",
+                            "TotalSum",
+                            "ShippingMethodName",
+                            "Status",
+                            "Created"
+                        ]
+                    }
+                },
+                "customerOrderItem": {
+                    "push": {
+                        "supported": true,
+                        "comment": ""
+                    },
+                    "pull": {
+                        "supported": true,
+                        "comment": "",
+                        "properties": [
+                            "Id",
+                            "ProductId",
+                            "CustomerOrderId",
+                            "Name",
+                            "Sku",
+                            "Price",
+                            "Vat",
+                            "Quantity"
+                        ]
+                    }
+                },
+                "customerOrderBillingAddress": {
+                    "push": {
+                        "supported": true,
+                        "comment": ""
+                    },
+                    "pull": {
+                        "supported": true,
+                        "comment": "",
+                        "properties": [
+                            "Id",
+                            "CustomerId",
+                            "FirstName",
+                            "LastName",
+                            "Company",
+                            "Street",
+                            "ExtraAddressLine",
+                            "ZipCode",
+                            "City",
+                            "State",
+                            "CountryIso"
+                        ]
+                    }
+                },
+                "customerOrderShippingAddress": {
+                    "push": {
+                        "supported": true,
+                        "comment": ""
+                    },
+                    "pull": {
+                        "supported": true,
+                        "comment": "",
+                        "properties": [
+                            "Id",
+                            "CustomerId",
+                            "FirstName",
+                            "LastName",
+                            "Company",
+                            "Street",
+                            "ExtraAddressLine",
+                            "ZipCode",
+                            "City",
+                            "State",
+                            "CountryIso"
+                        ]
+                    }
+                }
+            }
+        },
+        "image": {
+            "comment": "",
+            "supported": true,
+            "transactional": true,
+            "objects": {
+                "image": {
+                    "push": {
+                        "supported": true,
+                        "comment": ""
+                    },
+                    "pull": {
+                        "supported": true,
+                        "comment": "",
+                        "properties": [
+                            "Id",
+                            "RelationType",
+                            "ForeignKey",
+                            "Filename",
+                            "Sort"
+                        ]
+                    }
+                }
+            }
+        },
+        "manufacturer": {
+            "comment": "",
+            "supported": true,
+            "transactional": true,
+            "objects": {
+                "manufacturer": {
+                    "push": {
+                        "supported": true,
+                        "comment": ""
+                    },
+                    "pull": {
+                        "supported": true,
+                        "comment": "",
+                        "properties": [
+                            "Id",
+                            "Name"
+                        ]
+                    }
+                }
+            }
+        },
+        "product": {
+            "comment": "",
+            "supported": true,
+            "transactional": true,
+            "objects": {
+                "product": {
+                    "push": {
+                        "supported": true,
+                        "comment": ""
+                    },
+                    "pull": {
+                        "supported": true,
+                        "comment": "",
+                        "properties": [
+                            "Id",
+                            "ManufacturerId",
+                            "BasePriceUnitId",
+                            "Sku",
+                            "StockLevel",
+                            "Vat",
+                            "Ean",
+                            "IsTopProduct",
+                            "ProductWeight",
+                            "Sort",
+                            "Created",
+                            "AvailableFrom",
+                            "ManufacturerNumber",
+                            "SupplierDeliveryTime"
+                        ]
+                    }
+                },
+                "product2Category": {
+                    "push": {
+                        "supported": true,
+                        "comment": ""
+                    },
+                    "pull": {
+                        "supported": true,
+                        "comment": "",
+                        "properties": [
+                            "Id",
+                            "CategoryId",
+                            "ProductId"
+                        ]
+                    }
+                },
+                "productI18n": {
+                    "push": {
+                        "supported": true,
+                        "comment": ""
+                    },
+                    "pull": {
+                        "supported": true,
+                        "comment": "",
+                        "properties": [
+                            "LocaleName",
+                            "ProductId",
+                            "Name",
+                            "UrlPath",
+                            "Description",
+                            "ShortDescription"
+                        ]
+                    }
+                },
+                "productVariation": {
+                    "push": {
+                        "supported": true,
+                        "comment": ""
+                    },
+                    "pull": {
+                        "supported": true,
+                        "comment": "",
+                        "properties": [
+                            "Id",
+                            "ProductId",
+                            "Type"
+                        ]
+                    }
+                },
+                "productVariationI18n": {
+                    "push": {
+                        "supported": true,
+                        "comment": ""
+                    },
+                    "pull": {
+                        "supported": true,
+                        "comment": "",
+                        "properties": [
+                            "LocaleName",
+                            "ProductVariationId",
+                            "Name"
+                        ]
+                    }
+                },
+                "productVariationValue": {
+                    "push": {
+                        "supported": true,
+                        "comment": ""
+                    },
+                    "pull": {
+                        "supported": true,
+                        "comment": "",
+                        "properties": [
+                            "Id",
+                            "ProductVariationId",
+                            "ExtraWeight",
+                            "Sku",
+                            "Sort",
+                            "StockLevel"
+                        ]
+                    }
+                },
+                "productVariationValueExtraCharge": {
+                    "push": {
+                        "supported": true,
+                        "comment": ""
+                    },
+                    "pull": {
+                        "supported": true,
+                        "comment": "",
+                        "properties": [
+                            "CustomerGroupId",
+                            "ProductVariationValueId",
+                            "ExtraChargeNet"
+                        ]
+                    }
+                },
+                "productVariationValueI18n": {
+                    "push": {
+                        "supported": true,
+                        "comment": ""
+                    },
+                    "pull": {
+                        "supported": true,
+                        "comment": "",
+                        "properties": [
+                            "LocaleName",
+                            "ProductVariationValueId",
+                            "Name"
+                        ]
+                    }
+                }
+            }
+        },
+        "globalData": {
+            "comment": "",
+            "supported": true,
+            "transactional": true,
+            "objects": {
+                "currency": {
+                    "push": {
+                        "supported": true,
+                        "comment": ""
+                    },
+                    "pull": {
+                        "supported": true,
+                        "comment": "",
+                        "properties": [
+                            "Id",
+                            "Name",
+                            "Iso",
+                            "Factor",
+                            "DelimiterCent",
+                            "DelimiterThousand"
+                        ]
+                    }
+                },
+                "customerGroup": {
+                    "push": {
+                        "supported": true,
+                        "comment": ""
+                    },
+                    "pull": {
+                        "supported": true,
+                        "comment": "",
+                        "properties": [
+                            "Id",
+                            "Discount"
+                        ]
+                    }
+                },
+                "customerGroupI18n": {
+                    "push": {
+                        "supported": true,
+                        "comment": ""
+                    },
+                    "pull": {
+                        "supported": true,
+                        "comment": "",
+                        "properties": [
+                            "LocaleName",
+                            "CustomerGroupId",
+                            "Name"
+                        ]
+                    }
+                },
+                "language": {
+                    "push": {
+                        "supported": true,
+                        "comment": ""
+                    },
+                    "pull": {
+                        "supported": true,
+                        "comment": "",
+                        "properties": [
+                            "Id",
+                            "NameEnglish",
+                            "NameGerman",
+                            "LocaleName"
+                        ]
+                    }
+                },
+                "taxRate": {
+                    "push": {
+                        "supported": true,
+                        "comment": ""
+                    },
+                    "pull": {
+                        "supported": true,
+                        "comment": "",
+                        "properties": [
+                            "Id",
+                            "TaxZoneId",
+                            "TaxClassId",
+                            "Rate",
+                            "Priority"
+                        ]
+                    }
+                },
+                "unit": {
+                    "push": {
+                        "supported": true,
+                        "comment": ""
+                    },
+                    "pull": {
+                        "supported": true,
+                        "comment": "",
+                        "properties": [
+                            "Id",
+                            "LocaleName",
+                            "Name"
+                        ]
+                    }
+                }
+            }
+        }
+    }
+}
