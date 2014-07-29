@@ -1,7 +1,6 @@
 <?php
 namespace jtl\Connector\Modified;
 
-use \jtl\Core\Exception\TransactionException;
 use \jtl\Core\Exception\DatabaseException;
 use \jtl\Core\Rpc\RequestPacket;
 use \jtl\Core\Utilities\RpcMethod;
@@ -9,12 +8,11 @@ use \jtl\Core\Controller\Controller as CoreController;
 use \jtl\Core\Database\Mysql;
 use \jtl\Connector\ModelContainer\MainContainer;
 use \jtl\Core\Rpc\ResponsePacket;
-use \jtl\Connector\Transaction\Handler as TransactionHandler;
 use \jtl\Connector\Session\SessionHelper;
 use \jtl\Connector\Base\Connector as BaseConnector;
-
 use \jtl\Connector\Modified\Config\Loader\Config as ConfigLoader;
-use jtl\Core\Rpc\Error as Error;
+use \jtl\Core\Rpc\Error as Error;
+use \jtl\Core\Http\Response;
 
 class Connector extends BaseConnector
 {
@@ -72,7 +70,7 @@ class Connector extends BaseConnector
         $controller = RpcMethod::buildController($this->getMethod()->getController());
         $class = "\\jtl\\Connector\\Modified\\Controller\\{$controller}";
         
-        if (class_exists($class)) {       
+        if(class_exists($class)) {       
             $this->_controller = $class::getInstance();
             $this->_action = RpcMethod::buildAction($this->getMethod()->getAction());
             
@@ -85,19 +83,9 @@ class Connector extends BaseConnector
     public function handle(RequestPacket $requestpacket)
     {
        	$this->init();
-
        	$this->_controller->setMethod($this->getMethod());
 
-        // transaction        
-        if (($this->_action !== "commit")) {
-        	return $this->_controller->{$this->_action}($requestpacket->getParams());
-        }
-        else if (TransactionHandler::exists($requestpacket) && MainContainer::isMain($this->getMethod()->getController()) && $this->_action === "commit") {
-        	return $this->_controller->{$this->_action}($requestpacket->getParams(), $requestpacket->getGlobals()->getTransaction()->getId());
-        }
-        else {
-        	throw new TransactionException("Only Main Controller can handle commit actions");
-        }
+        return $this->_controller->{$this->_action}($requestpacket->getParams());        
     }
     
     function error_handler($errno, $errstr, $errfile, $errline, $errcontext)
@@ -122,10 +110,10 @@ class Connector extends BaseConnector
     
         file_put_contents("/tmp/error.log", date("[Y-m-d H:i:s] ") . "(" . $types[$errno] . ") File ({$errfile}, {$errline}): {$errstr}\n", FILE_APPEND);
     }
-        
+
     public function shutdown_handler()
     {
-        if (($err = error_get_last())) {
+        if(($err = error_get_last())) {
             ob_clean();
 
             $error = new Error();
