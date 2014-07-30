@@ -20,4 +20,3 @@ $connector = Connector::getInstance();
 $application = Application::getInstance();
 $application->register($connector);
 $application->run();
-?>

@@ -1,12 +1,9 @@
 <?php
 namespace jtl\Connector\Modified;
 
-use \jtl\Core\Exception\DatabaseException;
 use \jtl\Core\Rpc\RequestPacket;
 use \jtl\Core\Utilities\RpcMethod;
-use \jtl\Core\Controller\Controller as CoreController;
 use \jtl\Core\Database\Mysql;
-use \jtl\Connector\ModelContainer\MainContainer;
 use \jtl\Core\Rpc\ResponsePacket;
 use \jtl\Connector\Session\SessionHelper;
 use \jtl\Connector\Base\Connector as BaseConnector;

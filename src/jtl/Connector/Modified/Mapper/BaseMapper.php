@@ -39,21 +39,28 @@ class BaseMapper
 		    elseif(method_exists(get_class($this),$host)) $value = $this->$host($data);
 		    else {
 		        $subMapperClass = "\\jtl\\Connector\\Modified\\Mapper\\{$endpoint[0]}";
-		        if(!class_exists($subMapperClass)) throw new \Exception("There was no property or method to map ".$endpoint[0]);
+		        if(!$isSub = class_exists($subMapperClass)) throw new \Exception("There was no property or method to map ".$endpoint[0]);
 		        else {
+		            if(!method_exists($model,$endpoint[1])) throw new \Exception("Set method ".$setmethod." does not exists");
+		            
 		            $subMapper = new $subMapperClass();
-		            $value = $subMapper->pull($data);
+		            
+		            $values = $subMapper->pull($data);
+		            
+		            foreach($values as $obj) $model->$endpoint[1]($obj);
 		        }
 		    }		   		
-		    
-		    if($model->isIdentity($host)) $value = new Identity($value);
-		    if(isset($endpoint[1])) settype($value,$endpoint[1]);
-		    
-		    $setMethod = array_key_exists($host,$model->getNavigations()) ? 'add'.ucfirst($host) : 'set'.ucfirst($host);
-		    $model->{$setMethod}($value);
+		   		   
+		    if(!$isSub) {
+		        if($model->isIdentity($host)) $value = new Identity($value);
+		        if(isset($endpoint[1])) settype($value,$endpoint[1]);
+		        
+		        $setMethod =  'set'.ucfirst($host);
+		        $model->{$setMethod}($value);
+		    }
 		}
 		
-		return $model;
+		return $model->getPublic();
 	}
 	
 	/**
@@ -92,9 +99,7 @@ class BaseMapper
 	    $return = array();
 		
 		foreach($dbResult as $data) {			
-			$model = $this->generateModel($data);
-	    	
-			$return[] = $model->getPublic();			            	
+			$return[] = $this->generateModel($data);			            	
 		}		
 			    
 		return $return;
@@ -140,4 +145,3 @@ class BaseMapper
 	    return $objs !== null ? intval($objs[0]->count) : 0;
 	}	
 }
-?>

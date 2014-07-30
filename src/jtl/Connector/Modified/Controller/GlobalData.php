@@ -1,5 +1,5 @@
 <?php
 namespace jtl\Connector\Modified\Controller;
 
-class Category extends BaseController {   
+class GlobalData extends BaseController {   
 }
