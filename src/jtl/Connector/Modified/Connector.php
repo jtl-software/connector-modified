@@ -110,10 +110,10 @@ class Connector extends BaseConnector
     
         file_put_contents("/tmp/error.log", date("[Y-m-d H:i:s] ") . "(" . $types[$errno] . ") File ({$errfile}, {$errline}): {$errstr}\n", FILE_APPEND);
     }
-
+       
     public function shutdown_handler()
     {
-        if(($err = error_get_last())) {
+        if (($err = error_get_last())) {
             ob_clean();
 
             $error = new Error();
