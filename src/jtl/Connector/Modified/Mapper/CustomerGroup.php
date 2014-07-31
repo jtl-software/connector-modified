@@ -10,7 +10,7 @@ class CustomerGroup extends BaseMapper
         "query" => "SELECT * FROM customers_status GROUP BY customers_status_id",
         "mapPull" => array(
             "id" => "customers_status_id",
-            "discount" => "customers_status_discount|float",
+            "discount" => "customers_status_discount",
             "i18n" => "CustomerGroupI18n|addI18n"
         )
     );    

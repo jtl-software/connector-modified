@@ -8,7 +8,10 @@ class GlobalData extends \jtl\Connector\Modified\Mapper\BaseMapper
     protected $mapperConfig = array(
         "mapPull" => array(
             "languages" => "Language|addLanguage",
-            "customerGroups" => "CustomerGroup|addCustomerGroup"
+            "customerGroups" => "CustomerGroup|addCustomerGroup",
+            "taxRates" => "TaxRate|addTaxRate",
+            "currencies" => "Currency|addCurrency",
+            "units" => "Unit|addUnit"
         )  
     );
     

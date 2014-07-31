@@ -9,8 +9,8 @@ class Category extends \jtl\Connector\Modified\Mapper\BaseMapper
     	"mapPull" => array(
         	"id" => "categories_id",
         	"parentCategoryId" => null,
-        	"sort" => "sort_order|integer",
-    	    "isActive" => "categories_status|boolean",
+        	"sort" => "sort_order",
+    	    "isActive" => "categories_status",
     	    "i18ns" => "CategoryI18n|addI18n",
     	    "invisibilities" => "CategoryInvisibility|addInvisibility"
         ),

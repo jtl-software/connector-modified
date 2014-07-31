@@ -11,13 +11,17 @@ class BaseMapper
     protected $db;
     protected $mapperConfig;
 	protected $shopConfig;
+	protected $type;
+	protected $model;
     
 	public function __construct() {
-	    $this->db = Mysql::getInstance();
-	     
 	    $session = new SessionHelper("modified");
+	    $reflect = new \ReflectionClass($this);
 	    
+	    $this->db = Mysql::getInstance();
 	    $this->shopConfig = $session->shopConfig;
+	    $this->model = "\\jtl\\Connector\\Model\\".$reflect->getShortName();
+	    $this->type = null; 
 	}
 	
 	/**
@@ -26,37 +30,38 @@ class BaseMapper
 	 * @return object
 	 */
 	public function generateModel($data) {
-	    $reflect = new \ReflectionClass($this);
+	    $model = new $this->model();
+		if(!$this->type) $this->type = $model->getType();
 	    
-	    $class = "\\jtl\\Connector\\Model\\{$reflect->getShortName()}";
-		$model = new $class();
-		
 		foreach($this->mapperConfig['mapPull'] as $host => $endpoint) {
 		    $value = null;
-		    $endpoint = explode('|',$endpoint);
 		    
-		    if(isset($data[$endpoint[0]])) $value = $data[$endpoint[0]];
-		    elseif(method_exists(get_class($this),$host)) $value = $this->$host($data);
-		    else {
-		        $subMapperClass = "\\jtl\\Connector\\Modified\\Mapper\\{$endpoint[0]}";
-		        if(!$isSub = class_exists($subMapperClass)) throw new \Exception("There was no property or method to map ".$endpoint[0]);
-		        else {
-		            if(!method_exists($model,$endpoint[1])) throw new \Exception("Set method ".$setmethod." does not exists");
-		            
-		            $subMapper = new $subMapperClass();
-		            
-		            $values = $subMapper->pull($data);
-		            
-		            foreach($values as $obj) $model->$endpoint[1]($obj);
-		        }
-		    }		   		
-		   		   
-		    if(!$isSub) {
-		        if($model->isIdentity($host)) $value = new Identity($value);
-		        if(isset($endpoint[1])) settype($value,$endpoint[1]);
+		    if($this->type->getProperty($host)->isNavigation()) {
+		        list($endpoint,$setMethod) = explode('|',$endpoint);
 		        
-		        $setMethod =  'set'.ucfirst($host);
-		        $model->{$setMethod}($value);
+		        $subMapperClass = "\\jtl\\Connector\\Modified\\Mapper\\".$endpoint;
+		        
+		        if(!class_exists($subMapperClass)) throw new \Exception("There is no mapper for ".$endpoint);
+		        else {
+		            if(!method_exists($model,$setMethod)) throw new \Exception("Set method ".$setMethod." does not exists");
+		        
+		            $subMapper = new $subMapperClass();
+		        
+		            $values = $subMapper->pull($data);
+		        
+		            foreach($values as $obj) $model->$setMethod($obj);
+		        }
+		    }
+		    else {
+		        if(isset($data[$endpoint])) $value = $data[$endpoint];
+		        elseif(method_exists(get_class($this),$host)) $value = $this->$host($data);
+		        else throw new \Exception("There is no property or method to map ".$host);
+		        
+		        if($this->type->getProperty($host)->isIdentity()) $value = new Identity($value);
+		        else settype($value,$this->type->getProperty($host)->getType());
+		        
+		        $setMethod = 'set'.ucfirst($host);
+		        $model->$setMethod($value);
 		    }
 		}
 		
