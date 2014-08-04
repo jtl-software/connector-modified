@@ -32,7 +32,7 @@ class BaseController extends Controller
             
             $mapper = new $class();
         
-            $result = $mapper->pull(null,$filter->getOffset(),$filter->getLimit());
+            $result = $mapper->pull($params,$filter->getOffset(),$filter->getLimit());
             	
             $action->setResult($result);
         }

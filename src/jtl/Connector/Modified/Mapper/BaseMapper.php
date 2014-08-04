@@ -13,6 +13,7 @@ class BaseMapper
 	protected $shopConfig;
 	protected $type;
 	protected $model;
+	protected $sqlite = null;
     
 	public function __construct() {
 	    $session = new SessionHelper("modified");
@@ -31,7 +32,7 @@ class BaseMapper
 	 */
 	public function generateModel($data) {
 	    $model = new $this->model();
-		if(!$this->type) $this->type = $model->getType();
+		if(!$this->type) $this->type = $model->getModelType();
 	    
 		foreach($this->mapperConfig['mapPull'] as $host => $endpoint) {
 		    $value = null;
@@ -58,7 +59,12 @@ class BaseMapper
 		        else throw new \Exception("There is no property or method to map ".$host);
 		        
 		        if($this->type->getProperty($host)->isIdentity()) $value = new Identity($value);
-		        else settype($value,$this->type->getProperty($host)->getType());
+		        else {
+		            $type = $this->type->getProperty($host)->getType();
+		            
+		            if($type == "\\jtl\\Connector\\Model\\DateTime") $value = new \DateTime($value);
+		            else settype($value,$type);
+		        }
 		        
 		        $setMethod = 'set'.ucfirst($host);
 		        $model->$setMethod($value);
@@ -91,11 +97,12 @@ class BaseMapper
 	 * @param integer $limit
 	 * @return array
 	 */  
-	public function pull($data,$offset=0,$limit) {        
+	public function pull($data=null,$offset=0,$limit) {        
         $limitQuery = isset($limit) ? ' LIMIT '.$offset.','.$limit : '';
         
 	    if(isset($this->mapperConfig['query'])) {
-	        $query = preg_replace('/\[\[(\w+)\]\]/e','$data[$1]', $this->mapperConfig['query']).$limitQuery;	        
+	        $query = !is_null($data) ? preg_replace('/\[\[(\w+)\]\]/e','$data[$1]', $this->mapperConfig['query']) : $this->mapperConfig['query'];
+	        $query .= $limitQuery;	        
 	    }
 	    else $query = 'SELECT * FROM '.$this->mapperConfig['table'].$limitQuery;
         
@@ -148,5 +155,14 @@ class BaseMapper
 	    $objs = $this->db->query("SELECT count(*) as count FROM {$this->mapperConfig['table']} LIMIT 1", array("return" => "object"));
 	    
 	    return $objs !== null ? intval($objs[0]->count) : 0;
-	}	
+	}
+    
+	/**
+	 * Get sqlite instance of setup db
+	 * @return \PDO 
+	 */
+	public function getSqlite() {
+	    if(is_null($this->sqlite)) $this->sqlite = new \PDO('sqlite:'.realpath(__DIR__.'/../../Modified/').'/connector.sdb');
+	    return $this->sqlite;
+	}
 }

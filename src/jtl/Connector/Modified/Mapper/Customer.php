@@ -26,7 +26,7 @@ class Customer extends BaseMapper
 			"eMail" => "customers_email_address",
 			"vatNumber" => "customers_vat_id",
 			"hasNewsletterSubscription" => null,
-			"created" => null						
+			"created" => "customers_date_added"						
 		),
         "mapPush" => array(
             "customers_id" => "_id",
@@ -49,10 +49,6 @@ class Customer extends BaseMapper
     
     protected function customerGroupId($data) {
         return $this->replaceZero($data['customers_status']);
-    }
-    
-    protected function created($data) {
-        return new \DateTime($data['customers_date_added']);       
     }
     
     protected function hasNewsletterSubscription($data) {
