@@ -73,9 +73,9 @@ class BaseController extends Controller
                 
                 $statModel = new Statistic();
                 
-                $statModel->_available = $mapper->statistic();                
-                $statModel->_pending = 0;   
-                $statModel->_controllerName = lcfirst($reflect->getShortName());
+                $statModel->setAvailable($mapper->statistic());                
+                $statModel->setPending(0);   
+                $statModel->setControllerName(lcfirst($reflect->getShortName()));
                 
                 $action->setResult($statModel->getPublic());
             }

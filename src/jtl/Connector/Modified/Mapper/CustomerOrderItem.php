@@ -16,7 +16,8 @@ class CustomerOrderItem extends BaseMapper
         	"name" => "products_name",
         	"price" => null,
         	"vat" => "products_tax",
-        	"sku" => "products_model"
+        	"sku" => "products_model",
+            "variations" => "CustomerOrderItemVariation|addVariation"
         ),
         "mapPush" => array(
             "orders_products_id" => "_id",

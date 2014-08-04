@@ -5,7 +5,6 @@ class Category extends \jtl\Connector\Modified\Mapper\BaseMapper
 {
     protected $mapperConfig = array(
         "table" => "categories",
-    	"pk" => "categories_id",
     	"mapPull" => array(
         	"id" => "categories_id",
         	"parentCategoryId" => null,

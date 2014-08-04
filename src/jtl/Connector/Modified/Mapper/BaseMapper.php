@@ -33,7 +33,7 @@ class BaseMapper
 	public function generateModel($data) {
 	    $model = new $this->model();
 		if(!$this->type) $this->type = $model->getModelType();
-	    
+
 		foreach($this->mapperConfig['mapPull'] as $host => $endpoint) {
 		    $value = null;
 		    
@@ -50,20 +50,20 @@ class BaseMapper
 		        
 		            $values = $subMapper->pull($data);
 		        
-		            foreach($values as $obj) $model->$setMethod($obj);
+		            foreach($values as $obj) $model->$setMethod($obj);		            
 		        }
 		    }
 		    else {
 		        if(isset($data[$endpoint])) $value = $data[$endpoint];
 		        elseif(method_exists(get_class($this),$host)) $value = $this->$host($data);
 		        else throw new \Exception("There is no property or method to map ".$host);
-		        
+
 		        if($this->type->getProperty($host)->isIdentity()) $value = new Identity($value);
 		        else {
 		            $type = $this->type->getProperty($host)->getType();
 		            
-		            if($type == "\\jtl\\Connector\\Model\\DateTime") $value = new \DateTime($value);
-		            else settype($value,$type);
+		            if($type == "DateTime" && !is_null($value)) $value = new \DateTime($value);
+		            else settype($value,$type);		            
 		        }
 		        
 		        $setMethod = 'set'.ucfirst($host);
@@ -163,6 +163,7 @@ class BaseMapper
 	 */
 	public function getSqlite() {
 	    if(is_null($this->sqlite)) $this->sqlite = new \PDO('sqlite:'.realpath(__DIR__.'/../../Modified/').'/connector.sdb');
+	    
 	    return $this->sqlite;
 	}
 }

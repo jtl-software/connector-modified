@@ -13,14 +13,12 @@ class CustomerOrder extends BaseMapper
         	"created" => "date_purchased",
         	"status" => null,
         	"paymentModuleCode" => null,
-        	//"shippingMethodCode" => "shipping_class",
-        	//"shippingMethodName" => "shipping_method",
         	"currencyIso" => "currency",
         	"shippingAddressId" => null,
         	"billingAddressId" => null,
             "billingAddress" => "CustomerOrderBillingAddress|addBillingAddress",
             "shippingAddress" => "CustomerOrderShippingAddress|addShippingAddress",
-            "positions" => "CustomerOrderItem|addPosition"
+            "items" => "CustomerOrderItem|addItem"
         ),
         "mapPush" => array(
             "orders_id" => "_id",

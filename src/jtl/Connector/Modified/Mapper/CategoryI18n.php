@@ -25,5 +25,5 @@ class CategoryI18n extends \jtl\Connector\Modified\Mapper\BaseMapper
     
     protected function localeName($data) {
         return $this->fullLocale($data['code']);
-    }
+    }    
 }

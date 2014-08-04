@@ -11,8 +11,8 @@ class Currency extends BaseMapper
         	"id" => "currencies_id",
         	"name" => "title",
         	"factor" => "value",
-        	"decimalSeparator" => "decimal_point",
-        	"thousandsSeparator" => "thousands_point",
+        	"delimiterCent" => "decimal_point",
+        	"delimiterThousand" => "thousands_point",
     	    "isDefault" => null
         )
     );    
