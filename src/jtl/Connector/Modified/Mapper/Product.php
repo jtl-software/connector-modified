@@ -18,14 +18,17 @@ class Product extends BaseMapper
 			"productWeight" => "products_weight",
 			"manufacturerId" => null,
 			"manufacturerNumber" => "products_manufacturers_model",
-            //"basePriceUnitId" => null,
-			//"basePriceDivisor" => "products_vpe_value",
+            "basePriceUnitId" => null,
+			"basePriceDivisor" => "products_vpe_value",
 			"isTopProduct" => "products_startpage",
             "considerStock" => null,
 			"considerVariationStock" => null,
 			"permitNegativeStock" => null,
-			"vat" => null
-			
+			"vat" => null,
+            "i18ns" => "ProductI18n|addI18n",
+            "categories" => "Product2Category|addCategory",
+            "prices" => "ProductPrice|addPrice",
+            "specialPrices" => "ProductSpecialPrice|addSpecialPrice"	
         ),
         "mapPush" => array(
             "products_id" => "_id",
