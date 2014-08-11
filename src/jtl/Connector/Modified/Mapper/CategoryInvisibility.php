@@ -23,4 +23,24 @@ class CategoryInvisibility extends \jtl\Connector\Modified\Mapper\BaseMapper
         
         return $return;
     }
+    
+    public function push($data,$dbObj) {
+        $return = [];
+        
+        if($this->shopConfig['GROUP_CHECK'] == 1) {
+            foreach($data->getInvisibilities() as $invisibility) {
+                $categoryInvisibility = new CategoryInvisibilityModel();
+                $categoryInvisibility->setCustomerGroupId($invisibility->getCustomerGroupId());
+                $categoryInvisibility->setCategoryId($data->getId());
+
+                $return[] = $categoryInvisibility;
+                
+                $id = $invisibility->getCustomerGroupId()->getEndpoint();
+                $property = "group_permission_".$id;
+                $dbObj->$property = 0;
+            }
+        }
+        
+        return $return;
+    }
 }

@@ -50,7 +50,25 @@ class BaseController extends Controller
         $action = new Action();
         
         $action->setHandled(true);
-        $action->setResult(true);
+        
+        try {
+            $reflect = new \ReflectionClass($this);
+            $class = "\\jtl\\Connector\\Modified\\Mapper\\{$reflect->getShortName()}";
+            
+            if(!class_exists($class)) throw new \Exception("Class ".$class." not available");
+            
+            $mapper = new $class();
+            
+            $result = $mapper->push($params);
+            
+            $action->setResult($result);
+        }
+        catch (\Exception $exc) {
+            $err = new Error();
+            $err->setCode($exc->getCode());
+            $err->setMessage($exc->getFile().' ('.$exc->getLine().'):'.$exc->getMessage());
+            $action->setError($err);
+        }
         
         return $action;        
     }

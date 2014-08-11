@@ -16,7 +16,10 @@ class Category extends \jtl\Connector\Modified\Mapper\BaseMapper
         "mapPush" => array(
             "categories_id" => "id",
             "parent_id" => "parentCategoryId",
-            "sort_order" => "sort"
+            "sort_order" => "sort",
+            "categories_status" => "isActive",
+            "CategoryI18n|addI18n" => "i18ns",
+            "CategoryInvisibility|addInvisibility|true" => "invisibilities"
         )
     );     
 

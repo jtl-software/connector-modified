@@ -74,20 +74,83 @@ class BaseMapper
 		return $model->getPublic();
 	}
 	
-	/**
-	 * map from model to db object
-	 * @param object $data
-	 * @return \stdClass
-	 */
-	public function generateDbObj($data) {
-		$dbObj = new \stdClass();
-
-		foreach($this->mapperConfig['mapPush'] as $endpoint => $host) {
-			if(!empty($endpoint)) $dbObj->$endpoint = isset($data->$host) ? $data->$host : null;
-			if(method_exists(get_class($this),$endpoint)) $dbObj->$endpoint = $this->$endpoint($data);
-		}
+    /**
+     * map from model to db object
+     * @param unknown $data
+     * @param string $parentDbObj
+     * @throws \Exception
+     * @return multitype:NULL
+     */
+	public function generateDbObj($data,$parentDbObj=null) {
+	    $return = [];
+	    if(!is_array($data)) $data = array($data);
+	    
+	    foreach($data as $obj) {
+	        $subMapper = [];
+	        
+    	    $model = new $this->model();	    
+    	    if(!$this->type) $this->type = $model->getModelType();
+    	    
+    	    $dbObj = new \stdClass();
+    
+    		foreach($this->mapperConfig['mapPush'] as $endpoint => $host) {
+    		    if(is_null($host) && method_exists(get_class($this),$endpoint)) {
+    		        $dbObj->$endpoint = $this->$endpoint($obj);
+    		    }
+    		    elseif($this->type->getProperty($host)->isNavigation()) {
+    		        $subMapper[$endpoint] = $host;    		       
+    		    }
+    		    else {
+    		        $value = null;
+    		        
+		            $getMethod = 'get'.ucfirst($host);
+		            $setMethod = 'set'.ucfirst($host);
+                    $value = $obj->$getMethod();
+        		    
+        		    if(isset($value)) {
+        		        if($this->type->getProperty($host)->isIdentity()) {
+        		            $model->$setMethod($value);
+        		            
+        		            $value = $value->getEndpoint();
+        		        }
+        		        else {
+        		            $type = $this->type->getProperty($host)->getType();
+        		            if($type == "bool") settype($value,"integer");
+        		        }		       
+        		    }
+        		    else throw new \Exception("There is no property or method to map ".$endpoint);
+        		            		    
+        		    $dbObj->$endpoint = $value;
+    		    }	    		    
+    		}
+    
+    		if(isset($parentDbObj)) $dbObj = (object) array_merge((array) $parentDbObj, (array) $dbObj);
 		
-		return $dbObj;
+		    // insert/update db
+    		//echo "SQL OBJ: ";
+		    //var_dump($dbObj);
+		    //$obj-> set pk
+            
+		    // sub mapper
+		    foreach($subMapper as $endpoint => $host) {
+		        list($endpoint,$navSetMethod,$addToParent) = explode('|',$endpoint);
+		        
+		        $subMapperClass = "\\jtl\\Connector\\Modified\\Mapper\\".$endpoint;
+		        
+		        if(!class_exists($subMapperClass)) throw new \Exception("There is no mapper for ".$host);
+		        else {
+		            $subMapper = new $subMapperClass();
+		        
+		            $values = $subMapper->push($obj,$addToParent ? $dbObj : null);
+		        
+		            foreach($values as $setObj) $model->$navSetMethod($setObj);
+		        }
+		    }
+		    
+            $return[] = $model->getPublic();		
+	    }
+		
+	    return is_array($data) ? $return : $return[0];
 	}
 	
 	/**
@@ -118,6 +181,23 @@ class BaseMapper
 	}
     
 	/**
+	 * Default push method
+	 * @param unknown $data
+	 * @param string $dbObj
+	 * @return multitype:NULL
+	 */
+	public function push($data,$dbObj = null) {
+	    if(isset($this->mapperConfig['getMethod'])) {
+	        $subGetMethod = $this->mapperConfig['getMethod'];
+	        $data = $data->$subGetMethod();	       
+	    }
+	    
+	    $return = $this->generateDbObj($data,$dbObj);
+	    
+	    return $return;
+	}
+	
+	/**
 	 * Get full locale by ISO code
 	 * @param string $country
 	 * @return Ambigous <NULL, multitype:string , string>
@@ -131,8 +211,7 @@ class BaseMapper
 	 * @param string $locale
 	 */
 	public function locale2id($locale) {
-	    $iso2 = Language::map($locale);
-	    
+	    $iso2 = Language::map($locale);	    
 	    $dbResult = $this->db->query('SELECT languages_id FROM languages WHERE code="'.$iso2.'"');
 
 	    return $dbResult[0]['languages_id'];

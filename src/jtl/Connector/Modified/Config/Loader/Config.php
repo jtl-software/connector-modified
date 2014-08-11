@@ -2,7 +2,6 @@
 namespace jtl\Connector\Modified\Config\Loader;
 
 use \jtl\Core\Config\Loader\Base as BaseLoader;
-use \jtl\Core\Config\Base as BaseConfig;
 use \jtl\Core\Filesystem\Tool;
 use \jtl\Core\Exception\ConfigException;
 
