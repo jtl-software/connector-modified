@@ -81,24 +81,39 @@ class BaseMapper
      * @throws \Exception
      * @return multitype:NULL
      */
-	public function generateDbObj($data,$parentDbObj=null) {
+	public function generateDbObj($data,$parentDbObj,$parentObj=null) {
 	    $return = [];
 	    if(!is_array($data)) $data = array($data);
 	    
 	    foreach($data as $obj) {
 	        $subMapper = [];
 	        
-    	    $model = new $this->model();	    
+    	    $model = new $this->model();	
+    	        
     	    if(!$this->type) $this->type = $model->getModelType();
     	    
     	    $dbObj = new \stdClass();
     
     		foreach($this->mapperConfig['mapPush'] as $endpoint => $host) {
     		    if(is_null($host) && method_exists(get_class($this),$endpoint)) {
-    		        $dbObj->$endpoint = $this->$endpoint($obj);
+    		        $dbObj->$endpoint = $this->$endpoint($obj,$model,$parentObj);
     		    }
     		    elseif($this->type->getProperty($host)->isNavigation()) {
-    		        $subMapper[$endpoint] = $host;    		       
+    		        list($preEndpoint,$preNavSetMethod,$preAddToParent) = explode('|',$endpoint);
+    		        
+    		        if($preAddToParent) {
+    		            $preSubMapperClass = "\\jtl\\Connector\\Modified\\Mapper\\".$preEndpoint;
+    		            
+    		            if(!class_exists($preSubMapperClass)) throw new \Exception("There is no mapper for ".$host);
+    		            else {
+    		                $preSubMapper = new $preSubMapperClass();
+    		            
+    		                $values = $preSubMapper->push($obj,$dbObj);
+    		            
+    		                foreach($values as $setObj) $model->$preNavSetMethod($setObj);
+    		            }
+    		        }
+    		        else $subMapper[$endpoint] = $host;    		       
     		    }
     		    else {
     		        $value = null;
@@ -115,25 +130,49 @@ class BaseMapper
         		        }
         		        else {
         		            $type = $this->type->getProperty($host)->getType();
-        		            if($type == "bool") settype($value,"integer");
+        		            if($type == "DateTime") $value = $value->format('Y-m-d H:i:s');
+        		            elseif($type == "bool") settype($value,"integer");
         		        }		       
         		    }
         		    else throw new \Exception("There is no property or method to map ".$endpoint);
         		            		    
-        		    $dbObj->$endpoint = $value;
+        		    if(!empty($value)) $dbObj->$endpoint = $value;        		    
     		    }	    		    
     		}
     
-    		if(isset($parentDbObj)) $dbObj = (object) array_merge((array) $parentDbObj, (array) $dbObj);
-		
-		    // insert/update db
-    		//echo "SQL OBJ: ";
-		    //var_dump($dbObj);
-		    //$obj-> set pk
-            
-		    // sub mapper
+    		switch($obj->getAction()) {
+    		    case 'complete':
+    		    break;
+    		
+    		    case 'insert':
+    		        $insertResult = $this->db->insertRow($dbObj,$this->mapperConfig['table']);
+    		        
+    		        if(isset($this->mapperConfig['identity'])) {
+    		            $obj->{$this->mapperConfig['identity']}()->setEndpoint($insertResult->getKey());
+    		        }
+    		    break;
+    		
+    		    case 'update':
+    		        $whereKey = $this->mapperConfig['where'];
+    		        $whereValue = $dbObj->{$this->mapperConfig['where']};
+    		
+    		        if(is_array($whereKey)) {
+    		            $whereValue = [];
+    		            foreach($whereKey as $key) {
+    		                $whereValue[] = $dbObj->{$key};
+    		            }
+    		        }
+    		        
+    		        $this->db->updateRow($dbObj,$this->mapperConfig['table'],$whereKey,$whereValue);
+    		    break;
+    		
+    		    case 'delete':
+    		    break;
+    		}
+    		
+    		// sub mapper
 		    foreach($subMapper as $endpoint => $host) {
-		        list($endpoint,$navSetMethod,$addToParent) = explode('|',$endpoint);
+		        list($endpoint,$navSetMethod) = explode('|',$endpoint);
 		        
 		        $subMapperClass = "\\jtl\\Connector\\Modified\\Mapper\\".$endpoint;
 		        
@@ -141,7 +180,7 @@ class BaseMapper
 		        else {
 		            $subMapper = new $subMapperClass();
 		        
-		            $values = $subMapper->push($obj,$addToParent ? $dbObj : null);
+		            $values = $subMapper->push($obj);
 		        
 		            foreach($values as $setObj) $model->$navSetMethod($setObj);
 		        }
@@ -186,13 +225,14 @@ class BaseMapper
 	 * @param string $dbObj
 	 * @return multitype:NULL
 	 */
-	public function push($data,$dbObj = null) {
+	public function push($data,$dbObj=null) {
 	    if(isset($this->mapperConfig['getMethod'])) {
 	        $subGetMethod = $this->mapperConfig['getMethod'];
+	        $parent = $data;
 	        $data = $data->$subGetMethod();	       
 	    }
 	    
-	    $return = $this->generateDbObj($data,$dbObj);
+	    $return = $this->generateDbObj($data,$dbObj,$parent);
 	    
 	    return $return;
 	}
@@ -219,7 +259,7 @@ class BaseMapper
 	
 	/**
 	 * Replace 0 value with empty string
-	 * @param  $data
+	 * @param $data
 	 * @return Ambigous <string, unknown>
 	 */
 	public function replaceZero($data) {
@@ -244,5 +284,14 @@ class BaseMapper
 	    if(is_null($this->sqlite)) $this->sqlite = new \PDO('sqlite:'.realpath(__DIR__.'/../../Modified/').'/connector.sdb');
 	    
 	    return $this->sqlite;
+	}
+	
+	/**
+	 * Create a new identity
+	 * @param int $id
+	 * @return \jtl\Connector\Model\Identity
+	 */
+	public function identity($id) {
+	    return new Identity($id);
 	}
 }

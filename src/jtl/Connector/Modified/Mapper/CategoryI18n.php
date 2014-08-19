@@ -6,6 +6,7 @@ class CategoryI18n extends \jtl\Connector\Modified\Mapper\BaseMapper
     protected $mapperConfig = array(
         "table" => "categories_description",
         "getMethod" => "getI18ns",
+        "where" => array("categories_id","language_id"),
         "query" => "SELECT categories_description.*,languages.code 
             FROM categories_description 
             LEFT JOIN languages ON languages.languages_id=categories_description.language_id 
@@ -18,7 +19,7 @@ class CategoryI18n extends \jtl\Connector\Modified\Mapper\BaseMapper
     	),
         "mapPush" => array(
             "language_id" => null,
-            "categories_id" => "categoryId",
+            "categories_id" => null, // must come from new insert pk
             "categories_name" => "name",
             "categories_description" => "description"
         )
@@ -30,5 +31,10 @@ class CategoryI18n extends \jtl\Connector\Modified\Mapper\BaseMapper
     
     protected function language_id($data) {
         return $this->locale2id($data->getLocaleName());
+    }
+    
+    protected function categories_id($data,$return,$parent) {
+        $return->setCategoryId($this->identity($parent->getId()->getEndpoint()));
+        return $parent->getId()->getEndpoint();        
     }
 }

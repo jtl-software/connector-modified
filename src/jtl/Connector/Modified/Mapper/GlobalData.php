@@ -12,7 +12,7 @@ class GlobalData extends \jtl\Connector\Modified\Mapper\BaseMapper
             "taxRates" => "TaxRate|addTaxRate",
             "currencies" => "Currency|addCurrency",
             "units" => "Unit|addUnit"
-        )  
+        )   
     );
     
     public function pull() {

@@ -27,18 +27,25 @@ class CategoryInvisibility extends \jtl\Connector\Modified\Mapper\BaseMapper
     public function push($data,$dbObj) {
         $return = [];
         
-        if($this->shopConfig['GROUP_CHECK'] == 1) {
-            foreach($data->getInvisibilities() as $invisibility) {
-                $categoryInvisibility = new CategoryInvisibilityModel();
-                $categoryInvisibility->setCustomerGroupId($invisibility->getCustomerGroupId());
-                $categoryInvisibility->setCategoryId($data->getId());
+        $inactiveGroups = [];
+        
+        foreach($data->getInvisibilities() as $invisibility) {
+            $categoryInvisibility = new CategoryInvisibilityModel();
+            $categoryInvisibility->setCustomerGroupId($invisibility->getCustomerGroupId());
+            $categoryInvisibility->setCategoryId($data->getId());
 
-                $return[] = $categoryInvisibility;
+            $return[] = $categoryInvisibility;
+            
+            $inactiveGroups[] = $invisibility->getCustomerGroupId()->getEndpoint();
+        }            
+        
+        $groups = $this->db->query('SELECT customers_status_id FROM customers_status GROUP BY customers_status_id');
                 
-                $id = $invisibility->getCustomerGroupId()->getEndpoint();
-                $property = "group_permission_".$id;
-                $dbObj->$property = 0;
-            }
+        foreach($groups as $group) {
+            $groupId = $group['customers_status_id'];
+            $property = "group_permission_".$groupId;
+            
+            $dbObj->$property = in_array($groupId,$inactiveGroups) ? 0 : 1;             
         }
         
         return $return;

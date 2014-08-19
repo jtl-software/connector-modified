@@ -75,7 +75,7 @@ class BaseController extends Controller
     
     public function delete($params) 
     {
-        
+        // not used anymore   
     }
     
     public function statistic($params) {
