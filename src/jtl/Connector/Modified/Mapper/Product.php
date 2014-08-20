@@ -7,6 +7,8 @@ class Product extends BaseMapper
 {
     protected $mapperConfig = array(
         "table" => "products",
+        "where" => "products_id",
+        "identity" => "getId",
         "mapPull" => array(
         	"id" => "products_id",
 			"ean" => "products_ean",
@@ -28,23 +30,26 @@ class Product extends BaseMapper
             "i18ns" => "ProductI18n|addI18n",
             "categories" => "Product2Category|addCategory",
             "prices" => "ProductPrice|addPrice",
-            "specialPrices" => "ProductSpecialPrice|addSpecialPrice"	
+            "specialPrices" => "ProductSpecialPrice|addSpecialPrice",
+            "variations" => "ProductVariation|addVariation"	
         ),
         "mapPush" => array(
-            "products_id" => "_id",
-            "products_ean" => "_ean",
-            "products_quantity" => "_stockLevel",
-            "products_model" => "_sku",
-            "products_sort" => "_sort",
-            "products_date_added" => null,
-            "products_date_available" => null,
-            "products_weight" => "_productWeight",
-            "manufacturers_id" => "_manufacturerId",
-            "products_manufacturers_model" => "_manufacturerNumber",
-            "products_vpe" => "_basePriceUnitId",
-            "products_vpe_value" => "_basePriceDivisor",
-            "products_startpage" => "_isTopProduct",
-            "products_tax_class_id" => null       
+            "products_id" => "id",
+            "products_ean" => "ean",
+            "products_quantity" => "stockLevel",
+            "products_model" => "sku",
+            "products_sort" => "sort",
+            "products_date_added" => "created",
+            "products_date_available" => "availableFrom",
+            "products_weight" => "productWeight",
+            "manufacturers_id" => "manufacturerId",
+            "products_manufacturers_model" => "manufacturerNumber",
+            "products_vpe" => "basePriceUnitId",
+            "products_vpe_value" => "basePriceDivisor",
+            "products_startpage" => "isTopProduct",
+            "products_tax_class_id" => null,
+            "ProductI18n|addI18n" => "i18ns",
+            "Product2Category|addCategory" => "categories"
         )
     );
     
@@ -74,10 +79,17 @@ class Product extends BaseMapper
     
     protected function vat($data) {
         $sqliteResult = $this->getSqlite()->query('SELECT value FROM options WHERE key="tax_rate"');
-        
         $taxId = $sqliteResult->fetchColumn();
                 
         $sql = $this->db->query('SELECT tax_rate FROM tax_rates WHERE tax_rates_id='.$taxId);
         return floatval($sql[0]['tax_rate']);
-    }    
+    }  
+
+    protected function products_tax_class_id($data) {
+        $sqliteResult = $this->getSqlite()->query('SELECT value FROM options WHERE key="tax_rate"');
+        $taxId = $sqliteResult->fetchColumn();
+    
+        $sql = $this->db->query('SELECT tax_class_id FROM tax_rates WHERE tax_rates_id='.$taxId);
+        return $sql[0]['tax_class_id'];
+    }
 }

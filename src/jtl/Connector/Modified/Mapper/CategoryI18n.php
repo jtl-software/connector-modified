@@ -19,7 +19,7 @@ class CategoryI18n extends \jtl\Connector\Modified\Mapper\BaseMapper
     	),
         "mapPush" => array(
             "language_id" => null,
-            "categories_id" => null, // must come from new insert pk
+            "categories_id" => null,
             "categories_name" => "name",
             "categories_description" => "description"
         )

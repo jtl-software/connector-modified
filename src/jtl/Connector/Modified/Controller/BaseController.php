@@ -4,7 +4,6 @@ namespace jtl\Connector\Modified\Controller;
 use \jtl\Core\Controller\Controller;
 use \jtl\Core\Database\Mysql;
 use \jtl\Connector\Result\Action;
-use \jtl\Core\Model\QueryFilter;
 use \jtl\Core\Rpc\Error;
 use \jtl\Core\Utilities\ClassName;
 use \jtl\Connector\Model\Statistic;
@@ -20,10 +19,7 @@ class BaseController extends Controller
     public function pull($params) {        
         $action = new Action();
         $action->setHandled(true);
-        
-        $filter = new QueryFilter();
-        $filter->set($params);
-
+       
         try {
             $reflect = new \ReflectionClass($this);
             $class = "\\jtl\\Connector\\Modified\\Mapper\\{$reflect->getShortName()}";
@@ -32,7 +28,7 @@ class BaseController extends Controller
             
             $mapper = new $class();
         
-            $result = $mapper->pull($params,$filter->getOffset(),$filter->getLimit());
+            $result = $mapper->pull(null,$params->getOffset(),$params->getLimit());
             	
             $action->setResult($result);
         }

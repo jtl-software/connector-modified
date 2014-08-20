@@ -99,9 +99,9 @@ class BaseMapper
     		        $dbObj->$endpoint = $this->$endpoint($obj,$model,$parentObj);
     		    }
     		    elseif($this->type->getProperty($host)->isNavigation()) {
-    		        list($preEndpoint,$preNavSetMethod,$preAddToParent) = explode('|',$endpoint);
+    		        list($preEndpoint,$preNavSetMethod,$preMapper) = explode('|',$endpoint);
     		        
-    		        if($preAddToParent) {
+    		        if($preMapper) {
     		            $preSubMapperClass = "\\jtl\\Connector\\Modified\\Mapper\\".$preEndpoint;
     		            
     		            if(!class_exists($preSubMapperClass)) throw new \Exception("There is no mapper for ".$host);
@@ -139,16 +139,18 @@ class BaseMapper
         		    if(!empty($value)) $dbObj->$endpoint = $value;        		    
     		    }	    		    
     		}
-    
+            
+    		var_dump($dbObj);
+    		    		
     		switch($obj->getAction()) {
     		    case 'complete':
     		    break;
     		
     		    case 'insert':
-    		        $insertResult = $this->db->insertRow($dbObj,$this->mapperConfig['table']);
+    		        //$insertResult = $this->db->insertRow($dbObj,$this->mapperConfig['table']);
     		        
     		        if(isset($this->mapperConfig['identity'])) {
-    		            $obj->{$this->mapperConfig['identity']}()->setEndpoint($insertResult->getKey());
+    		            //$obj->{$this->mapperConfig['identity']}()->setEndpoint($insertResult->getKey());    		            
     		        }
     		    break;
     		
@@ -163,7 +165,7 @@ class BaseMapper
     		            }
     		        }
     		        
-    		        $this->db->updateRow($dbObj,$this->mapperConfig['table'],$whereKey,$whereValue);
+    		        //$this->db->updateRow($dbObj,$this->mapperConfig['table'],$whereKey,$whereValue);
     		    break;
     		
     		    case 'delete':
@@ -258,6 +260,17 @@ class BaseMapper
 	}
 	
 	/**
+	 * get full locale by modified language id
+	 * @param unknown $id
+	 * @return \jtl\Connector\Modified\Mapper\Ambigous
+	 */
+	public function id2locale($id) {
+	    $dbResult = $this->db->query('SELECT code FROM languages WHERE languages_id="'.$id.'"');
+	    
+	    return $this->fullLocale($dbResult[0]['code']);
+	}
+	
+	/**
 	 * Replace 0 value with empty string
 	 * @param $data
 	 * @return Ambigous <string, unknown>
@@ -284,6 +297,14 @@ class BaseMapper
 	    if(is_null($this->sqlite)) $this->sqlite = new \PDO('sqlite:'.realpath(__DIR__.'/../../Modified/').'/connector.sdb');
 	    
 	    return $this->sqlite;
+	}
+	
+	/**
+	 * Get modified customer groups
+	 * @return Ambigous <NULL, number, boolean, multitype:multitype: , multitype:unknown >
+	 */
+	public function getCustomerGroups() {
+	    return $this->db->query("SELECT customers_status_id FROM customers_status GROUP BY customers_status_id ORDER BY customers_status_id");
 	}
 	
 	/**

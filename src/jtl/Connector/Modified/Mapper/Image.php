@@ -8,9 +8,9 @@ class Image extends BaseMapper
     protected $mapperConfig = array(
         "table" => "products_images",
         "mapPull" => array(
-        	//"id" => "image_id",
+        	"id" => "image_id",
         	"relationType" => null,
-        	//"foreignKey" => "products_id",
+        	"foreignKey" => "products_id",
         	"filename" => null,
         	"sort" => "image_nr"        		
         )

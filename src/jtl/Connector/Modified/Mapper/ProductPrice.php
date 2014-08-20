@@ -46,10 +46,6 @@ class ProductPrice extends BaseMapper
         }
         
         return $return;
-    }
-    
-	private function getCustomerGroups() {
-	    return $this->db->query("SELECT customers_status_id FROM customers_status GROUP BY customers_status_id ORDER BY customers_status_id");	    
-	}
+    }    
 }
 ?>

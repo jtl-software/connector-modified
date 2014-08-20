@@ -34,5 +34,11 @@ class ManufacturerI18n extends BaseMapper
         }      
         
         return $return;
+    } 
+
+    public function push($data,$dbObj) {
+        foreach($data->getI18ns() as $language) {
+            $dbObj->manufacturers_name = $language->getDescription();
+        }            
     }
 }

@@ -7,6 +7,8 @@ class Product2Category extends BaseMapper
 {
     protected $mapperConfig = array(
         "table" => "products_to_categories",
+        "getMethod" => "getCategories",
+        "where" => array("categories_id","products_id"),
         "query" => 'SELECT *,CONCAT(products_id,"_",categories_id) AS id FROM products_to_categories WHERE products_id=[[products_id]]',
         "mapPull" => array(
         	"id" => "id",
@@ -14,8 +16,8 @@ class Product2Category extends BaseMapper
         	"productId" => "products_id"
         ),
         "mapPush" => array(
-            "categories_id" => "_categoryId",
-            "products_id" => "_productId" 
+            "categories_id" => "categoryId",
+            "products_id" => "productId" 
         )
     );    
 }

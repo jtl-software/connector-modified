@@ -9,6 +9,7 @@ class CustomerOrder extends BaseMapper
         "table" => "orders",
         "mapPull" => array(
         	"id" => "orders_id",
+            "orderNumber" => "orders_id",
         	"customerId" => "customers_id",
         	"created" => "date_purchased",
         	"status" => null,
@@ -21,17 +22,17 @@ class CustomerOrder extends BaseMapper
             "items" => "CustomerOrderItem|addItem"
         ),
         "mapPush" => array(
-            "orders_id" => "_id",
-            "customers_id" => "_customerId",
-            "date_purchased" => "_created",
-            "comments" => "_note",
-            "orders_status" => "_status",
-            "customers_ip" => "_ip",
-            "shipping_class" => "_shippingMethodCode",
-            "shipping_method" => "_shippingMethodName",
-            "payment_method" => null,
-            "orders_status" => null,
-            "currency" => "_currencyIso"            
+            "orders_id" => "id",
+            "customers_id" => "customerId",
+            "date_purchased" => "created",
+            "comments" => "note",
+            "orders_status" => "status",
+            "customers_ip" => "ip",
+            "shipping_class" => "shippingMethodCode",
+            "shipping_method" => "shippingMethodName",
+            //"payment_method" => null,
+            //"orders_status" => null,
+            "currency" => "currencyIso"            
         )
     );
 
