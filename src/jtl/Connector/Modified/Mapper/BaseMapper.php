@@ -140,10 +140,25 @@ class BaseMapper
     		    }	    		    
     		}
             
-    		var_dump($dbObj);
-    		    		
     		switch($obj->getAction()) {
     		    case 'complete':
+    		        if(isset($this->mapperConfig['where'])) {
+    		            $whereKey = $this->mapperConfig['where'];
+    		            $whereValue = $dbObj->{$this->mapperConfig['where']};
+    		        
+    		            if(is_array($whereKey)) {
+    		                $whereValue = [];
+    		                foreach($whereKey as $key) {
+    		                    $whereValue[] = $dbObj->{$key};
+    		                }
+    		            }
+    		        
+    		            //$insertResult = $this->db->deleteInsertRow($dbObj,$this->mapperConfig['table'],$whereKey,$whereValue);
+    		            
+    		            if(isset($this->mapperConfig['identity'])) {
+    		                //$obj->{$this->mapperConfig['identity']}()->setEndpoint($insertResult->getKey());
+    		            }
+    		        }
     		    break;
     		
     		    case 'insert':
@@ -155,22 +170,26 @@ class BaseMapper
     		    break;
     		
     		    case 'update':
-    		        $whereKey = $this->mapperConfig['where'];
-    		        $whereValue = $dbObj->{$this->mapperConfig['where']};
-    		
-    		        if(is_array($whereKey)) {
-    		            $whereValue = [];
-    		            foreach($whereKey as $key) {
-    		                $whereValue[] = $dbObj->{$key};
-    		            }
+    		        if(isset($this->mapperConfig['where'])) {
+        		        $whereKey = $this->mapperConfig['where'];
+        		        $whereValue = $dbObj->{$this->mapperConfig['where']};
+        		
+        		        if(is_array($whereKey)) {
+        		            $whereValue = [];
+        		            foreach($whereKey as $key) {
+        		                $whereValue[] = $dbObj->{$key};
+        		            }
+        		        }
+        		        
+        		        //$this->db->updateRow($dbObj,$this->mapperConfig['table'],$whereKey,$whereValue);
     		        }
-    		        
-    		        //$this->db->updateRow($dbObj,$this->mapperConfig['table'],$whereKey,$whereValue);
     		    break;
     		
     		    case 'delete':
     		    break;
     		}
+    		
+    		if($obj->getAction()) var_dump($dbObj);
     		
     		// sub mapper
 		    foreach($subMapper as $endpoint => $host) {
@@ -201,11 +220,11 @@ class BaseMapper
 	 * @param integer $limit
 	 * @return array
 	 */  
-	public function pull($data=null,$offset=0,$limit) {        
+	public function pull($parentData=null,$offset=0,$limit) {        
         $limitQuery = isset($limit) ? ' LIMIT '.$offset.','.$limit : '';
         
 	    if(isset($this->mapperConfig['query'])) {
-	        $query = !is_null($data) ? preg_replace('/\[\[(\w+)\]\]/e','$data[$1]', $this->mapperConfig['query']) : $this->mapperConfig['query'];
+	        $query = !is_null($parentData) ? preg_replace('/\[\[(\w+)\]\]/e','$parentData[$1]', $this->mapperConfig['query']) : $this->mapperConfig['query'];
 	        $query .= $limitQuery;	        
 	    }
 	    else $query = 'SELECT * FROM '.$this->mapperConfig['table'].$limitQuery;

@@ -16,7 +16,7 @@ class Product extends BaseMapper
 			"sku" => "products_model",
             "sort" => "products_sort",
 			"created" => "products_date_added",
-			"availableFrom" => null,
+			"availableFrom" => "products_date_available",
 			"productWeight" => "products_weight",
 			"manufacturerId" => null,
 			"manufacturerNumber" => "products_manufacturers_model",
@@ -34,6 +34,7 @@ class Product extends BaseMapper
             "variations" => "ProductVariation|addVariation"	
         ),
         "mapPush" => array(
+            /*
             "products_id" => "id",
             "products_ean" => "ean",
             "products_quantity" => "stockLevel",
@@ -48,8 +49,12 @@ class Product extends BaseMapper
             "products_vpe_value" => "basePriceDivisor",
             "products_startpage" => "isTopProduct",
             "products_tax_class_id" => null,
-            "ProductI18n|addI18n" => "i18ns",
-            "Product2Category|addCategory" => "categories"
+            */
+            //"ProductI18n|addI18n" => "i18ns",
+            //"Product2Category|addCategory" => "categories",
+            //"ProductPrice|addPrice" => "prices",
+            //"ProductSpecialPrice|addSpecialPrice" => "specialPrices",
+            "ProductVariation|addVariation" => "variations"
         )
     );
     
@@ -60,11 +65,11 @@ class Product extends BaseMapper
     protected function basePriceUnitId($data) {
         return $this->replaceZero($data['products_vpe']);
     }
-    
+    /*
     protected function availableFrom($data) {
         return !is_null($data['products_date_available']) ? $data['products_date_available'] : null;
     }
-    
+    */
     protected function considerStock($data)  {
         return $this->shopConfig['STOCK_CHECK'];
     }

@@ -6,16 +6,12 @@ use \jtl\Connector\Modified\Mapper\BaseMapper;
 class ProductPrice extends BaseMapper
 {
     protected $mapperConfig = array(
+        "getMethod" => "getPrices",
         "mapPull" => array(
         	"customerGroupId" => "groupId",
         	"productId" => "products_id",
         	"netPrice" => "personal_offer",
         	"quantity" => "quantity"
-        ),
-        "mapPush" => array(
-            "products_id" => "_productId",
-            "personal_offer" =>"_netPrice",
-            "quantity" => "_quantity"
         )
     );
 	
@@ -46,6 +42,32 @@ class ProductPrice extends BaseMapper
         }
         
         return $return;
-    }    
+    }  
+
+    public function push($data) {
+        $productId = $data->getId()->getEndpoint();
+        
+        if(!empty($productId)) {
+            foreach($this->getCustomerGroups() as $group) {
+                $this->db->query('DELETE FROM personal_offers_by_customers_status_'.$group['customers_status_id'].' WHERE products_id='.$productId);
+            }
+        }
+        
+        foreach($data->getPrices() as $price) {
+            $obj = new \stdClass();
+            
+            if($price->getQuantity() == 1 && $price->getCustomerGroupId()->getEndpoint() == $this->shopConfig['DEFAULT_CUSTOMERS_STATUS_ID']) {
+                $obj->products_price = $price->getNetprice();
+                $this->db->updateRow($obj,'products','products_id',$productId);                
+            }
+            else {
+                $obj->products_id = $productId;
+                $obj->personal_offer = $price->getNetprice();
+                $obj->quantity = $price->getQuantity();
+                
+                $this->db->insertRow($obj,'personal_offers_by_customers_status_'.$price->getCustomerGroupId()->getEndpoint());
+            }
+        }
+    }
 }
 ?>

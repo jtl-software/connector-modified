@@ -8,10 +8,12 @@ class ProductSpecialPrice extends BaseMapper
     protected $mapperConfig = array(
         "table" => "specials",
         "query" => "SELECT * FROM specials WHERE products_id=[[products_id]]",
+        "getMethod" => "getSpecialPrices",
+        "where" => "specials_id",
         "mapPull" => array(
         	"id" => "specials_id",
             "productId" => "products_id",		
-            "isActive" => null,
+            "isActive" => "status",
             "activeUntil" => "expires_date",	
             "stockLimit" => "specials_quantity",
             "considerStockLimit" => null,	
@@ -19,17 +21,14 @@ class ProductSpecialPrice extends BaseMapper
             "specialPrices" => "SpecialPrice|addSpecialPrice"
         ),
         "mapPush" => array(
-            "specials_id" => "_id",
-            "products_id" => "_productId",
-            "status" => null,
-            "expires_date" => null,
-            "specials_quantity" => "_stockLimit"
+            "specials_id" => "id",
+            "products_id" => "productId",
+            "status" => "isActive",
+            "expires_date" => "activeUntil",
+            "specials_quantity" => "stockLimit",
+            "SpecialPrice|addSpecialPrice|true" => "specialPrices"
         )
     );
-    
-    protected function isActive($data) {
-        return (bool) $data['status'];
-    }
     
     protected function considerStockLimit($data) {
         return ($data['specials_quantity'] == 0) ? false : true;

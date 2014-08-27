@@ -12,9 +12,14 @@ class SpecialPrice extends BaseMapper
             "priceNet" => "specials_new_products_price"
         )
     );
-   
+    
     public function pull($data) {
        return array($this->generateModel($data));
+    }
+    
+    public function push($parent,$dbObj) {
+        $prices = $parent->getSpecialPrices();
+        $dbObj->specials_new_products_price = $prices[0]->getPriceNet();
     }
     
     protected function customerGroupId($data) {
