@@ -36,5 +36,13 @@ class ProductSpecialPrice extends BaseMapper
     
     protected function considerDateLimit($data) {
         return ($data['expires_date'] == '0000-00-00 00:00:00') ? false : true;
-    }    
+    } 
+
+    public function push($parent,$dbObj) {
+        foreach($parent->getSpecialPrices() as $special) {
+            $special->setProductId($parent->getId());
+        }
+    
+        return parent::push($parent,$dbObj);
+    }
 }

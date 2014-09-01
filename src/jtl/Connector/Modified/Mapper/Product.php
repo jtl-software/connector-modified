@@ -31,10 +31,10 @@ class Product extends BaseMapper
             "categories" => "Product2Category|addCategory",
             "prices" => "ProductPrice|addPrice",
             "specialPrices" => "ProductSpecialPrice|addSpecialPrice",
-            "variations" => "ProductVariation|addVariation"	
+            "variations" => "ProductVariation|addVariation",
+            "invisibilities" => "ProductInvisibility|addInvisibility"
         ),
         "mapPush" => array(
-            /*
             "products_id" => "id",
             "products_ean" => "ean",
             "products_quantity" => "stockLevel",
@@ -49,12 +49,12 @@ class Product extends BaseMapper
             "products_vpe_value" => "basePriceDivisor",
             "products_startpage" => "isTopProduct",
             "products_tax_class_id" => null,
-            */
-            //"ProductI18n|addI18n" => "i18ns",
-            //"Product2Category|addCategory" => "categories",
-            //"ProductPrice|addPrice" => "prices",
-            //"ProductSpecialPrice|addSpecialPrice" => "specialPrices",
-            "ProductVariation|addVariation" => "variations"
+            "ProductI18n|addI18n" => "i18ns",
+            "Product2Category|addCategory" => "categories",
+            "ProductPrice|addPrice" => "prices",
+            "ProductSpecialPrice|addSpecialPrice" => "specialPrices",
+            "ProductVariation|addVariation" => "variations",
+            "ProductInvisibility|addInvisibility|true" => "invisibilities"
         )
     );
     

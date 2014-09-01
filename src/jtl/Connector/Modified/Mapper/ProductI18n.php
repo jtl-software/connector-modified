@@ -17,7 +17,7 @@ class ProductI18n extends BaseMapper
         	"localeName" => null,
             "productId" => "products_id",
             "name" => "products_name",
-            "urlPath" => "products_url",
+            //"urlPath" => "products_url",
             "description" => "products_description",
             "metaDescription" => "products_meta_description",
             "metaKeywords" => "products_meta_keywords",
@@ -45,5 +45,13 @@ class ProductI18n extends BaseMapper
     
     protected function language_id($data) {
         return $this->locale2id($data->getLocaleName());
+    }
+    
+    public function push($parent,$dbObj) {
+        foreach($parent->getI18ns() as $i18n) {
+            $i18n->setProductId($parent->getId());
+        }
+        
+        return parent::push($parent,$dbObj);
     }
 }

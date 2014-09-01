@@ -56,7 +56,8 @@ class BaseMapper
 		    else {
 		        if(isset($data[$endpoint])) $value = $data[$endpoint];
 		        elseif(method_exists(get_class($this),$host)) $value = $this->$host($data);
-		        else throw new \Exception("There is no property or method to map ".$host);
+		        //else throw new \Exception($this->model.": There is no property or method to map ".$host);
+		        else $value = '';
 
 		        if($this->type->getProperty($host)->isIdentity()) $value = new Identity($value);
 		        else {
@@ -139,7 +140,7 @@ class BaseMapper
         		    if(!empty($value)) $dbObj->$endpoint = $value;        		    
     		    }	    		    
     		}
-            
+            /*
     		switch($obj->getAction()) {
     		    case 'complete':
     		        if(isset($this->mapperConfig['where'])) {
@@ -153,19 +154,19 @@ class BaseMapper
     		                }
     		            }
     		        
-    		            //$insertResult = $this->db->deleteInsertRow($dbObj,$this->mapperConfig['table'],$whereKey,$whereValue);
+    		            $insertResult = $this->db->deleteInsertRow($dbObj,$this->mapperConfig['table'],$whereKey,$whereValue);
     		            
     		            if(isset($this->mapperConfig['identity'])) {
-    		                //$obj->{$this->mapperConfig['identity']}()->setEndpoint($insertResult->getKey());
+    		                $obj->{$this->mapperConfig['identity']}()->setEndpoint($insertResult->getKey());
     		            }
     		        }
     		    break;
     		
     		    case 'insert':
-    		        //$insertResult = $this->db->insertRow($dbObj,$this->mapperConfig['table']);
+    		        $insertResult = $this->db->insertRow($dbObj,$this->mapperConfig['table']);
     		        
     		        if(isset($this->mapperConfig['identity'])) {
-    		            //$obj->{$this->mapperConfig['identity']}()->setEndpoint($insertResult->getKey());    		            
+    		            $obj->{$this->mapperConfig['identity']}()->setEndpoint($insertResult->getKey());    		            
     		        }
     		    break;
     		
@@ -181,14 +182,14 @@ class BaseMapper
         		            }
         		        }
         		        
-        		        //$this->db->updateRow($dbObj,$this->mapperConfig['table'],$whereKey,$whereValue);
+        		        $this->db->updateRow($dbObj,$this->mapperConfig['table'],$whereKey,$whereValue);
     		        }
     		    break;
     		
     		    case 'delete':
     		    break;
     		}
-    		
+    		*/
     		if($obj->getAction()) var_dump($dbObj);
     		
     		// sub mapper

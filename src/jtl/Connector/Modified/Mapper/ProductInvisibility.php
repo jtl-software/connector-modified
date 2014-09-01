@@ -1,10 +1,10 @@
 <?php
 namespace jtl\Connector\Modified\Mapper;
 
-use \jtl\Connector\Model\CategoryInvisibility as CategoryInvisibilityModel;
+use \jtl\Connector\Model\ProductInvisibility as ProductInvisibilityModel;
 use \jtl\Connector\Model\Identity;
 
-class CategoryInvisibility extends \jtl\Connector\Modified\Mapper\BaseMapper
+class ProductInvisibility extends \jtl\Connector\Modified\Mapper\BaseMapper
 {
     public function pull($data) {
         $return = [];
@@ -12,11 +12,11 @@ class CategoryInvisibility extends \jtl\Connector\Modified\Mapper\BaseMapper
         if($this->shopConfig['GROUP_CHECK'] == 1) {
             foreach($data as $key => $value) {
                 if(preg_match("/group_permission_([0-9]+)/",$key,$match) && $value == 0) {
-                    $categoryInvisibility = new CategoryInvisibilityModel();                 
-                    $categoryInvisibility->setCustomerGroupId(new Identity($match[1]));
-                    $categoryInvisibility->setCategoryId(new Identity($data['categories_id']));
+                    $productInvisibility = new ProductInvisibilityModel();                 
+                    $productInvisibility->setCustomerGroupId(new Identity($match[1]));
+                    $productInvisibility->setProductId(new Identity($data['products_id']));
                     
-                    $return[] = $categoryInvisibility;
+                    $return[] = $productInvisibility;
                 }            
             }
         }
