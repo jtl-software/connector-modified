@@ -6,16 +6,11 @@ use \jtl\Connector\Modified\Mapper\BaseMapper;
 class Unit extends BaseMapper
 {
     protected $mapperConfig = array(
-        "query" => "SELECT products_vpe.*,languages.code FROM products_vpe LEFT JOIN languages ON languages.languages_id=products_vpe.language_id",
+        "query" => "SELECT products_vpe_id FROM products_vpe GROUP BY products_vpe_id",
         "table" => "products_vpe",
         "mapPull" => array(
         	"id" => "products_vpe_id",
-        	//"localeName" => "code",
-        	//"name" => "products_vpe_name"
+            "i18ns" => "Unit18n|addI18n"        	
         )
-    );
-    
-    protected function localeName($data) {
-    	return $this->fullLocale($data['code']);
-    }
+    ); 
 }

@@ -10,8 +10,8 @@ class CustomerOrderItemVariation extends BaseMapper
         "mapPull" => array(
         	"id" => "orders_products_attributes_id",
             "customerOrderItemId" => "orders_products_id",
-            "productVariationId" => null,
-            "productVariationValueId" => null,	
+            "productVariationId" => "orders_products_options_id",
+            "productVariationValueId" => "orders_products_options_values_id",	
             "productVariationName" => "products_options",
             "productVariationValueName" => "products_options_values",	
             "surcharge" => null
@@ -30,13 +30,5 @@ class CustomerOrderItemVariation extends BaseMapper
     
     protected function surcharge($data) {
         return ($data['price_prefix'] == '+') ? $data['options_values_price'] : $data['options_values_price'] * -1;
-    }
-    
-    protected function productVariationId($data) {
-        return $data['products_id'].'-'.$data['orders_products_options_id'];
-    }
-    
-    protected function productVariationValueId($data) {
-        return $data['products_id'].'-'.$data['orders_products_options_id'].'-'.$data['orders_products_options_values_id'];
-    }         
+    }     
 }

@@ -12,7 +12,7 @@ class CustomerGroup extends BaseMapper
             "id" => "customers_status_id",
             "discount" => "customers_status_discount",
             "isDefault" => null,
-            "i18n" => "CustomerGroupI18n|addI18n"
+            "i18ns" => "CustomerGroupI18n|addI18n"
         )
     );   
 

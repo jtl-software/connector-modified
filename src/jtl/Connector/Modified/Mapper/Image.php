@@ -36,7 +36,7 @@ class Image extends BaseMapper
     		if(!isset($modelData['image_nr'])) $modelData['image_nr'] = 0;
     		
     		$model = $this->generateModel($modelData);
-    		
+    		    		
     		$result[] = $model;
     	}
 		
