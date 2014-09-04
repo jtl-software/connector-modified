@@ -12,7 +12,7 @@ class OrderStatus extends Module {
     public function __construct($db,$sqlite) {
         parent::__construct($db,$sqlite);
         
-        $customerOrderModel = new \ReflectionClass('\jtl\Connector\Model\CustomerOrderStatus');
+        $customerOrderModel = new \ReflectionClass('\jtl\Connector\Model\CustomerOrder');
         $this->jtlStats =  $customerOrderModel->getConstants();
         
         $this->modifiedStats = $this->db->query('SELECT * FROM orders_status WHERE (orders_status_id, language_id) IN (SELECT orders_status_id, MAX(language_id) FROM orders_status GROUP BY orders_status_id)');
@@ -27,6 +27,7 @@ class OrderStatus extends Module {
         }
         
         foreach($this->jtlStats as $key => $value) {
+            if(!in_array($value,array('insert','update','delete','complete')) && strpos($key,'PAYMENT_STATUS') === false) {
             $options = '';
             foreach($this->modifiedStats as $modifiedStat) {
                 $selected = ($modifiedStat['orders_status_id'] == $currentMapping[$value]) ? ' selected="selected"' : '';
@@ -39,6 +40,7 @@ class OrderStatus extends Module {
                         <select class="form-control" name="'.$value.'" id="'.$value.'">'.$options.'</select>
                     </div>
             </div>';
+            }
         }
  
         return $data['stats']; 

@@ -7,11 +7,13 @@ class CustomerOrder extends BaseMapper
 {
     protected $mapperConfig = array(
         "table" => "orders",
+        "where" => "orders_id",
         "mapPull" => array(
         	"id" => "orders_id",
             "orderNumber" => "orders_id",
         	"customerId" => "customers_id",
         	"created" => "date_purchased",
+            "note" => "comments",
         	"status" => null,
         	"paymentModuleCode" => null,
         	"currencyIso" => "currency",
@@ -22,17 +24,15 @@ class CustomerOrder extends BaseMapper
             "items" => "CustomerOrderItem|addItem"
         ),
         "mapPush" => array(
-            "orders_id" => "id",
+            "orders_id" => "id",                
             "customers_id" => "customerId",
             "date_purchased" => "created",
             "comments" => "note",
-            "orders_status" => "status",
-            "customers_ip" => "ip",
-            "shipping_class" => "shippingMethodCode",
-            "shipping_method" => "shippingMethodName",
-            //"payment_method" => null,
-            //"orders_status" => null,
-            "currency" => "currencyIso"            
+            "orders_status" => null,
+            "payment_method" => null,
+            "currency" => "currencyIso",
+            "CustomerOrderBillingAddress|addBillingAddress|true" => "billingAddress",
+            //"CustomerOrderShippingAddress|addShippingAddress" => "shippingAddress"
         )
     );
 
@@ -82,16 +82,15 @@ class CustomerOrder extends BaseMapper
         return $jtlStatus;
     }
     
-    /*
     protected function orders_status($data) {
-        $sqlite = new \PDO('sqlite:'.realpath(__DIR__.'/../../XTC/').'/xtc.sdb');
+        $sqlite = $this->getSqlite();
     
-        $xtcStatus = $sqlite->query('SELECT xtc FROM status WHERE jtl="'.$data->_status.'"');
-        $xtcStatus = $xtcStatus->fetchColumn();
+        $modifiedStatus = $sqlite->query('SELECT modified FROM status WHERE jtl="'.$data->getStatus().'"');
+        $modifiedStatus = $modifiedStatus->fetchColumn();
     
-        return $xtcStatus;
+        return $modifiedStatus;
     }
-    */
+    
     protected function shippingAddressId($data) {
     	return 'cID_'.$data['customers_id'];
     }
@@ -103,4 +102,10 @@ class CustomerOrder extends BaseMapper
     protected function paymentModuleCode($data) {
         return $this->paymentMapping[$data['payment_method']];
     }     
+    
+    protected function payment_method($data) {
+        $payments = array_flip($this->paymentMapping);
+        
+        return $payments[$data->getPaymentModuleCode()];
+    }
 }
