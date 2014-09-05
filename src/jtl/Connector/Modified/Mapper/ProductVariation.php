@@ -10,6 +10,7 @@ class ProductVariation extends BaseMapper
         "query" => 'SELECT * FROM products_attributes WHERE products_id=[[products_id]] GROUP BY options_id',
         "where" => "options_id",
         "getMethod" => "getVariations",
+        "identity" => "getId",
         "mapPull" => array(
         	"id" => "options_id",
         	"productId" => "products_id",

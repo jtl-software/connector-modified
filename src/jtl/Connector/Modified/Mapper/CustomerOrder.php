@@ -2,12 +2,14 @@
 namespace jtl\Connector\Modified\Mapper;
 
 use \jtl\Connector\Modified\Mapper\BaseMapper;
+use jtl\Core\Utilities\Date as DateUtil;
 
 class CustomerOrder extends BaseMapper
 {
     protected $mapperConfig = array(
         "table" => "orders",
         "where" => "orders_id",
+        "identity" => "getId",
         "mapPull" => array(
         	"id" => "orders_id",
             "orderNumber" => "orders_id",
@@ -15,7 +17,7 @@ class CustomerOrder extends BaseMapper
         	"created" => "date_purchased",
             "note" => "comments",
         	"status" => null,
-        	"paymentModuleCode" => null,
+        	"paymentModuleCode" => null,            
         	"currencyIso" => "currency",
         	"shippingAddressId" => null,
         	"billingAddressId" => null,
@@ -30,12 +32,17 @@ class CustomerOrder extends BaseMapper
             "comments" => "note",
             "orders_status" => null,
             "payment_method" => null,
+            "payment_class" => null,
             "currency" => "currencyIso",
             "CustomerOrderBillingAddress|addBillingAddress|true" => "billingAddress",
-            //"CustomerOrderShippingAddress|addShippingAddress" => "shippingAddress"
+            "CustomerOrderShippingAddress|addShippingAddress|true" => "shippingAddress",
+            "customers_address_format_id" => null,
+            "billing_address_format_id" => null,
+            "delivery_address_format_id" => null,
+            "CustomerOrderItem|addItem" => "items"
         )
     );
-
+    
     private $paymentMapping = array(
         'cash' => 'pm_cash',
         'klarna_SpecCamp' => 'pm_klarna',
@@ -70,7 +77,7 @@ class CustomerOrder extends BaseMapper
     	
         $this->mapperConfig['query'] = 'SELECT * FROM orders '.$where;
         
-        return parent::pull(null,$params->offset,$params->limit);        
+        return parent::pull(null,$params->offset,$params->limit);
     }
     
     protected function status($data) {
@@ -107,5 +114,76 @@ class CustomerOrder extends BaseMapper
         $payments = array_flip($this->paymentMapping);
         
         return $payments[$data->getPaymentModuleCode()];
+    }
+    
+    protected function payment_class($data) {
+        $payments = array_flip($this->paymentMapping);
+    
+        return $payments[$data->getPaymentModuleCode()];
+    }
+    
+    protected function customers_address_format_id($data) {
+        return 5;
+    }
+    
+    protected function billing_address_format_id($data) {
+        return 5;
+    }
+    
+    protected function delivery_address_format_id($data) {
+        return 5;
+    }
+    
+    public function push($data,$dbObj) {
+        $return = parent::push($data,$dbObj);
+
+        $orderHistory = new \stdClass();
+        $orderHistory->orders_id = $data->getId()->getEndpoint();
+        $orderHistory->orders_status_id = $this->orders_status($data);
+        $orderHistory->date_added = date('Y-m-d H:i:s');
+            
+        $this->db->insertRow($orderHistory,'orders_status_history');
+        
+        return $return;
+    }
+    
+    public function complete($data) {
+        $orderId = $data->getId()->getEndpoint();
+        
+        $queries = array(
+            'DELETE FROM orders_total WHERE orders_id='.$orderId,
+            'DELETE FROM orders_status_history WHERE orders_id='.$orderId,
+            'DELETE FROM orders_products_attributes WHERE orders_id='.$orderId,
+            'DELETE FROM orders_products WHERE orders_id='.$orderId,
+            'DELETE FROM orders WHERE orders_id='.$orderId
+        );
+        
+        foreach($queries as $query) {
+            $this->db->query($query);
+        }        
+    }
+    
+    public function addData($model,$data) {
+        $shipping = new \jtl\Connector\Model\CustomerOrderItem();
+        $shipping->setType('shipping');
+        $shipping->setName($data['shipping_method']);
+        $shipping->setCustomerOrderId($this->identity($data['orders_id']));
+        $shipping->setId($this->identity('shipping'));
+        $shipping->setShippingClassId($this->identity($data['shipping_class']));
+        $shipping->setQuantity(1);
+        $shipping->setVat(0);
+        
+        $sum = 0;
+        
+        $totalData = $this->db->query('SELECT class,value FROM orders_total WHERE orders_id='.$data['orders_id']);
+        
+        foreach($totalData as $total) {
+            if($total['class'] == 'ot_shipping') $shipping->setPrice(floatval($total['value']));
+            if($total['class'] == 'ot_total') $sum += floatval($total['value']);
+            if($total['class'] == 'ot_tax') $sum -= floatval($total['value']);
+        }
+        
+        $model->setTotalSum($sum);        
+        $model->addItem($shipping);
     }
 }

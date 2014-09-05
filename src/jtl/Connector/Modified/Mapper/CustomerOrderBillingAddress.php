@@ -23,8 +23,18 @@ class CustomerOrderBillingAddress extends BaseMapper
             "eMail" => "customers_email_address"
 		),
         "mapPush" => array(
+            "customers_name" => null,
+            "customers_lastname" => "lastName",
+            "customers_firstname" => "firstName",
+            "customers_company" => "company",
+            "customers_street_address" => "street",
+            "customers_suburb" => "extraAddressLine",
+            "customers_postcode" => "zipCode",
+            "customers_city" => "city",
+            "customers_state" => "state",
+            "billing_name" => null,
             "billing_firstname" => "firstName",
-            "billing_lastname" => "lastName",
+            "billing_lastname" => "lastName",                
             "billing_company" => "company",
             "billing_street_address" => "street",
             "billing_suburb" => "extraAddressLine",
@@ -40,11 +50,19 @@ class CustomerOrderBillingAddress extends BaseMapper
        return array($this->generateModel($data));
     }
     
-    public function id($data) {
+    protected function id($data) {
     	return "cID_".$data['customers_id'];
     }
     
     public function push($parent,$dbObj) {
         $this->generateDbObj($parent->getBillingAddress(),$dbObj,null,true);
+    }
+    
+    protected function customers_name($data) {
+        return $data->getFirstName().' '.$data->getLastName();
+    }
+    
+    protected function billing_name($data) {
+        return $data->getFirstName().' '.$data->getLastName();
     }
 }

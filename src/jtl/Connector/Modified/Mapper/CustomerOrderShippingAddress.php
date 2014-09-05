@@ -7,31 +7,32 @@ class CustomerOrderShippingAddress extends BaseMapper
 {
     protected $mapperConfig = array(
         "table" => "customer_orders",
+        "getMethod" => "getShippingAddress",
         "mapPull" => array(
         	"id" => null,
 			"customerId" => "customers_id",
-			"firstName" => "billing_firstname",
-			"lastName" => "billing_lastname",
-			"company" => "billing_company",
-			"street" => "billing_street_address",
-			"extraAddressLine" => "billing_suburb",
-			"zipCode" => "billing_postcode",
-			"city" => "billing_city",
-			"state" => "billing_state",
-			"countryIso" => "billing_country_iso_code_2",
+			"firstName" => "delivery_firstname",
+			"lastName" => "delivery_lastname",
+			"company" => "delivery_company",
+			"street" => "delivery_street_address",
+			"extraAddressLine" => "delivery_suburb",
+			"zipCode" => "delivery_postcode",
+			"city" => "delivery_city",
+			"state" => "delivery_state",
+			"countryIso" => "delivery_country_iso_code_2",
             "eMail" => "customers_email_address"
 		),
         "mapPush" => array(
-            "billing_firstname" => "_firstName",
-            "billing_lastname" => "_lastName",
-            "billing_company" => "_company",
-            "billing_street_address" => "_street",
-            "billing_suburb" => "_extraAddressLine",
-            "billing_postcode" => "_zipCode",
-            "billing_city" => "_city",
-            "billing_state" => "_state",
-            "billing_country_iso_code_2" => "_countryIso",
-            "customers_email_address" => "_eMail"
+            "delivery_name" => null,
+            "delivery_firstname" => "firstName",
+            "delivery_lastname" => "lastName",
+            "delivery_company" => "company",
+            "delivery_street_address" => "street",
+            "delivery_suburb" => "extraAddressLine",
+            "delivery_postcode" => "zipCode",
+            "delivery_city" => "city",
+            "delivery_state" => "state",
+            "delivery_country_iso_code_2" => "countryIso"
         )
     );
     
@@ -39,7 +40,15 @@ class CustomerOrderShippingAddress extends BaseMapper
        return array($this->generateModel($data));
     }
     
-    public function id($data) {
+    protected function id($data) {
     	return "cID_".$data['customers_id'];
+    }
+    
+    public function push($parent,$dbObj) {
+        $this->generateDbObj($parent->getShippingAddress(),$dbObj,null,true);
+    }
+    
+    protected function delivery_name($data) {
+        return $data->getFirstName().' '.$data->getLastName();
     }
 }

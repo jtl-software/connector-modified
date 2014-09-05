@@ -72,6 +72,8 @@ class BaseMapper
 		    }
 		}
 		
+		if(method_exists(get_class($this),'addData')) $this->addData($model,$data);
+		
 		return $model->getPublic();
 	}
 	
@@ -142,8 +144,8 @@ class BaseMapper
     		}
             
     		if(!$addToParent) {
-                /*
-        		switch($obj->getAction()) {
+                
+    		    switch($obj->getAction()) {
         		    case 'complete':
         		        if(isset($this->mapperConfig['where'])) {
         		            $whereKey = $this->mapperConfig['where'];
@@ -189,10 +191,23 @@ class BaseMapper
         		    break;
         		
         		    case 'delete':
+        		        if(isset($this->mapperConfig['where'])) {
+        		            $whereKey = $this->mapperConfig['where'];
+        		            $whereValue = $dbObj->{$this->mapperConfig['where']};
+        		        
+        		            if(is_array($whereKey)) {
+        		                $whereValue = [];
+        		                foreach($whereKey as $key) {
+        		                    $whereValue[] = $dbObj->{$key};
+        		                }
+        		            }
+        		        
+        		            $this->db->deleteRow($dbObj,$this->mapperConfig['table'],$whereKey,$whereValue);
+        		        }        		   
         		    break;
         		}
-        		*/
-        		if($obj->getAction()) var_dump($dbObj);
+        		
+        		//if($obj->getAction()) var_dump($dbObj);
     		}
     		else {	
     		    foreach($dbObj as $key => $value) {
@@ -256,6 +271,8 @@ class BaseMapper
 	 * @return multitype:NULL
 	 */
 	public function push($data,$dbObj=null) {
+	    if($data->getAction() == 'complete' && method_exists(get_class($this),'complete')) $this->complete($data);	    
+	    
 	    if(isset($this->mapperConfig['getMethod'])) {
 	        $subGetMethod = $this->mapperConfig['getMethod'];
 	        $parent = $data;

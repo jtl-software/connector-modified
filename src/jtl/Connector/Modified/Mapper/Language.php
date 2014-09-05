@@ -7,6 +7,7 @@ class Language extends BaseMapper
 {
     protected $mapperConfig = array(
         "table" => "languages",
+        "identity" => "getId",
         "mapPull" => array(
         	"id" => "languages_id",
         	"nameEnglish" => "name",
