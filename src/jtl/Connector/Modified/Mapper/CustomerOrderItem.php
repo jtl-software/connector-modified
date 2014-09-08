@@ -42,26 +42,36 @@ class CustomerOrderItem extends BaseMapper
         $return = [];
         
         $shippingCosts = 0;
+        $sum = 0;
+        $taxes = 0;
         
         foreach($parent->getItems() as $itemData) {
-            if($itemData->getType() == "product") $return[] = $this->generateDbObj($itemData,$dbObj,$parent);
-            elseif($itemData->getType() == "shipping") $shippingCosts += $itemData->getPrice();
+            if($itemData->getType() == "product") {
+                $return[] = $this->generateDbObj($itemData,$dbObj,$parent);
+                $tax = ($itemData->getPrice() / 100) * $itemData->getVat();
+                $taxes += $tax;
+                $sum += $itemData->getPrice() + $tax;
+            }
+            elseif($itemData->getType() == "shipping") {
+                $shippingCosts += $itemData->getPrice();
+                $tax = ($itemData->getPrice() / 100) * $itemData->getVat();
+                $taxes += $tax;
+            }
         }
         
+        $totals = [];
+        
         $ot_shipping = new \stdClass();
-        $ot_shipping->title = '<b>Summe</b>:';
-        $ot_shipping->text = '<b> '.number_format($shippingCosts,2,',','.').' '.$parent->getCurrencyIso().'</b>';
+        $ot_shipping->title = $parent->getShippingMethodName().':';
+        $ot_shipping->text = number_format($shippingCosts,2,',','.').' '.$parent->getCurrencyIso();
         $ot_shipping->value = $shippingCosts;
         $ot_shipping->sort_order = 30;
         $ot_shipping->class = 'ot_shipping';
-        $ot_shipping->orders_id = $parent->getId()->getEndpoint();
-        
-        /*
-        $totals = [];
+        $totals[] = $ot_shipping;
         
         $ot_subtotal = new \stdClass();
         $ot_subtotal->title = 'Zwischensumme:';
-        $ot_subtotal->text = '<b> '.number_format($sum,2,',','.').' '.$order->_currencyIso.'</b>';
+        $ot_subtotal->text = number_format($sum,2,',','.').' '.$parent->getCurrencyIso();
         $ot_subtotal->value = $sum;
         $ot_subtotal->sort_order = 10;
         $ot_subtotal->class = 'ot_subtotal';
@@ -69,24 +79,24 @@ class CustomerOrderItem extends BaseMapper
         
         $ot_total = new \stdClass();
         $ot_total->title = '<b>Summe</b>:';
-        $ot_total->text = number_format($dd,2,',','.').' '.$order->_currencyIso;
-        $ot_total->value = $sum + $ot_shipping->value;
+        $ot_total->text = '<b> '.number_format($sum+$shippingCosts,2,',','.').' '.$parent->getCurrencyIso().'</b>';
+        $ot_total->value = $sum + $shippingCosts;
         $ot_total->sort_order = 99;
         $ot_total->class = 'ot_total';
         $totals[] = $ot_total;
         
         $ot_tax = new \stdClass();
-        $ot_tax->title = '<b>Steuer</b>:';
-        $ot_tax->text = '<b> '.number_format($sum,2,',','.').' '.$order->_currencyIso.'</b>';
-        $ot_tax->value = $sum;
+        $ot_tax->title = 'Steuer:';
+        $ot_tax->text = number_format($taxes,2,',','.').' '.$parent->getCurrencyIso();
+        $ot_tax->value = $taxes;
         $ot_tax->sort_order = 30;
         $ot_tax->class = 'ot_tax';
         $totals[] = $ot_tax;
         
         foreach($totals as $total) {
-            $this->db->deleteInsertRow($total,'orders_total',array('orders_id','class'),array($data->getId()->getEndpoint(),$total->class));
+            $total->orders_id = $parent->getId()->getEndpoint();
+            $this->db->deleteInsertRow($total,'orders_total',array('orders_id','class'),array($parent->getId()->getEndpoint(),$total->class));
         }
-        */
                 
         return $return;
     }

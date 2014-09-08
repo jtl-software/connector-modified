@@ -23,6 +23,8 @@ class CustomerOrder extends BaseMapper
         	"billingAddressId" => null,
             "billingAddress" => "CustomerOrderBillingAddress|addBillingAddress",
             "shippingAddress" => "CustomerOrderShippingAddress|addShippingAddress",
+            "shippingMethodCode" => "shipping_class",
+            "shippingMethodName" => "shipping_method",
             "items" => "CustomerOrderItem|addItem"
         ),
         "mapPush" => array(
@@ -39,6 +41,8 @@ class CustomerOrder extends BaseMapper
             "customers_address_format_id" => null,
             "billing_address_format_id" => null,
             "delivery_address_format_id" => null,
+            "shipping_class" => "shippingMethodCode",
+            "shipping_method" => "shippingMethodName",
             "CustomerOrderItem|addItem" => "items"
         )
     );
