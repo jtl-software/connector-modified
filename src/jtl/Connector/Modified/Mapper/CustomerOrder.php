@@ -21,11 +21,11 @@ class CustomerOrder extends BaseMapper
         	"currencyIso" => "currency",
         	"shippingAddressId" => null,
         	"billingAddressId" => null,
-            "billingAddress" => "CustomerOrderBillingAddress|addBillingAddress",
+        	"billingAddress" => "CustomerOrderBillingAddress|addBillingAddress",
             "shippingAddress" => "CustomerOrderShippingAddress|addShippingAddress",
             "shippingMethodCode" => "shipping_class",
             "shippingMethodName" => "shipping_method",
-            "items" => "CustomerOrderItem|addItem"
+            "items" => "CustomerOrderItem|addItem"            
         ),
         "mapPush" => array(
             "orders_id" => "id",                

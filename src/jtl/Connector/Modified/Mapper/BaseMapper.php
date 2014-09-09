@@ -49,7 +49,7 @@ class BaseMapper
 		            $subMapper = new $subMapperClass();
 		        
 		            $values = $subMapper->pull($data);
-		        
+		  
 		            foreach($values as $obj) $model->$setMethod($obj);		            
 		        }
 		    }
@@ -74,7 +74,7 @@ class BaseMapper
 		
 		if(method_exists(get_class($this),'addData')) $this->addData($model,$data);
 		
-		return $model->getPublic();
+		return $this->type->isMain() ? $model->getPublic() : $model;
 	}
 	
     /**

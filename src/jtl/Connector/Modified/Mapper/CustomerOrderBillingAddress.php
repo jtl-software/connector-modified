@@ -6,7 +6,6 @@ use \jtl\Connector\Modified\Mapper\BaseMapper;
 class CustomerOrderBillingAddress extends BaseMapper
 {
     protected $mapperConfig = array(
-        "table" => "customer_orders",
         "getMethod" => "getBillingAddress",
         "mapPull" => array(
         	"id" => null,
