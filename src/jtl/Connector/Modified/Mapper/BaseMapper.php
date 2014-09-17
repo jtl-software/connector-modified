@@ -248,7 +248,17 @@ class BaseMapper
         $limitQuery = isset($limit) ? ' LIMIT '.$offset.','.$limit : '';
         
 	    if(isset($this->mapperConfig['query'])) {
-	        $query = !is_null($parentData) ? preg_replace('/\[\[(\w+)\]\]/e','$parentData[$1]', $this->mapperConfig['query']) : $this->mapperConfig['query'];
+	        if(!is_null($parentData)) { 
+	           $query = preg_replace_callback(
+	               '/\[\[(\w+)\]\]/',
+    	           function ($match) use ($parentData) {
+    	               return $parentData[$match[1]];
+    	           },
+    	           $this->mapperConfig['query']
+	           );
+	        }
+	        else $query = $this->mapperConfig['query'];
+	        
 	        $query .= $limitQuery;	        
 	    }
 	    else $query = 'SELECT * FROM '.$this->mapperConfig['table'].$limitQuery;
@@ -271,6 +281,8 @@ class BaseMapper
 	 * @return multitype:NULL
 	 */
 	public function push($data,$dbObj=null) {
+	    $parent = null;
+	    
 	    if($data->getAction() == 'complete' && method_exists(get_class($this),'complete')) $this->complete($data);	    
 	    
 	    if(isset($this->mapperConfig['getMethod'])) {
