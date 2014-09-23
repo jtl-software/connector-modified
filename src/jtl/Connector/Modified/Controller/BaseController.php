@@ -71,11 +71,6 @@ class BaseController extends Controller
         return $action;        
     }
     
-    public function delete($params) 
-    {
-        // not used anymore   
-    }
-    
     public function statistic($params) {
         $reflect = new \ReflectionClass($this);
         $class = "\\jtl\\Connector\\Modified\\Mapper\\{$reflect->getShortName()}";

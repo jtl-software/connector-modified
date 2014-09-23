@@ -8,7 +8,7 @@ use \jtl\Core\Rpc\RequestPacket;
 use \jtl\Core\Rpc\ResponsePacket;
 use \jtl\Core\Rpc\Error;
 use \jtl\Core\Http\Response;
-use \jtl\Connector\Modified\Connector;
+use \jtl\Connector\Modified\Modified;
 
 //error_reporting(E_ALL ^ E_NOTICE);
 //ini_set('display_errors',1);
@@ -16,7 +16,7 @@ use \jtl\Connector\Modified\Connector;
 $condir = __DIR__ . '/../vendor/jtl/connector/';
 define('CONNECTOR_DIR', $condir);
 
-$connector = Connector::getInstance();
+$connector = Modified::getInstance();
 $application = Application::getInstance();
 $application->register($connector);
 $application->run();

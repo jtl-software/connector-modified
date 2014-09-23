@@ -11,7 +11,7 @@ use \jtl\Connector\Modified\Config\Loader\Config as ConfigLoader;
 use \jtl\Core\Rpc\Error as Error;
 use \jtl\Core\Http\Response;
 
-class Connector extends BaseConnector
+class Modified extends BaseConnector
 {
     protected $_controller;
     protected $_action;
@@ -19,9 +19,10 @@ class Connector extends BaseConnector
     protected function init()
     {
         $session = new SessionHelper("modified");
-		
-        register_shutdown_function(array($this,'shutdown_handler'));
+        
         set_error_handler(array($this,'error_handler'), E_ALL);
+        set_exception_handler(array($this,'exception_handler'));
+        register_shutdown_function(array($this,'shutdown_handler'));
         
         $config = $this->getConfig();
         $session->config = $config;
@@ -107,23 +108,48 @@ class Connector extends BaseConnector
     
         file_put_contents("/tmp/error.log", date("[Y-m-d H:i:s] ") . "(" . $types[$errno] . ") File ({$errfile}, {$errline}): {$errstr}\n", FILE_APPEND);
     }
-       
-    public function shutdown_handler()
-    {
-        if (($err = error_get_last())) {
-            ob_clean();
 
-            $error = new Error();
-            $error->setCode($err['type'])
-            ->setData('Shutdown! File: ' . $err['file'] . ' - Line: ' . $err['line'])
-            ->setMessage($err['message']);
+    public function exception_handler(\Exception $exception)
+    {
+        $trace = $exception->getTrace();
+        if (isset($trace[0]['args'][0])) {
+            $requestpacket = $trace[0]['args'][0];
+        }
     
-            $reponsepacket = new ResponsePacket();
-            $reponsepacket->setError($error)
+        $error = new Error();
+        $error->setCode($exception->getCode())
+            ->setData("Exception: " . substr(strrchr(get_class($exception), "\\"), 1) . " - File: {$exception->getFile()} - Line: {$exception->getLine()}")
+            ->setMessage($exception->getMessage());
+    
+        $responsepacket = new ResponsePacket();
+        $responsepacket->setError($error)
             ->setJtlrpc("2.0");
     
-            Response::send($reponsepacket);
+        if (isset($requestpacket) && $requestpacket !== null && is_object($requestpacket) && get_class($requestpacket) == "jtl\\Core\\Rpc\\RequestPacket") {
+            $responsepacket->setId($requestpacket->getId());
         }
+    
+        Response::send($responsepacket);
+    }
+    
+    public function shutdown_handler()
+    {
+        if(($err = error_get_last())) {
+            if($err['type'] != 2 && $err['type'] != 8) {
+                ob_clean();
+    
+                $error = new Error();
+                $error->setCode($err['type'])
+                    ->setData('Shutdown! File: ' . $err['file'] . ' - Line: ' . $err['line'])
+                    ->setMessage($err['message']);
+        
+                $responsepacket = new ResponsePacket();
+                $responsepacket->setError($error)
+                    ->setJtlrpc("2.0");
+        
+                Response::send($responsepacket);
+            }            
+        }        
     }
 }
 ?>
