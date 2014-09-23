@@ -71,7 +71,7 @@ class BaseController extends Controller
         return $action;        
     }
     
-    public function statistic($params) {
+    public function statistic(QueryFilter $filter) {
         $reflect = new \ReflectionClass($this);
         $class = "\\jtl\\Connector\\Modified\\Mapper\\{$reflect->getShortName()}";
         

@@ -8,7 +8,7 @@ use \jtl\Core\Model\DataModel;
 use \jtl\Core\Model\QueryFilter;
 
 class Connector extends Controller {   
-    public function statistic($params) {
+    public function statistic(QueryFilter $filter) {
         $action = new Action();
         $action->setHandled(true);
         
