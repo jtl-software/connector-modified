@@ -15,7 +15,7 @@ class Product extends BaseMapper
 			"stockLevel" => "products_quantity",
 			"sku" => "products_model",
             "sort" => "products_sort",
-			"created" => "products_date_added",
+			"creationDate" => "products_date_added",
 			"availableFrom" => "products_date_available",
 			"productWeight" => "products_weight",
 			"manufacturerId" => null,

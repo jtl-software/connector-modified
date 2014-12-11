@@ -1,15 +1,15 @@
 <?php
 namespace jtl\Connector\Modified;
 
-use \jtl\Core\Rpc\RequestPacket;
-use \jtl\Core\Utilities\RpcMethod;
-use \jtl\Core\Database\Mysql;
-use \jtl\Core\Rpc\ResponsePacket;
+use \jtl\Connector\Core\Rpc\RequestPacket;
+use \jtl\Connector\Core\Utilities\RpcMethod;
+use \jtl\Connector\Core\Database\Mysql;
+use \jtl\Connector\Core\Rpc\ResponsePacket;
 use \jtl\Connector\Session\SessionHelper;
 use \jtl\Connector\Base\Connector as BaseConnector;
 use \jtl\Connector\Modified\Config\Loader\Config as ConfigLoader;
-use \jtl\Core\Rpc\Error as Error;
-use \jtl\Core\Http\Response;
+use \jtl\Connector\Core\Rpc\Error as Error;
+use \jtl\Connector\Core\Http\Response;
 
 class Modified extends BaseConnector
 {
@@ -93,10 +93,10 @@ class Modified extends BaseConnector
             E_WARNING => 'E_WARNING',
             E_PARSE => 'E_PARSE',
             E_NOTICE => 'E_NOTICE',
-            E_CORE_ERROR => 'E_CORE_ERROR',
-            E_CORE_WARNING => 'E_CORE_WARNING',
-            E_CORE_ERROR => 'E_COMPILE_ERROR',
-            E_CORE_WARNING => 'E_COMPILE_WARNING',
+            E_Connector_ERROR => 'E_Connector_ERROR',
+            E_Connector_WARNING => 'E_Connector_WARNING',
+            E_Connector_ERROR => 'E_COMPILE_ERROR',
+            E_Connector_WARNING => 'E_COMPILE_WARNING',
             E_USER_ERROR => 'E_USER_ERROR',
             E_USER_WARNING => 'E_USER_WARNING',
             E_USER_NOTICE => 'E_USER_NOTICE',
@@ -125,7 +125,7 @@ class Modified extends BaseConnector
         $responsepacket->setError($error)
             ->setJtlrpc("2.0");
     
-        if (isset($requestpacket) && $requestpacket !== null && is_object($requestpacket) && get_class($requestpacket) == "jtl\\Core\\Rpc\\RequestPacket") {
+        if (isset($requestpacket) && $requestpacket !== null && is_object($requestpacket) && get_class($requestpacket) == "jtl\\Connector\\Core\\Rpc\\RequestPacket") {
             $responsepacket->setId($requestpacket->getId());
         }
     

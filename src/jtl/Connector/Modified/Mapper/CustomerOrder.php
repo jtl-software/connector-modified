@@ -14,7 +14,7 @@ class CustomerOrder extends BaseMapper
         	"id" => "orders_id",
             "orderNumber" => "orders_id",
         	"customerId" => "customers_id",
-        	"created" => "date_purchased",
+        	"creationDate" => "date_purchased",
             "note" => "comments",
         	"status" => null,
         	"paymentModuleCode" => null,            
@@ -30,7 +30,7 @@ class CustomerOrder extends BaseMapper
         "mapPush" => array(
             "orders_id" => "id",                
             "customers_id" => "customerId",
-            "date_purchased" => "created",
+            "date_purchased" => "creationDate",
             "comments" => "note",
             "orders_status" => null,
             "payment_method" => null,

@@ -30,8 +30,7 @@ class Customer extends BaseMapper
 			"eMail" => "customers_email_address",
 			"vatNumber" => "customers_vat_id",
 			"hasNewsletterSubscription" => null,
-			"created" => "customers_date_added",
-            "modified" => "customers_last_modified"					
+			"creationDate" => "customers_date_added"
 		),
         "mapPush" => array(
             "customers_id" => "id",
@@ -46,7 +45,7 @@ class Customer extends BaseMapper
             "customers_email_address" => "eMail",
             "customers_vat_id" => "vatNumber",
             "customers_newsletter" => "hasNewsletterSubscription",
-            "customers_date_added" => "created"                        
+            "customers_date_added" => "creationDate"                        
         )
     );
     

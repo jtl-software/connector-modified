@@ -1,14 +1,14 @@
 <?php
 namespace jtl\Connector\Modified\Controller;
 
-use \jtl\Core\Controller\Controller;
-use \jtl\Core\Database\Mysql;
+use \jtl\Connector\Core\Controller\Controller;
+use \jtl\Connector\Core\Database\Mysql;
 use \jtl\Connector\Result\Action;
-use \jtl\Core\Rpc\Error;
-use \jtl\Core\Utilities\ClassName;
+use \jtl\Connector\Core\Rpc\Error;
+use \jtl\Connector\Core\Utilities\ClassName;
 use \jtl\Connector\Model\Statistic;
-use \jtl\Core\Model\DataModel;
-use \jtl\Core\Model\QueryFilter;
+use \jtl\Connector\Core\Model\DataModel;
+use \jtl\Connector\Core\Model\QueryFilter;
 
 class BaseController extends Controller
 {

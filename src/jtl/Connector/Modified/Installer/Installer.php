@@ -1,11 +1,11 @@
 <?php
 namespace jtl\Connector\Modified\Installer;
 
-use \jtl\Core\Config\Config;
-use \jtl\Core\Config\Loader\Json as ConfigJson;
+use \jtl\Connector\Core\Config\Config;
+use \jtl\Connector\Core\Config\Loader\Json as ConfigJson;
 use \jtl\Connector\Modified\Config\Loader\Config as ConfigLoader;
-use \jtl\Core\Database\Mysql;
-use \jtl\Core\Utilities\Singleton;
+use \jtl\Connector\Core\Database\Mysql;
+use \jtl\Connector\Core\Utilities\Singleton;
 use \jtl\Connector\Session\SessionHelper;
 
 class Installer extends Singleton {

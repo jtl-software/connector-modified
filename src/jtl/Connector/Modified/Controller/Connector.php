@@ -3,9 +3,9 @@ namespace jtl\Connector\Modified\Controller;
 
 use \jtl\Connector\Result\Action;
 use \jtl\Connector\Model\Statistic;
-use \jtl\Core\Controller\Controller;
-use \jtl\Core\Model\DataModel;
-use \jtl\Core\Model\QueryFilter;
+use \jtl\Connector\Core\Controller\Controller;
+use \jtl\Connector\Core\Model\DataModel;
+use \jtl\Connector\Core\Model\QueryFilter;
 
 class Connector extends Controller {   
     public function statistic(QueryFilter $filter) {

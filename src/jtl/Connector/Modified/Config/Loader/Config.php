@@ -1,9 +1,9 @@
 <?php
 namespace jtl\Connector\Modified\Config\Loader;
 
-use \jtl\Core\Config\Loader\Base as BaseLoader;
-use \jtl\Core\Filesystem\Tool;
-use \jtl\Core\Exception\ConfigException;
+use \jtl\Connector\Core\Config\Loader\Base as BaseLoader;
+use \jtl\Connector\Core\Filesystem\Tool;
+use \jtl\Connector\Core\Exception\ConfigException;
 
 class Config extends BaseLoader
 {

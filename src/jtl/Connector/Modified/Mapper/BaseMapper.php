@@ -1,9 +1,9 @@
 <?php
 namespace jtl\Connector\Modified\Mapper;
 
-use \jtl\Core\Database\Mysql;
+use \jtl\Connector\Core\Database\Mysql;
 use \jtl\Connector\Session\SessionHelper;
-use \jtl\Core\Utilities\Language;
+use \jtl\Connector\Core\Utilities\Language;
 use \jtl\Connector\Model\Identity;
 
 class BaseMapper
@@ -36,6 +36,8 @@ class BaseMapper
 
 		foreach($this->mapperConfig['mapPull'] as $host => $endpoint) {
 		    $value = null;
+		    
+		    if(!$this->type->getProperty($host)) throw new \Exception("Property ".$host." not found");
 		    
 		    if($this->type->getProperty($host)->isNavigation()) {
 		        list($endpoint,$setMethod) = explode('|',$endpoint);

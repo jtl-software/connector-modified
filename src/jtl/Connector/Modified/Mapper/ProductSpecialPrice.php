@@ -14,7 +14,7 @@ class ProductSpecialPrice extends BaseMapper
         	"id" => "specials_id",
             "productId" => "products_id",		
             "isActive" => "status",
-            "activeUntil" => null,	
+            "activeUntilDate" => null,	
             "stockLimit" => "specials_quantity",
             "considerStockLimit" => null,	
             "considerDateLimit" => null,
@@ -24,7 +24,7 @@ class ProductSpecialPrice extends BaseMapper
             "specials_id" => "id",
             "products_id" => "productId",
             "status" => "isActive",
-            "expires_date" => "activeUntil",
+            "expires_date" => "activeUntilDate",
             "specials_quantity" => "stockLimit",
             "SpecialPrice|addSpecialPrice|true" => "specialPrices"
         )
