@@ -146,8 +146,7 @@ class BaseMapper
     		}
             
     		if(!$addToParent) {
-                
-    		    switch($obj->getAction()) {
+                switch($obj->getAction()) {
         		    case 'complete':
         		        if(isset($this->mapperConfig['where'])) {
         		            $whereKey = $this->mapperConfig['where'];
@@ -160,7 +159,7 @@ class BaseMapper
         		                }
         		            }
         		        
-        		            $insertResult = $this->db->deleteInsertRow($dbObj,$this->mapperConfig['table'],$whereKey,$whereValue);
+        		            //$insertResult = $this->db->deleteInsertRow($dbObj,$this->mapperConfig['table'],$whereKey,$whereValue);
         		            
         		            if(isset($this->mapperConfig['identity'])) {
         		                $obj->{$this->mapperConfig['identity']}()->setEndpoint($insertResult->getKey());
@@ -169,7 +168,7 @@ class BaseMapper
         		    break;
         		
         		    case 'insert':
-        		        $insertResult = $this->db->insertRow($dbObj,$this->mapperConfig['table']);
+        		        //$insertResult = $this->db->insertRow($dbObj,$this->mapperConfig['table']);
         		        
         		        if(isset($this->mapperConfig['identity'])) {
         		            $obj->{$this->mapperConfig['identity']}()->setEndpoint($insertResult->getKey());    		            
@@ -188,7 +187,7 @@ class BaseMapper
             		            }
             		        }
             		        
-            		        $this->db->updateRow($dbObj,$this->mapperConfig['table'],$whereKey,$whereValue);
+            		        //$this->db->updateRow($dbObj,$this->mapperConfig['table'],$whereKey,$whereValue);
         		        }
         		    break;
         		
@@ -204,7 +203,7 @@ class BaseMapper
         		                }
         		            }
         		        
-        		            $this->db->deleteRow($dbObj,$this->mapperConfig['table'],$whereKey,$whereValue);
+        		            //$this->db->deleteRow($dbObj,$this->mapperConfig['table'],$whereKey,$whereValue);
         		        }        		   
         		    break;
         		}
@@ -285,7 +284,7 @@ class BaseMapper
 	public function push($data,$dbObj=null) {
 	    $parent = null;
 	    
-	    if($data->getAction() == 'complete' && method_exists(get_class($this),'complete')) $this->complete($data);	    
+	    if(method_exists($data,'getAction') && $data->getAction() == 'complete' && method_exists(get_class($this),'complete')) $this->complete($data);	    
 	    
 	    if(isset($this->mapperConfig['getMethod'])) {
 	        $subGetMethod = $this->mapperConfig['getMethod'];

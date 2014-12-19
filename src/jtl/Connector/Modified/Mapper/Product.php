@@ -40,7 +40,7 @@ class Product extends BaseMapper
             "products_quantity" => "stockLevel",
             "products_model" => "sku",
             "products_sort" => "sort",
-            "products_date_added" => "created",
+            "products_date_added" => "creationDate",
             "products_date_available" => "availableFrom",
             "products_weight" => "productWeight",
             "manufacturers_id" => "manufacturerId",
@@ -54,7 +54,7 @@ class Product extends BaseMapper
             "ProductPrice|addPrice" => "prices",
             "ProductSpecialPrice|addSpecialPrice" => "specialPrices",
             "ProductVariation|addVariation" => "variations",
-            "ProductInvisibility|addInvisibility|true" => "invisibilities"
+            "ProductInvisibility|addInvisibility|true" => "invisibilities"            
         )
     );
     
