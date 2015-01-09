@@ -13,25 +13,25 @@ use \jtl\Connector\Core\Model\QueryFilter;
 class BaseController extends Controller
 {
    	protected $_db;
-		
+
 	public function __construct() {
-		 $this->_db = Mysql::getInstance();		 
-	}	
-	
-    public function pull(QueryFilter $queryfilter) {        
+		 $this->_db = Mysql::getInstance();
+	}
+
+    public function pull(QueryFilter $queryfilter) {
         $action = new Action();
         $action->setHandled(true);
-       
+
         try {
             $reflect = new \ReflectionClass($this);
             $class = "\\jtl\\Connector\\Modified\\Mapper\\{$reflect->getShortName()}";
-            
-            if(!class_exists($class)) throw new \Exception("Class ".$class." not available"); 
-            
+
+            if(!class_exists($class)) throw new \Exception("Class ".$class." not available");
+
             $mapper = new $class();
-        
+
             $result = $mapper->pull(null,$queryfilter->getOffset(),$queryfilter->getLimit());
-            	
+
             $action->setResult($result);
         }
         catch (\Exception $exc) {
@@ -40,25 +40,25 @@ class BaseController extends Controller
             $err->setMessage($exc->getFile().' ('.$exc->getLine().'):'.$exc->getMessage());
             $action->setError($err);
         }
-        
-        return $action;        
+
+        return $action;
     }
-	
+
     public function push(DataModel $model) {
         $action = new Action();
-        
+
         $action->setHandled(true);
-        
+
         try {
             $reflect = new \ReflectionClass($this);
             $class = "\\jtl\\Connector\\Modified\\Mapper\\{$reflect->getShortName()}";
-            
+
             if(!class_exists($class)) throw new \Exception("Class ".$class." not available");
-            
+
             $mapper = new $class();
-            
+
             $result = $mapper->push($model);
-            
+
             $action->setResult($result);
         }
         catch (\Exception $exc) {
@@ -67,27 +67,27 @@ class BaseController extends Controller
             $err->setMessage($exc->getFile().' ('.$exc->getLine().'):'.$exc->getMessage());
             $action->setError($err);
         }
-        
-        return $action;        
+
+        return $action;
     }
-    
+
     public function statistic(QueryFilter $filter) {
         $reflect = new \ReflectionClass($this);
         $class = "\\jtl\\Connector\\Modified\\Mapper\\{$reflect->getShortName()}";
-        
+
         if(class_exists($class)) {
             $action = new Action();
             $action->setHandled(true);
-    
+
             try {
                 $mapper = new $class();
-                
+
                 $statModel = new Statistic();
-                
-                $statModel->setAvailable($mapper->statistic());                
-                $statModel->setPending(0);   
+
+                $statModel->setAvailable($mapper->statistic());
+                $statModel->setPending(0);
                 $statModel->setControllerName(lcfirst($reflect->getShortName()));
-                
+
                 $action->setResult($statModel->getPublic());
             }
             catch (\Exception $exc) {
@@ -96,9 +96,9 @@ class BaseController extends Controller
                 $err->setMessage($exc->getMessage());
                 $action->setError($err);
             }
-            
+
             return $action;
         }
-    }	
-	
+    }
+
 }

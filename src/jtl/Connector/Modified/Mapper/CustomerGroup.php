@@ -15,9 +15,9 @@ class CustomerGroup extends BaseMapper
             "isDefault" => null,
             "i18ns" => "CustomerGroupI18n|addI18n"
         )
-    );   
+    );
 
     protected function isDefault($data) {
-        return ($data['customers_status_id'] == $this->shopConfig['DEFAULT_CUSTOMERS_STATUS_ID']) ? true : false;
+        return ($data['customers_status_id'] == $this->shopConfig['settings']['DEFAULT_CUSTOMERS_STATUS_ID']) ? true : false;
     }
 }

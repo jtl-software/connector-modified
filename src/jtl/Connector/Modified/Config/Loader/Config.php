@@ -7,7 +7,7 @@ use \jtl\Connector\Core\Exception\ConfigException;
 
 class Config extends BaseLoader
 {
-
+    
     const DELIMITER = '::';
 
     //Configuration params in modified-Config

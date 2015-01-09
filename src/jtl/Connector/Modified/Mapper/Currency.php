@@ -15,9 +15,9 @@ class Currency extends BaseMapper
         	"delimiterThousand" => "thousands_point",
     	    "isDefault" => null
         )
-    );    
-    
+    );
+
     protected function isDefault($data) {
-        return $data['code'] == $this->shopConfig['DEFAULT_CURRENCY'] ? true : false;
+        return $data['code'] == $this->shopConfig['settings']['DEFAULT_CURRENCY'] ? true : false;
     }
 }

@@ -1,19 +1,17 @@
 <?php
 namespace jtl\Connector\Modified\Installer;
 
-class Module {
-    public $db = null;
-    public $sqlite = null;
-    
-    public function __construct($db,$sqlite) {
-        $this->db = $db;
-        $this->sqlite = $sqlite;        
-    }
-    
-    public function form() {
-        return null;
-    }
-    
-    public function save() {        
-    }
+abstract class Module {
+	private $_db;
+	private $_config;
+
+	public static $name = null;
+
+	public function __construct($db,$config) {
+		
+	}
+
+	public abstract function form();
+
+	public abstract function save();
 }

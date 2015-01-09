@@ -16,12 +16,12 @@ class Language extends BaseMapper
             "isDefault" => null
         )
     );
-        
+
     protected function localeName($data) {
     	return $this->fullLocale($data['code']);
     }
-    
+
     protected function isDefault($data) {
-        return $data['code'] == $this->shopConfig['DEFAULT_LANGUAGE'] ? true : false;
-    }    
+        return $data['code'] == $this->shopConfig['settings']['DEFAULT_LANGUAGE'] ? true : false;
+    }
 }

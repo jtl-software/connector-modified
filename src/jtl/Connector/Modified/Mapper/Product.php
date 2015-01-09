@@ -54,14 +54,14 @@ class Product extends BaseMapper
             "ProductPrice|addPrice" => "prices",
             "ProductSpecialPrice|addSpecialPrice" => "specialPrices",
             "ProductVariation|addVariation" => "variations",
-            "ProductInvisibility|addInvisibility|true" => "invisibilities"            
+            "ProductInvisibility|addInvisibility|true" => "invisibilities"
         )
     );
-    
+
     protected function manufacturerId($data) {
         return $this->replaceZero($data['manufacturers_id']);
     }
-    
+
     protected function basePriceUnitId($data) {
         return $this->replaceZero($data['products_vpe']);
     }
@@ -71,29 +71,29 @@ class Product extends BaseMapper
     }
     */
     protected function considerStock($data)  {
-        return $this->shopConfig['STOCK_CHECK'];
+        return $this->shopConfig['settings']['STOCK_CHECK'];
     }
-    
+
     protected function considerVariationStock($data)  {
-        return $this->shopConfig['ATTRIBUTE_STOCK_CHECK'];
+        return $this->shopConfig['settings']['ATTRIBUTE_STOCK_CHECK'];
     }
-    
+
     protected function permitNegativeStock($data)  {
-        return $this->shopConfig['STOCK_ALLOW_CHECKOUT'];
+        return $this->shopConfig['settings']['STOCK_ALLOW_CHECKOUT'];
     }
-    
+
     protected function vat($data) {
         $sqliteResult = $this->getSqlite()->query('SELECT value FROM options WHERE key="tax_rate"');
         $taxId = $sqliteResult->fetchColumn();
-                
+
         $sql = $this->db->query('SELECT tax_rate FROM tax_rates WHERE tax_rates_id='.$taxId);
         return floatval($sql[0]['tax_rate']);
-    }  
+    }
 
     protected function products_tax_class_id($data) {
         $sqliteResult = $this->getSqlite()->query('SELECT value FROM options WHERE key="tax_rate"');
         $taxId = $sqliteResult->fetchColumn();
-    
+
         $sql = $this->db->query('SELECT tax_class_id FROM tax_rates WHERE tax_rates_id='.$taxId);
         return $sql[0]['tax_class_id'];
     }
