@@ -53,7 +53,7 @@ class Check extends Module {
             $result = $this->_checkResults[$check];
 
             $html .= '<tr class="'.($result[0] === true ? '' : 'danger').'"><td><b>'.$data['title'].'</b><br/>'.vsprintf($data['info'],$result[1]).'</td><td><h4 class="pull-right">';
-            $html .= $result[0] ? '<span class="label label-success">'.vsprintf($data['ok'],$result[1]).'</span>' : '<span class="label label-danger">'.vsprintf($data['fault'],$result[1]).'</span>';
+            $html .= $result[0] ? '<span class="label label-success"><span class="glyphicon glyphicon-ok"></span> '.vsprintf($data['ok'],$result[1]).'</span>' : '<span class="label label-danger"><span class="glyphicon glyphicon-warning-sign"></span> '.vsprintf($data['fault'],$result[1]).'</span>';
             $html .= '</h4></td></tr>';
         }
         $html .= '</tbody></table>';

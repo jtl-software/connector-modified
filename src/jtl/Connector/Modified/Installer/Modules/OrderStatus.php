@@ -4,7 +4,7 @@ namespace jtl\Connector\Modified\Installer\Modules;
 use \jtl\Connector\Modified\Installer\Module;
 
 class OrderStatus extends Module {
-    public static $name = 'Order status mapping';
+    public static $name = '<span class="glyphicon glyphicon-random"></span> Order status mapping';
 
     private $_jtlStats = null;
     private $_modifiedStats = null;

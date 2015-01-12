@@ -4,7 +4,7 @@ namespace jtl\Connector\Modified\Installer\Modules;
 use \jtl\Connector\Modified\Installer\Module;
 
 class TaxRate extends Module {
-    public static $name = "Default tax rate";
+    public static $name = '<span class="glyphicon glyphicon-euro"></span> Default tax rate';
 
     public function form() {
         $rates = $this->db->query('SELECT r.tax_rates_id,r.tax_rate,r.tax_class_id,r.tax_description,c.tax_class_title FROM tax_rates r LEFT JOIN tax_class c ON r.tax_class_id=c.tax_class_id');
