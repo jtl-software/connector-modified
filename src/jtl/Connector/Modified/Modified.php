@@ -25,6 +25,7 @@ class Modified extends BaseConnector
         register_shutdown_function(array($this,'shutdown_handler'));
 
         if(!isset($session->shopConfig)) $session->shopConfig = $this->readConfigFile();
+        if(!isset($session->connectorConfig)) $session->connectorConfig = json_decode(@file_get_contents(CONNECTOR_DIR.'/config/config.json'));
 
         // get db singleton and connect
         $db = Mysql::getInstance();

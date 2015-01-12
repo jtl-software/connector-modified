@@ -11,13 +11,13 @@ class GlobalData extends \jtl\Connector\Modified\Mapper\BaseMapper
             "customerGroups" => "CustomerGroup|addCustomerGroup",
             "taxRates" => "TaxRate|addTaxRate",
             "currencies" => "Currency|addCurrency",
-            //"units" => "Unit|addUnit"
-        )   
+            "units" => "Unit|addUnit"
+        )
     );
-    
+
     public function pull() {
         $globalData = $this->generateModel(null);
-        
+
         return [$globalData];
-    }       
+    }
 }

@@ -11,9 +11,9 @@ class BaseMapper
     protected $db;
     protected $mapperConfig;
 	protected $shopConfig;
+	protected $connectorConfig;
 	protected $type;
 	protected $model;
-	protected $sqlite = null;
 
 	public function __construct() {
 	    $session = new SessionHelper("modified");
@@ -21,6 +21,7 @@ class BaseMapper
 
 	    $this->db = Mysql::getInstance();
 	    $this->shopConfig = $session->shopConfig;
+	    $this->connectorConfig = $session->connectorConfig;
 	    $this->model = "\\jtl\\Connector\\Model\\".$reflect->getShortName();
 	    $this->type = null;
 	}
@@ -345,16 +346,6 @@ class BaseMapper
 	    $objs = $this->db->query("SELECT count(*) as count FROM {$this->mapperConfig['table']} LIMIT 1", array("return" => "object"));
 
 	    return $objs !== null ? intval($objs[0]->count) : 0;
-	}
-
-	/**
-	 * Get sqlite instance of setup db
-	 * @return \PDO
-	 */
-	public function getSqlite() {
-	    if(is_null($this->sqlite)) $this->sqlite = new \PDO('sqlite:'.realpath(__DIR__.'/../../Modified/').'/connector.sdb');
-
-	    return $this->sqlite;
 	}
 
 	/**

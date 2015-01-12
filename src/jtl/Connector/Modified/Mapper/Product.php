@@ -65,11 +65,7 @@ class Product extends BaseMapper
     protected function basePriceUnitId($data) {
         return $this->replaceZero($data['products_vpe']);
     }
-    /*
-    protected function availableFrom($data) {
-        return !is_null($data['products_date_available']) ? $data['products_date_available'] : null;
-    }
-    */
+
     protected function considerStock($data)  {
         return $this->shopConfig['settings']['STOCK_CHECK'];
     }
@@ -83,18 +79,12 @@ class Product extends BaseMapper
     }
 
     protected function vat($data) {
-        $sqliteResult = $this->getSqlite()->query('SELECT value FROM options WHERE key="tax_rate"');
-        $taxId = $sqliteResult->fetchColumn();
-
-        $sql = $this->db->query('SELECT tax_rate FROM tax_rates WHERE tax_rates_id='.$taxId);
+        $sql = $this->db->query('SELECT tax_rate FROM tax_rates WHERE tax_rates_id='.$this->connectorConfig->tax_rate);
         return floatval($sql[0]['tax_rate']);
     }
 
     protected function products_tax_class_id($data) {
-        $sqliteResult = $this->getSqlite()->query('SELECT value FROM options WHERE key="tax_rate"');
-        $taxId = $sqliteResult->fetchColumn();
-
-        $sql = $this->db->query('SELECT tax_class_id FROM tax_rates WHERE tax_rates_id='.$taxId);
+        $sql = $this->db->query('SELECT tax_class_id FROM tax_rates WHERE tax_rates_id='.$this->connectorConfig->tax_rate);
         return $sql[0]['tax_class_id'];
     }
 }
