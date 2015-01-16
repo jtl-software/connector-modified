@@ -24,13 +24,19 @@ class Check extends Module {
         ),
         'config_file' => array(
             'title' => 'Connector config file',
-            'info' => 'The connector config folder or file "%s" must be writable.',
+            'info' => 'The config folder or file "%s" must be writable.',
             'ok' => 'Config is writable',
             'fault' => 'Config is not writable'
         ),
+        'db_file' => array(
+            'title' => 'Connector database',
+            'info' => 'The database file "%s" must be writable.',
+            'ok' => 'Database is writable',
+            'fault' => 'Database is not writable'
+        ),
         'connector_log' => array(
             'title' => 'Connector logs folder',
-            'info' => 'The folder "%s" must be writable.',
+            'info' => 'The logs folder "%s" must be writable.',
             'ok' => 'Logs folder is writable',
             'fault' => 'Logs folder is not writable'
         )
@@ -72,6 +78,11 @@ class Check extends Module {
     private function config_file() {
         $path = CONNECTOR_DIR.'/config';
         if(file_exists($path.'/config.json')) $path = $path.'/config.json';
+        return array(is_writable($path),array($path));
+    }
+
+    private function db_file() {
+        $path = CONNECTOR_DIR.'/db/connector.s3db';
         return array(is_writable($path),array($path));
     }
 

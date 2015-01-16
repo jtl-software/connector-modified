@@ -33,6 +33,7 @@
 
         <chmod file="./dist/config" mode="0777" />
         <chmod file="./dist/db" mode="0777" />
+        <chmod file="./dist/db/connector.s3db" mode="0777" />
         <chmod file="./dist/logs" mode="0777" />
 
         <delete dir="./build" />
