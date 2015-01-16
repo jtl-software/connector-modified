@@ -17,7 +17,6 @@ class Modified extends BaseConnector
 
     protected function init()
     {
-        session_start();
         $session = new SessionHelper("modified");
 
         set_error_handler(array($this,'error_handler'), E_ALL);

@@ -22,8 +22,7 @@
             <div class="panel-body">
                 <form class="form-horizontal" role="form" method="post">
                     <?php
-                        define('CONNECTOR_DIR',realpath(__DIR__ . '/../'));
-                        require_once(CONNECTOR_DIR."/vendor/autoload.php");
+                        include('../index.php');
 
                         use \jtl\Connector\Modified\Installer\Installer;
 

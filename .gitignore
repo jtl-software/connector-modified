@@ -3,3 +3,5 @@ composer.lock
 config/config.json
 logs/database.log
 logs/rpc.log
+build/**
+dist/**
