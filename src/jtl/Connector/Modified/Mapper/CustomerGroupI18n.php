@@ -15,11 +15,11 @@ class CustomerGroupI18n extends BaseMapper
             "localeName" => null
         )
     );
-    
+
     protected function localeName($data) {
     	return $this->fullLocale($data['code']);
     }
-    
+
     protected function name($data) {
         return html_entity_decode($data['customers_status_name']);
     }

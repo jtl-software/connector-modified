@@ -7,9 +7,9 @@ class ProductI18n extends BaseMapper
 {
     protected $mapperConfig = array(
         "table" => "products_description",
-        "query" => "SELECT products_description.*,languages.code 
-            FROM products_description 
-            LEFT JOIN languages ON languages.languages_id=products_description.language_id 
+        "query" => "SELECT products_description.*,languages.code
+            FROM products_description
+            LEFT JOIN languages ON languages.languages_id=products_description.language_id
             WHERE products_id=[[products_id]]",
         "getMethod" => "getI18ns",
         "where" => array("products_id","language_id"),
@@ -21,7 +21,7 @@ class ProductI18n extends BaseMapper
             "description" => "products_description",
             "metaDescription" => "products_meta_description",
             "metaKeywords" => "products_meta_keywords",
-            "shortDescription" => null                     
+            "shortDescription" => null
         ),
         "mapPush" => array(
             "language_id" => null,
@@ -34,24 +34,24 @@ class ProductI18n extends BaseMapper
             "products_short_description" => "shortDescription"
         )
     );
-        
+
     protected function localeName($data) {
     	return $this->fullLocale($data['code']);
     }
 
     protected function shortDescription($data) {
         return !is_null($data['products_short_description']) ? $data['products_short_description'] : '';
-    }  
-    
+    }
+
     protected function language_id($data) {
         return $this->locale2id($data->getLocaleName());
     }
-    
+
     public function push($parent,$dbObj) {
         foreach($parent->getI18ns() as $i18n) {
             $i18n->setProductId($parent->getId());
         }
-        
+
         return parent::push($parent,$dbObj);
     }
 }

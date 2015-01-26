@@ -9,6 +9,7 @@ use \jtl\Connector\Session\SessionHelper;
 use \jtl\Connector\Base\Connector as BaseConnector;
 use \jtl\Connector\Core\Rpc\Error as Error;
 use \jtl\Connector\Core\Http\Response;
+use \jtl\Connector\Core\Rpc\Method;
 
 class Modified extends BaseConnector
 {
@@ -99,7 +100,19 @@ class Modified extends BaseConnector
        	$this->init();
        	$this->_controller->setMethod($this->getMethod());
 
-        return $this->_controller->{$this->_action}($requestpacket->getParams());
+        $result = array();
+
+        if($this->action === Method::ACTION_PUSH) {
+            if(!is_array($requestpacket->getParams())) {
+                throw new \Exception('Pushed data is not an array');
+            }
+
+            foreach($requestpacket->getParams() as $param) {
+                $result[] = $this->controller->{$this->action}($param);
+            }
+
+            return $result;
+        } else return $this->controller->{$this->action}($requestpacket->getParams());
     }
 
     function error_handler($errno, $errstr, $errfile, $errline, $errcontext)

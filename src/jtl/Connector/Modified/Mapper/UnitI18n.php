@@ -14,7 +14,7 @@ class UnitI18n extends BaseMapper
         	"name" => "products_vpe_name"
         )
     );
-    
+
     protected function localeName($data) {
     	return $this->fullLocale($data['code']);
     }

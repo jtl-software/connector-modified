@@ -18,15 +18,15 @@ class Product2Category extends BaseMapper
         ),
         "mapPush" => array(
             "categories_id" => "categoryId",
-            "products_id" => "productId" 
+            "products_id" => "productId"
         )
-    );    
-    
+    );
+
     public function push($parent,$dbObj) {
         foreach($parent->getCategories() as $category) {
             $category->setProductId($parent->getId());
         }
-        
+
         return parent::push($parent,$dbObj);
     }
 }

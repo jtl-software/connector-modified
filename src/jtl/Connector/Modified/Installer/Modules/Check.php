@@ -29,7 +29,7 @@ class Check extends Module {
             'fault' => 'Config is not writable'
         ),
         'db_file' => array(
-            'title' => 'Connector database',
+            'title' => 'Connector sqlite session database',
             'info' => 'The database file "%s" must be writable.',
             'ok' => 'Database is writable',
             'fault' => 'Database is not writable'
@@ -39,10 +39,17 @@ class Check extends Module {
             'info' => 'The logs folder "%s" must be writable.',
             'ok' => 'Logs folder is writable',
             'fault' => 'Logs folder is not writable'
+        ),
+        'connector_table' => array(
+            'title' => 'Connector mapping table',
+            'info' => 'The mapping table must be available in the shop database.',
+            'ok' => 'Table was created',
+            'fault' => 'Failed to create table'
         )
     );
 
     public function __construct($db,$config) {
+        parent::__construct($db,$config);
         $this->runChecks();
     }
 
@@ -89,6 +96,29 @@ class Check extends Module {
     private function connector_log() {
         $path = CONNECTOR_DIR.'/logs';
         return array(is_writable($path),array($path));
+    }
+
+    private function connector_table() {
+        if(count($this->db->query("SHOW TABLES LIKE 'jtl_connector_link'")) == 0) {
+            $sql = "
+                CREATE TABLE IF NOT EXISTS `jtl_connector_link` (
+                  `endpointId` int(10) NOT NULL,
+                  `hostId` int(10) NOT NULL,
+                  `type` int(10),
+                  PRIMARY KEY (`endpointId`,`hostId`,`type`)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+            ";
+
+            try {
+                $this->db->query($sql);
+                return array(true);
+            }
+            catch(\Exception $e) {
+                return array(false);
+            }
+        }
+
+        return array(true);
     }
 
     public function save() {

@@ -16,21 +16,21 @@ class ProductPrice extends BaseMapper
             "ProductPriceItem|addItem" => "items"
         )
     );
-	
+
     public function pull($data) {
         $customerGroups = $this->getCustomerGroups();
-        
+
         $return = [];
         $defaultSet = false;
-        
+
         foreach($customerGroups as $groupData) {
             $groupData['products_id'] = $data['products_id'];
             $groupData['default_price'] = $data['products_price'];
-            
-            $return[] = $this->generateModel($groupData);       
-        }       
-        
+
+            $return[] = $this->generateModel($groupData);
+        }
+
         return $return;
-    } 
+    }
 }
 ?>

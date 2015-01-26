@@ -35,19 +35,19 @@ class CustomerOrderShippingAddress extends BaseMapper
             "delivery_country_iso_code_2" => "countryIso"
         )
     );
-    
+
     public function pull($data) {
        return array($this->generateModel($data));
     }
-    
+
     protected function id($data) {
     	return "cID_".$data['customers_id'];
     }
-    
+
     public function push($parent,$dbObj) {
         $this->generateDbObj($parent->getShippingAddress(),$dbObj,null,true);
     }
-    
+
     protected function delivery_name($data) {
         return $data->getFirstName().' '.$data->getLastName();
     }
