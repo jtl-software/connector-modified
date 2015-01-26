@@ -10,14 +10,20 @@ use \jtl\Connector\Base\Connector as BaseConnector;
 use \jtl\Connector\Core\Rpc\Error as Error;
 use \jtl\Connector\Core\Http\Response;
 use \jtl\Connector\Core\Rpc\Method;
+use \jtl\Connector\Modified\Mapper\PrimaryKeyMapper;
+use \jtl\Connector\Core\Config\Config;
+use \jtl\Connector\Core\Config\Loader\Json as ConfigJson;
+use \jtl\Connector\Core\Config\Loader\System as ConfigSystem;
+use \jtl\Connector\Result\Action;
 
 class Modified extends BaseConnector
 {
     protected $_controller;
     protected $_action;
 
-    protected function init()
-    {
+    public function __construct() {
+        $this->initConnectorConfig();
+
         $session = new SessionHelper("modified");
 
         set_error_handler(array($this,'error_handler'), E_ALL);
@@ -42,6 +48,31 @@ class Modified extends BaseConnector
         $db->setNames();
 
         if(!isset($session->shopConfig['settings'])) $session->shopConfig += $this->readConfigDb($db);
+
+        $this->setPrimaryKeyMapper(new PrimaryKeyMapper());
+    }
+
+    protected function initConnectorConfig()
+    {
+        $config = null;
+
+        if (isset($_SESSION['config'])) $config = $_SESSION['config'];
+
+        if (empty($config)) {
+            if (!is_null($this->config)) $config = $this->getConfig();
+
+            if (empty($config)) {
+                $json = new ConfigJson(CONNECTOR_DIR . '/config/config.json');
+                $config = new Config(array(
+                    $json,
+                    new ConfigSystem()
+                ));
+
+                $this->setConfig($config);
+            }
+        }
+
+        if (!isset($_SESSION['config'])) $_SESSION['config'] = $config;
     }
 
     private function readConfigFile() {
@@ -97,22 +128,29 @@ class Modified extends BaseConnector
 
     public function handle(RequestPacket $requestpacket)
     {
-       	$this->init();
        	$this->_controller->setMethod($this->getMethod());
 
         $result = array();
 
-        if($this->action === Method::ACTION_PUSH) {
-            if(!is_array($requestpacket->getParams())) {
-                throw new \Exception('Pushed data is not an array');
+        if($this->_action != Method::ACTION_PULL) {
+            if(!is_array($requestpacket->getParams())) throw new \Exception('data is not an array');
+
+            $action = new Action();
+            $results = array();
+            $errors = array();
+
+            foreach ($requestpacket->getParams() as $param) {
+                $result = $this->_controller->{$this->_action}($param);
+                $results[] = $result->getResult();
+
+                $action->setHandled(true)
+                    ->setResult($results)
+                    ->setError($result->getError());
             }
 
-            foreach($requestpacket->getParams() as $param) {
-                $result[] = $this->controller->{$this->action}($param);
-            }
-
-            return $result;
-        } else return $this->controller->{$this->action}($requestpacket->getParams());
+            return $action;
+        }
+        else return $this->_controller->{$this->_action}($requestpacket->getParams());
     }
 
     function error_handler($errno, $errstr, $errfile, $errline, $errcontext)
@@ -174,6 +212,7 @@ class Modified extends BaseConnector
 
                 $responsepacket = new ResponsePacket();
                 $responsepacket->setError($error)
+                    ->setId('unknown')
                     ->setJtlrpc("2.0");
 
                 Response::send($responsepacket);
