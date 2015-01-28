@@ -9,6 +9,7 @@ class Installer {
 	private $_modules = array(
 		'check' => 'Check',
 		'connector' => 'Connector',
+		'levels' => 'CategoryLevels',
 		'tax_rate' => 'TaxRate',
 		'order_status' => 'OrderStatus'
 	);
