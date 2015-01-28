@@ -21,16 +21,16 @@ class PrimaryKeyMapper implements IPrimaryKeyMapper
 
     public function save($endpointId, $hostId, $type)
     {
-
-    }
-
-    public function update($endpointId = null, $hostId = null, $type)
-    {
-
+        $this->db->query('INSERT IGNORE INTO jtl_connector_link (endpointId, hostId, type) VALUES ('.$endpointId.','.$hostId.','.$type.')');
     }
 
     public function delete($endpointId = null, $hostId = null, $type)
     {
+        $where = 'type = '.$type;
 
+        if($endpointId) $where .= ' && endpointId = '.$endpointId;
+        if ($hostId) $where .= ' && hostId = '.$hostId;
+
+        $this->db->query('DELETE FROM jtl_connector_link WHERE '.$where);
     }
 }
