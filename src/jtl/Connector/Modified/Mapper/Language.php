@@ -12,12 +12,12 @@ class Language extends BaseMapper
         	"id" => "languages_id",
         	"nameEnglish" => "name",
         	"nameGerman" => "name",
-        	"localeName" => null,
+        	"languageISO" => null,
             "isDefault" => null
         )
     );
 
-    protected function localeName($data) {
+    protected function languageISO($data) {
     	return $this->fullLocale($data['code']);
     }
 

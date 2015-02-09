@@ -15,7 +15,8 @@ class GlobalData extends \jtl\Connector\Modified\Mapper\BaseMapper
         )
     );
 
-    public function pull() {
+    public function pull()
+    {
         $globalData = $this->generateModel(null);
 
         return [$globalData];

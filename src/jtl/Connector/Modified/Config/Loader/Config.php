@@ -1,13 +1,12 @@
 <?php
 namespace jtl\Connector\Modified\Config\Loader;
 
-use \jtl\Connector\Core\Config\Loader\Base as BaseLoader;
-use \jtl\Connector\Core\Filesystem\Tool;
-use \jtl\Connector\Core\Exception\ConfigException;
+use jtl\Connector\Core\Config\Loader\Base as BaseLoader;
+use jtl\Connector\Core\Filesystem\Tool;
+use jtl\Connector\Core\Exception\ConfigException;
 
 class Config extends BaseLoader
 {
-    
     const DELIMITER = '::';
 
     //Configuration params in modified-Config
@@ -29,7 +28,7 @@ class Config extends BaseLoader
       self::CFG_DB_NAME => 'db::name',
       self::CFG_DB_USER => 'db::user',
       self::CFG_DB_PASS => 'db::pass',
-      self::CFG_IMG_ORIGINAL => 'img::original'
+      self::CFG_IMG_ORIGINAL => 'img::original',
     );
 
     protected $config_file;
@@ -55,7 +54,7 @@ class Config extends BaseLoader
                 if (defined($value)) {
                     $s = constant($value);
                 }
-                if (strpos($this->trans[$value], self::DELIMITER) !== false) { // Special Key
+                if (strpos($this->trans[$value], self::DELIMITER) !== false) {
                     $ret = explode(self::DELIMITER, $this->trans[$value], 2);
                     if (!empty($ret) && is_array($ret)) {
                         if (!isset($data[$ret[0]])) {
@@ -63,8 +62,7 @@ class Config extends BaseLoader
                         }
                         $data[$ret[0]][$ret[1]] = $s;
                     }
-                }
-                else { // Default Key
+                } else {
                     $data[$this->trans[$value]] = $s;
                 }
             }
@@ -85,7 +83,7 @@ class Config extends BaseLoader
                 $keys[$key] = $value;
             }
         }
+
         return $keys;
     }
-
 }

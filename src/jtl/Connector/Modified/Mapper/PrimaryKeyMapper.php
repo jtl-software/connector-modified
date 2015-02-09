@@ -1,10 +1,18 @@
 <?php
 namespace jtl\Connector\Modified\Mapper;
 
-use \jtl\Connector\Mapper\IPrimaryKeyMapper;
+use jtl\Connector\Mapper\IPrimaryKeyMapper;
+use jtl\Connector\Core\Database\Mysql;
 
 class PrimaryKeyMapper implements IPrimaryKeyMapper
 {
+    protected $db;
+
+    public function __construct()
+    {
+        $this->db = Mysql::getInstance();
+    }
+
     public function getHostId($endpointId, $type)
     {
         $dbResult = $this->db->query('SELECT hostId FROM jtl_connector_link WHERE endpointId = '.$endpointId.' AND type = '.$type);

@@ -1,7 +1,7 @@
 <?php
 namespace jtl\Connector\Modified\Mapper;
 
-use \jtl\Connector\Modified\Mapper\BaseMapper;
+use jtl\Connector\Modified\Mapper\BaseMapper;
 
 class ProductI18n extends BaseMapper
 {
@@ -14,14 +14,14 @@ class ProductI18n extends BaseMapper
         "getMethod" => "getI18ns",
         "where" => array("products_id","language_id"),
         "mapPull" => array(
-        	"localeName" => null,
+            "languageISO" => null,
             "productId" => "products_id",
             "name" => "products_name",
             //"urlPath" => "products_url",
             "description" => "products_description",
             "metaDescription" => "products_meta_description",
             "metaKeywords" => "products_meta_keywords",
-            "shortDescription" => null
+            "shortDescription" => null,
         ),
         "mapPush" => array(
             "language_id" => null,
@@ -31,27 +31,31 @@ class ProductI18n extends BaseMapper
             "products_description" => "description",
             "products_meta_description" => "metaDescription",
             "products_meta_keywords" => "metaKeywords",
-            "products_short_description" => "shortDescription"
-        )
+            "products_short_description" => "shortDescription",
+        ),
     );
 
-    protected function localeName($data) {
-    	return $this->fullLocale($data['code']);
+    protected function languageISO($data)
+    {
+        return $this->fullLocale($data['code']);
     }
 
-    protected function shortDescription($data) {
+    protected function shortDescription($data)
+    {
         return !is_null($data['products_short_description']) ? $data['products_short_description'] : '';
     }
 
-    protected function language_id($data) {
-        return $this->locale2id($data->getLocaleName());
+    protected function language_id($data)
+    {
+        return $this->locale2id($data->getLanguageISO());
     }
 
-    public function push($parent,$dbObj) {
-        foreach($parent->getI18ns() as $i18n) {
+    public function push($parent, $dbObj)
+    {
+        foreach ($parent->getI18ns() as $i18n) {
             $i18n->setProductId($parent->getId());
         }
 
-        return parent::push($parent,$dbObj);
+        return parent::push($parent, $dbObj);
     }
 }

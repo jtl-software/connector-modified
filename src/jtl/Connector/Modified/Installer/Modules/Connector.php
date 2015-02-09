@@ -1,14 +1,20 @@
 <?php
 namespace jtl\Connector\Modified\Installer\Modules;
 
-use \jtl\Connector\Modified\Installer\Module;
+use jtl\Connector\Modified\Installer\Module;
 
-class Connector extends Module {
-	public static $name = '<span class="glyphicon glyphicon-transfer"></span> Connector configuration';
+class Connector extends Module
+{
+    public static $name = '<span class="glyphicon glyphicon-transfer"></span> Connector configuration';
 
-    public function form() {
-        if(is_null($this->config->platform_root)) $this->config->platform_root = realpath(CONNECTOR_DIR.'/../');
-        if(is_null($this->config->auth_token)) $this->config->auth_token = sha1(uniqid());
+    public function form()
+    {
+        if (is_null($this->config->platform_root)) {
+            $this->config->platform_root = realpath(CONNECTOR_DIR.'/../');
+        }
+        if (is_null($this->config->auth_token)) {
+            $this->config->auth_token = sha1(uniqid());
+        }
 
         $html = '
             <div class="form-group">
@@ -33,7 +39,8 @@ class Connector extends Module {
         return $html;
     }
 
-    public function save() {
+    public function save()
+    {
         $this->config->platform_root = $_REQUEST['config']['platform_root'];
         $this->config->auth_token = $_REQUEST['config']['auth_token'];
 

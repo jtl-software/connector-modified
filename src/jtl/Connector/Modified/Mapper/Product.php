@@ -1,7 +1,8 @@
 <?php
 namespace jtl\Connector\Modified\Mapper;
 
-use \jtl\Connector\Modified\Mapper\BaseMapper;
+use jtl\Connector\Modified\Mapper\BaseMapper;
+use jtl\Connector\Model\ProductStockLevel;
 
 class Product extends BaseMapper
 {
@@ -10,29 +11,28 @@ class Product extends BaseMapper
         "where" => "products_id",
         "identity" => "getId",
         "mapPull" => array(
-        	"id" => "products_id",
-			"ean" => "products_ean",
-			"stockLevel" => "products_quantity",
-			"sku" => "products_model",
+            "id" => "products_id",
+            "ean" => "products_ean",
+            //"stockLevel" => null,
+            "sku" => "products_model",
             "sort" => "products_sort",
-			"creationDate" => "products_date_added",
-			"availableFrom" => "products_date_available",
-			"productWeight" => "products_weight",
-			"manufacturerId" => null,
-			"manufacturerNumber" => "products_manufacturers_model",
+            "creationDate" => "products_date_added",
+            "availableFrom" => "products_date_available",
+            "productWeight" => "products_weight",
+            "manufacturerId" => null,
+            "manufacturerNumber" => "products_manufacturers_model",
             "basePriceUnitId" => null,
-			"basePriceDivisor" => "products_vpe_value",
-			"isTopProduct" => "products_startpage",
+            "basePriceDivisor" => "products_vpe_value",
+            "isTopProduct" => "products_startpage",
             "considerStock" => null,
-			"considerVariationStock" => null,
-			"permitNegativeStock" => null,
-			"vat" => null,
+            "considerVariationStock" => null,
+            "permitNegativeStock" => null,
             "i18ns" => "ProductI18n|addI18n",
             "categories" => "Product2Category|addCategory",
-            "prices" => "ProductPrice|addPrice",
+            //"prices" => "ProductPrice|addPrice",
             "specialPrices" => "ProductSpecialPrice|addSpecialPrice",
-            "variations" => "ProductVariation|addVariation",
-            "invisibilities" => "ProductInvisibility|addInvisibility"
+            //"variations" => "ProductVariation|addVariation",
+            "invisibilities" => "ProductInvisibility|addInvisibility",
         ),
         "mapPush" => array(
             "products_id" => "id",
@@ -48,36 +48,49 @@ class Product extends BaseMapper
             "products_vpe" => "basePriceUnitId",
             "products_vpe_value" => "basePriceDivisor",
             "products_startpage" => "isTopProduct",
-            "products_tax_class_id" => null,
+            //"products_tax_class_id" => null,
             "ProductI18n|addI18n" => "i18ns",
             "Product2Category|addCategory" => "categories",
             "ProductPrice|addPrice" => "prices",
             "ProductSpecialPrice|addSpecialPrice" => "specialPrices",
             "ProductVariation|addVariation" => "variations",
-            "ProductInvisibility|addInvisibility|true" => "invisibilities"
-        )
+            "ProductInvisibility|addInvisibility|true" => "invisibilities",
+        ),
     );
 
-    protected function manufacturerId($data) {
+    protected function stockLevel($data)
+    {
+        $stockLevel = new ProductStockLevel();
+        $stockLevel->setStockLevel($data['products_quantity']);
+
+        return $stockLevel;
+    }
+
+    protected function manufacturerId($data)
+    {
         return $this->replaceZero($data['manufacturers_id']);
     }
 
-    protected function basePriceUnitId($data) {
+    protected function basePriceUnitId($data)
+    {
         return $this->replaceZero($data['products_vpe']);
     }
 
-    protected function considerStock($data)  {
+    protected function considerStock($data)
+    {
         return $this->shopConfig['settings']['STOCK_CHECK'];
     }
 
-    protected function considerVariationStock($data)  {
+    protected function considerVariationStock($data)
+    {
         return $this->shopConfig['settings']['ATTRIBUTE_STOCK_CHECK'];
     }
 
-    protected function permitNegativeStock($data)  {
+    protected function permitNegativeStock($data)
+    {
         return $this->shopConfig['settings']['STOCK_ALLOW_CHECKOUT'];
     }
-
+    /*
     protected function vat($data) {
         $sql = $this->db->query('SELECT tax_rate FROM tax_rates WHERE tax_rates_id='.$this->connectorConfig->tax_rate);
         return floatval($sql[0]['tax_rate']);
@@ -87,4 +100,5 @@ class Product extends BaseMapper
         $sql = $this->db->query('SELECT tax_class_id FROM tax_rates WHERE tax_rates_id='.$this->connectorConfig->tax_rate);
         return $sql[0]['tax_class_id'];
     }
+    */
 }

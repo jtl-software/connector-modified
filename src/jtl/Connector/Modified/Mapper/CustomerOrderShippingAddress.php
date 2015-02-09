@@ -1,7 +1,7 @@
 <?php
 namespace jtl\Connector\Modified\Mapper;
 
-use \jtl\Connector\Modified\Mapper\BaseMapper;
+use jtl\Connector\Modified\Mapper\BaseMapper;
 
 class CustomerOrderShippingAddress extends BaseMapper
 {
@@ -9,19 +9,19 @@ class CustomerOrderShippingAddress extends BaseMapper
         "table" => "customer_orders",
         "getMethod" => "getShippingAddress",
         "mapPull" => array(
-        	"id" => null,
-			"customerId" => "customers_id",
-			"firstName" => "delivery_firstname",
-			"lastName" => "delivery_lastname",
-			"company" => "delivery_company",
-			"street" => "delivery_street_address",
-			"extraAddressLine" => "delivery_suburb",
-			"zipCode" => "delivery_postcode",
-			"city" => "delivery_city",
-			"state" => "delivery_state",
-			"countryIso" => "delivery_country_iso_code_2",
-            "eMail" => "customers_email_address"
-		),
+            "id" => null,
+            "customerId" => "customers_id",
+            "firstName" => "delivery_firstname",
+            "lastName" => "delivery_lastname",
+            "company" => "delivery_company",
+            "street" => "delivery_street_address",
+            "extraAddressLine" => "delivery_suburb",
+            "zipCode" => "delivery_postcode",
+            "city" => "delivery_city",
+            "state" => "delivery_state",
+            "countryIso" => "delivery_country_iso_code_2",
+            "eMail" => "customers_email_address",
+        ),
         "mapPush" => array(
             "delivery_name" => null,
             "delivery_firstname" => "firstName",
@@ -32,23 +32,27 @@ class CustomerOrderShippingAddress extends BaseMapper
             "delivery_postcode" => "zipCode",
             "delivery_city" => "city",
             "delivery_state" => "state",
-            "delivery_country_iso_code_2" => "countryIso"
-        )
+            "delivery_country_iso_code_2" => "countryIso",
+        ),
     );
 
-    public function pull($data) {
-       return array($this->generateModel($data));
+    public function pull($data)
+    {
+        return array($this->generateModel($data));
     }
 
-    protected function id($data) {
-    	return "cID_".$data['customers_id'];
+    protected function id($data)
+    {
+        return "cID_".$data['customers_id'];
     }
 
-    public function push($parent,$dbObj) {
-        $this->generateDbObj($parent->getShippingAddress(),$dbObj,null,true);
+    public function push($parent, $dbObj)
+    {
+        $this->generateDbObj($parent->getShippingAddress(), $dbObj, null, true);
     }
 
-    protected function delivery_name($data) {
+    protected function delivery_name($data)
+    {
         return $data->getFirstName().' '.$data->getLastName();
     }
 }

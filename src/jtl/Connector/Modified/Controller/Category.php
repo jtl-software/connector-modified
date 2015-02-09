@@ -1,5 +1,6 @@
 <?php
 namespace jtl\Connector\Modified\Controller;
 
-class Category extends BaseController {   
+class Category extends BaseController
+{
 }

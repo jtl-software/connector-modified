@@ -1,7 +1,7 @@
 <?php
 namespace jtl\Connector\Modified\Mapper;
 
-use \jtl\Connector\Modified\Mapper\BaseMapper;
+use jtl\Connector\Modified\Mapper\BaseMapper;
 
 class CustomerGroupI18n extends BaseMapper
 {
@@ -12,15 +12,17 @@ class CustomerGroupI18n extends BaseMapper
         "mapPull" => array(
             "customerGroupId" => "customers_status_id",
             "name" => null,
-            "localeName" => null
-        )
+            "languageISO" => null,
+        ),
     );
 
-    protected function localeName($data) {
-    	return $this->fullLocale($data['code']);
+    protected function languageISO($data)
+    {
+        return $this->fullLocale($data['code']);
     }
 
-    protected function name($data) {
+    protected function name($data)
+    {
         return html_entity_decode($data['customers_status_name']);
     }
 }

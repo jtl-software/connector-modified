@@ -21,17 +21,22 @@ class Modified extends BaseConnector
     protected $_controller;
     protected $_action;
 
-    public function __construct() {
+    public function initialize()
+    {
         $this->initConnectorConfig();
 
         $session = new SessionHelper("modified");
 
-        set_error_handler(array($this,'error_handler'), E_ALL);
-        set_exception_handler(array($this,'exception_handler'));
-        register_shutdown_function(array($this,'shutdown_handler'));
+        set_error_handler(array($this,'errorHandler'), E_ALL);
+        set_exception_handler(array($this,'exceptionHandler'));
+        register_shutdown_function(array($this,'shutdownHandler'));
 
-        if(!isset($session->shopConfig)) $session->shopConfig = $this->readConfigFile();
-        if(!isset($session->connectorConfig)) $session->connectorConfig = json_decode(@file_get_contents(CONNECTOR_DIR.'/config/config.json'));
+        if (!isset($session->shopConfig)) {
+            $session->shopConfig = $this->readConfigFile();
+        }
+        if (!isset($session->connectorConfig)) {
+            $session->connectorConfig = json_decode(@file_get_contents(CONNECTOR_DIR.'/config/config.json'));
+        }
 
         // get db singleton and connect
         $db = Mysql::getInstance();
@@ -47,7 +52,9 @@ class Modified extends BaseConnector
 
         $db->setNames();
 
-        if(!isset($session->shopConfig['settings'])) $session->shopConfig += $this->readConfigDb($db);
+        if (!isset($session->shopConfig['settings'])) {
+            $session->shopConfig += $this->readConfigDb($db);
+        }
 
         $this->setPrimaryKeyMapper(new PrimaryKeyMapper());
     }
@@ -56,10 +63,14 @@ class Modified extends BaseConnector
     {
         $config = null;
 
-        if (isset($_SESSION['config'])) $config = $_SESSION['config'];
+        if (isset($_SESSION['config'])) {
+            $config = $_SESSION['config'];
+        }
 
         if (empty($config)) {
-            if (!is_null($this->config)) $config = $this->getConfig();
+            if (!is_null($this->config)) {
+                $config = $this->getConfig();
+            }
 
             if (empty($config)) {
                 $json = new ConfigJson(CONNECTOR_DIR . '/config/config.json');
@@ -72,10 +83,13 @@ class Modified extends BaseConnector
             }
         }
 
-        if (!isset($_SESSION['config'])) $_SESSION['config'] = $config;
+        if (!isset($_SESSION['config'])) {
+            $_SESSION['config'] = $config;
+        }
     }
 
-    private function readConfigFile() {
+    private function readConfigFile()
+    {
         $connectorConfig = $this->getConfig();
         require_once($connectorConfig->read('connector_root') . '/includes/configure.php');
 
@@ -97,12 +111,13 @@ class Modified extends BaseConnector
         );
     }
 
-    private function readConfigDb($db) {
+    private function readConfigDb($db)
+    {
         $configDb = $db->query("SElECT configuration_key,configuration_value FROM configuration");
 
         $return = array();
 
-        foreach($configDb as $entry) {
+        foreach ($configDb as $entry) {
             $return[$entry['configuration_key']] = $entry['configuration_value'] == 'true' ? 1 : ($entry['configuration_value'] == 'false' ? 0 : $entry['configuration_value']);
         }
 
@@ -116,7 +131,7 @@ class Modified extends BaseConnector
         $controller = RpcMethod::buildController($this->getMethod()->getController());
         $class = "\\jtl\\Connector\\Modified\\Controller\\{$controller}";
 
-        if(class_exists($class)) {
+        if (class_exists($class)) {
             $this->_controller = $class::getInstance();
             $this->_action = RpcMethod::buildAction($this->getMethod()->getAction());
 
@@ -128,12 +143,14 @@ class Modified extends BaseConnector
 
     public function handle(RequestPacket $requestpacket)
     {
-       	$this->_controller->setMethod($this->getMethod());
+        $this->_controller->setMethod($this->getMethod());
 
         $result = array();
 
-        if($this->_action != Method::ACTION_PULL) {
-            if(!is_array($requestpacket->getParams())) throw new \Exception('data is not an array');
+        if ($this->_action != Method::ACTION_PULL) {
+            if (!is_array($requestpacket->getParams())) {
+                throw new \Exception('data is not an array');
+            }
 
             $action = new Action();
             $results = array();
@@ -149,11 +166,12 @@ class Modified extends BaseConnector
             }
 
             return $action;
+        } else {
+            return $this->_controller->{$this->_action}($requestpacket->getParams());
         }
-        else return $this->_controller->{$this->_action}($requestpacket->getParams());
     }
 
-    function error_handler($errno, $errstr, $errfile, $errline, $errcontext)
+    public function errorHandler($errno, $errstr, $errfile, $errline, $errcontext)
     {
         $types = array(
             E_ERROR => 'E_ERROR',
@@ -176,7 +194,7 @@ class Modified extends BaseConnector
         file_put_contents("/tmp/error.log", date("[Y-m-d H:i:s] ") . "(" . $types[$errno] . ") File ({$errfile}, {$errline}): {$errstr}\n", FILE_APPEND);
     }
 
-    public function exception_handler(\Exception $exception)
+    public function exceptionHandler(\Exception $exception)
     {
         $trace = $exception->getTrace();
         if (isset($trace[0]['args'][0])) {
@@ -199,10 +217,10 @@ class Modified extends BaseConnector
         Response::send($responsepacket);
     }
 
-    public function shutdown_handler()
+    public function shutdownHandler()
     {
-        if(($err = error_get_last())) {
-            if($err['type'] != 2 && $err['type'] != 8) {
+        if (($err = error_get_last())) {
+            if ($err['type'] != 2 && $err['type'] != 8) {
                 ob_clean();
 
                 $error = new Error();
@@ -220,4 +238,3 @@ class Modified extends BaseConnector
         }
     }
 }
-?>

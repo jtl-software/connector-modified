@@ -9,7 +9,7 @@ class ManufacturerI18n extends BaseMapper
         "mapPull" => array(
         	"manufacturerId" => "manufacturers_id",
         	"description" => "manufacturers_name",
-            "localeName" => "locale"
+            "languageISO" => "locale"
         )
     );
 

@@ -1,26 +1,26 @@
 <?php
 namespace jtl\Connector\Modified\Mapper;
 
-use \jtl\Connector\Modified\Mapper\BaseMapper;
+use jtl\Connector\Modified\Mapper\BaseMapper;
 
 class CustomerOrderBillingAddress extends BaseMapper
 {
     protected $mapperConfig = array(
         "getMethod" => "getBillingAddress",
         "mapPull" => array(
-        	"id" => null,
-			"customerId" => "customers_id",
-			"firstName" => "billing_firstname",
-			"lastName" => "billing_lastname",
-			"company" => "billing_company",
-			"street" => "billing_street_address",
-			"extraAddressLine" => "billing_suburb",
-			"zipCode" => "billing_postcode",
-			"city" => "billing_city",
-			"state" => "billing_state",
-			"countryIso" => "billing_country_iso_code_2",
-            "eMail" => "customers_email_address"
-		),
+            "id" => null,
+            "customerId" => "customers_id",
+            "firstName" => "billing_firstname",
+            "lastName" => "billing_lastname",
+            "company" => "billing_company",
+            "street" => "billing_street_address",
+            "extraAddressLine" => "billing_suburb",
+            "zipCode" => "billing_postcode",
+            "city" => "billing_city",
+            "state" => "billing_state",
+            "countryIso" => "billing_country_iso_code_2",
+            "eMail" => "customers_email_address",
+        ),
         "mapPush" => array(
             "customers_name" => null,
             "customers_lastname" => "lastName",
@@ -41,27 +41,32 @@ class CustomerOrderBillingAddress extends BaseMapper
             "billing_city" => "city",
             "billing_state" => "state",
             "billing_country_iso_code_2" => "countryIso",
-            "customers_email_address" => "eMail"
-        )
+            "customers_email_address" => "eMail",
+        ),
     );
 
-    public function pull($data) {
-       return array($this->generateModel($data));
+    public function pull($data)
+    {
+        return array($this->generateModel($data));
     }
 
-    protected function id($data) {
-    	return "cID_".$data['customers_id'];
+    protected function id($data)
+    {
+        return "cID_".$data['customers_id'];
     }
 
-    public function push($parent,$dbObj) {
-        $this->generateDbObj($parent->getBillingAddress(),$dbObj,null,true);
+    public function push($parent, $dbObj)
+    {
+        $this->generateDbObj($parent->getBillingAddress(), $dbObj, null, true);
     }
 
-    protected function customers_name($data) {
+    protected function customers_name($data)
+    {
         return $data->getFirstName().' '.$data->getLastName();
     }
 
-    protected function billing_name($data) {
+    protected function billing_name($data)
+    {
         return $data->getFirstName().' '.$data->getLastName();
     }
 }

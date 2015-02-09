@@ -1,15 +1,17 @@
 <?php
 namespace jtl\Connector\Modified\Installer\Modules;
 
-use \jtl\Connector\Modified\Installer\Module;
+use jtl\Connector\Modified\Installer\Module;
 
-class TaxRate extends Module {
+class TaxRate extends Module
+{
     public static $name = '<span class="glyphicon glyphicon-euro"></span> Default tax rate';
 
-    public function form() {
+    public function form()
+    {
         $rates = $this->db->query('SELECT r.tax_rates_id,r.tax_rate,r.tax_class_id,r.tax_description,c.tax_class_title FROM tax_rates r LEFT JOIN tax_class c ON r.tax_class_id=c.tax_class_id');
 
-        foreach($rates as $taxRate) {
+        foreach ($rates as $taxRate) {
             $selected = $taxRate['tax_rates_id'] == $this->config->tax_rate ? ' selected="selected"' : '';
             $options .= '<option value="'.$taxRate['tax_rates_id'].'"'.$selected.'>'.$taxRate['tax_description'].' - '.$taxRate['tax_class_title'].'</option>';
         }
@@ -27,7 +29,8 @@ class TaxRate extends Module {
         return $data['tax'];
     }
 
-    public function save() {
+    public function save()
+    {
         $this->config->tax_rate = $_REQUEST['tax_rate'];
 
         return true;

@@ -1,7 +1,7 @@
 <?php
 namespace jtl\Connector\Modified\Mapper;
 
-use \jtl\Connector\Modified\Mapper\BaseMapper;
+use jtl\Connector\Modified\Mapper\BaseMapper;
 use jtl\Core\Utilities\Date as DateUtil;
 
 class CustomerOrder extends BaseMapper
@@ -11,21 +11,21 @@ class CustomerOrder extends BaseMapper
         "where" => "orders_id",
         "identity" => "getId",
         "mapPull" => array(
-        	"id" => "orders_id",
+            "id" => "orders_id",
             "orderNumber" => "orders_id",
-        	"customerId" => "customers_id",
-        	"creationDate" => "date_purchased",
+            "customerId" => "customers_id",
+            "creationDate" => "date_purchased",
             "note" => "comments",
-        	"status" => null,
-        	"paymentModuleCode" => null,
-        	"currencyIso" => "currency",
-        	"shippingAddressId" => null,
-        	"billingAddressId" => null,
-        	"billingAddress" => "CustomerOrderBillingAddress|addBillingAddress",
+            "status" => null,
+            "paymentModuleCode" => null,
+            "currencyIso" => "currency",
+            "shippingAddressId" => null,
+            "billingAddressId" => null,
+            "billingAddress" => "CustomerOrderBillingAddress|addBillingAddress",
             "shippingAddress" => "CustomerOrderShippingAddress|addShippingAddress",
             "shippingMethodCode" => "shipping_class",
             "shippingMethodName" => "shipping_method",
-            "items" => "CustomerOrderItem|addItem"
+            "items" => "CustomerOrderItem|addItem",
         ),
         "mapPush" => array(
             "orders_id" => "id",
@@ -43,8 +43,8 @@ class CustomerOrder extends BaseMapper
             "delivery_address_format_id" => null,
             "shipping_class" => "shippingMethodCode",
             "shipping_method" => "shippingMethodName",
-            "CustomerOrderItem|addItem" => "items"
-        )
+            "CustomerOrderItem|addItem" => "items",
+        ),
     );
 
     private $paymentMapping = array(
@@ -68,80 +68,94 @@ class CustomerOrder extends BaseMapper
         'moneybookers_wlt' => 'pm_skrill_wlt',
         'invoice' => 'pm_invoice',
         'pn_sofortueberweisung' => 'pm_sofort',
-        'worldpay' => 'pm_worldpay'
+        'worldpay' => 'pm_worldpay',
     );
 
-    public function pull($params) {
-        if(isset($params->from) && isset($params->until)) {
-    	    $from = DateUtil::map($params->from,\DateTime::ISO8601,'Y-m-d H:i:s');
-    	    $until = DateUtil::map($params->until,\DateTime::ISO8601,'Y-m-d H:i:s');
-    	    $where = 'WHERE last_modified >= "'.$from.'" && last_modified <= "'.$until.'" ';
-    	}
-    	else $where = '';
+    public function pull($params)
+    {
+        if (isset($params->from) && isset($params->until)) {
+            $from = DateUtil::map($params->from, \DateTime::ISO8601, 'Y-m-d H:i:s');
+            $until = DateUtil::map($params->until, \DateTime::ISO8601, 'Y-m-d H:i:s');
+            $where = 'WHERE last_modified >= "'.$from.'" && last_modified <= "'.$until.'" ';
+        } else {
+            $where = '';
+        }
 
         $this->mapperConfig['query'] = 'SELECT * FROM orders '.$where;
 
-        return parent::pull(null,$params->offset,$params->limit);
+        return parent::pull(null, $params->offset, $params->limit);
     }
 
-    protected function status($data) {
-        return array_search($data['orders_status'],(array) $this->connectorConfig->mapping);
+    protected function status($data)
+    {
+        return array_search($data['orders_status'], (array) $this->connectorConfig->mapping);
     }
 
-    protected function orders_status($data) {
+    protected function orders_status($data)
+    {
         return $this->connectorConfig->mapping->{$data->getStatus()};
     }
 
-    protected function shippingAddressId($data) {
-    	return 'cID_'.$data['customers_id'];
+    protected function shippingAddressId($data)
+    {
+        return 'cID_'.$data['customers_id'];
     }
 
-    protected function billingAddressId($data) {
-    	return 'cID_'.$data['customers_id'];
+    protected function billingAddressId($data)
+    {
+        return 'cID_'.$data['customers_id'];
     }
 
-    protected function paymentModuleCode($data) {
+    protected function paymentModuleCode($data)
+    {
         return $this->paymentMapping[$data['payment_method']];
     }
 
-    protected function payment_method($data) {
+    protected function payment_method($data)
+    {
         $payments = array_flip($this->paymentMapping);
 
         return $payments[$data->getPaymentModuleCode()];
     }
 
-    protected function payment_class($data) {
+    protected function payment_class($data)
+    {
         $payments = array_flip($this->paymentMapping);
 
         return $payments[$data->getPaymentModuleCode()];
     }
 
-    protected function customers_address_format_id($data) {
+    protected function customers_address_format_id($data)
+    {
         return 5;
     }
 
-    protected function billing_address_format_id($data) {
+    protected function billing_address_format_id($data)
+    {
         return 5;
     }
 
-    protected function delivery_address_format_id($data) {
+    protected function delivery_address_format_id($data)
+    {
         return 5;
     }
 
-    public function push($data,$dbObj) {
-        $return = parent::push($data,$dbObj);
+    public function push($data, $dbObj)
+    {
+        $return = parent::push($data, $dbObj);
 
         $orderHistory = new \stdClass();
         $orderHistory->orders_id = $data->getId()->getEndpoint();
         $orderHistory->orders_status_id = $this->orders_status($data);
         $orderHistory->date_added = date('Y-m-d H:i:s');
 
-        $this->db->insertRow($orderHistory,'orders_status_history');
+        $this->db->insertRow($orderHistory, 'orders_status_history');
 
         return $return;
     }
 
-    public function complete($data) {
+    public function complete($data)
+    {
         $orderId = $data->getId()->getEndpoint();
 
         $queries = array(
@@ -149,15 +163,16 @@ class CustomerOrder extends BaseMapper
             'DELETE FROM orders_status_history WHERE orders_id='.$orderId,
             'DELETE FROM orders_products_attributes WHERE orders_id='.$orderId,
             'DELETE FROM orders_products WHERE orders_id='.$orderId,
-            'DELETE FROM orders WHERE orders_id='.$orderId
+            'DELETE FROM orders WHERE orders_id='.$orderId,
         );
 
-        foreach($queries as $query) {
+        foreach ($queries as $query) {
             $this->db->query($query);
         }
     }
 
-    public function addData($model,$data) {
+    public function addData($model, $data)
+    {
         $shipping = new \jtl\Connector\Model\CustomerOrderItem();
         $shipping->setType('shipping');
         $shipping->setName($data['shipping_method']);
@@ -171,10 +186,16 @@ class CustomerOrder extends BaseMapper
 
         $totalData = $this->db->query('SELECT class,value FROM orders_total WHERE orders_id='.$data['orders_id']);
 
-        foreach($totalData as $total) {
-            if($total['class'] == 'ot_shipping') $shipping->setPrice(floatval($total['value']));
-            if($total['class'] == 'ot_total') $sum += floatval($total['value']);
-            if($total['class'] == 'ot_tax') $sum -= floatval($total['value']);
+        foreach ($totalData as $total) {
+            if ($total['class'] == 'ot_shipping') {
+                $shipping->setPrice(floatval($total['value']));
+            }
+            if ($total['class'] == 'ot_total') {
+                $sum += floatval($total['value']);
+            }
+            if ($total['class'] == 'ot_tax') {
+                $sum -= floatval($total['value']);
+            }
         }
 
         $model->setTotalSum($sum);
