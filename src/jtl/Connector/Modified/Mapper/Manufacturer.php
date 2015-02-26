@@ -1,7 +1,7 @@
 <?php
 namespace jtl\Connector\Modified\Mapper;
 
-use \jtl\Connector\Modified\Mapper\BaseMapper;
+use jtl\Connector\Modified\Mapper\BaseMapper;
 
 class Manufacturer extends BaseMapper
 {
@@ -10,12 +10,12 @@ class Manufacturer extends BaseMapper
         "where" => "manufacturers_id",
         "identity" => "getId",
         "mapPull" => array(
-        	"id" => "manufacturers_id",
-        	"i18ns" => "ManufacturerI18n|addI18n"
+            "id" => "manufacturers_id",
+            "i18ns" => "ManufacturerI18n|addI18n",
         ),
         "mapPush" => array(
             "manufacturers_id" => "id",
-            "ManufacturerI18n|addI18n|true" => "i18ns"
-        )
+            "ManufacturerI18n|addI18n|true" => "i18ns",
+        ),
     );
 }

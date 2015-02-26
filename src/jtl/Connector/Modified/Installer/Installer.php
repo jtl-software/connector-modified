@@ -9,7 +9,7 @@ class Installer
     private $_modules = array(
         'check' => 'Check',
         'connector' => 'Connector',
-        'levels' => 'CategoryLevels',
+        //'levels' => 'CategoryLevels',
         'tax_rate' => 'TaxRate',
         'order_status' => 'OrderStatus',
     );
@@ -88,6 +88,7 @@ class Installer
 		        		<ul>';
 
                     foreach ($moduleErrors as $error) {
+                        var_dump($moduleErrors);
                         echo '<li>'.$error.'</li>';
                     }
 

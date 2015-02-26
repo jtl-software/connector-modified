@@ -6,6 +6,8 @@ use jtl\Connector\Model\Statistic;
 use jtl\Connector\Core\Controller\Controller;
 use jtl\Connector\Core\Model\DataModel;
 use jtl\Connector\Core\Model\QueryFilter;
+use jtl\Connector\Model\ConnectorIdentification;
+use jtl\Connector\Session\SessionHelper;
 
 class Connector extends Controller
 {
@@ -60,5 +62,26 @@ class Connector extends Controller
 
     public function push(DataModel $model)
     {
+    }
+
+    public function identify()
+    {
+        $action = new Action();
+        $action->setHandled(true);
+
+        $session = new SessionHelper("modified");
+        $config = $session->connectorConfig;
+
+        define('_VALID_XTC', true);
+        include $config->connector_root.'/admin/includes/version.php';
+
+        $connector = new ConnectorIdentification();
+        $connector->setEndpointVersion('1.0.0');
+        $connector->setPlatformName('Modified Shop');
+        $connector->setPlatformVersion(PROJECT_VERSION);
+
+        $action->setResult($connector);
+
+        return $action;
     }
 }

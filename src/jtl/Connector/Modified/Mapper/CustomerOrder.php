@@ -2,7 +2,6 @@
 namespace jtl\Connector\Modified\Mapper;
 
 use jtl\Connector\Modified\Mapper\BaseMapper;
-use jtl\Core\Utilities\Date as DateUtil;
 
 class CustomerOrder extends BaseMapper
 {
@@ -21,11 +20,11 @@ class CustomerOrder extends BaseMapper
             "currencyIso" => "currency",
             "shippingAddressId" => null,
             "billingAddressId" => null,
-            "billingAddress" => "CustomerOrderBillingAddress|addBillingAddress",
-            "shippingAddress" => "CustomerOrderShippingAddress|addShippingAddress",
-            "shippingMethodCode" => "shipping_class",
+            "billingAddress" => "CustomerOrderBillingAddress|setBillingAddress",
+            "shippingAddress" => "CustomerOrderShippingAddress|setShippingAddress",
+            "shippingMethodId" => "shipping_class",
             "shippingMethodName" => "shipping_method",
-            "items" => "CustomerOrderItem|addItem",
+            "items" => "CustomerOrderItem|addItem"
         ),
         "mapPush" => array(
             "orders_id" => "id",
@@ -73,17 +72,9 @@ class CustomerOrder extends BaseMapper
 
     public function pull($params)
     {
-        if (isset($params->from) && isset($params->until)) {
-            $from = DateUtil::map($params->from, \DateTime::ISO8601, 'Y-m-d H:i:s');
-            $until = DateUtil::map($params->until, \DateTime::ISO8601, 'Y-m-d H:i:s');
-            $where = 'WHERE last_modified >= "'.$from.'" && last_modified <= "'.$until.'" ';
-        } else {
-            $where = '';
-        }
+        $this->mapperConfig['query'] = 'SELECT * FROM orders';
 
-        $this->mapperConfig['query'] = 'SELECT * FROM orders '.$where;
-
-        return parent::pull(null, $params->offset, $params->limit);
+        return parent::pull(null, $params->limit);
     }
 
     protected function status($data)
@@ -177,8 +168,8 @@ class CustomerOrder extends BaseMapper
         $shipping->setType('shipping');
         $shipping->setName($data['shipping_method']);
         $shipping->setCustomerOrderId($this->identity($data['orders_id']));
-        $shipping->setId($this->identity('shipping'));
-        $shipping->setShippingClassId($this->identity($data['shipping_class']));
+        $shipping->settype('shipping');
+        $shipping->setId($this->identity($data['shipping_class']));
         $shipping->setQuantity(1);
         $shipping->setVat(0);
 

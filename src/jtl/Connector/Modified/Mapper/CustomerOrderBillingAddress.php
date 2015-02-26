@@ -19,7 +19,7 @@ class CustomerOrderBillingAddress extends BaseMapper
             "city" => "billing_city",
             "state" => "billing_state",
             "countryIso" => "billing_country_iso_code_2",
-            "eMail" => "customers_email_address",
+            "eMail" => "customers_email_address"
         ),
         "mapPush" => array(
             "customers_name" => null,
@@ -41,8 +41,8 @@ class CustomerOrderBillingAddress extends BaseMapper
             "billing_city" => "city",
             "billing_state" => "state",
             "billing_country_iso_code_2" => "countryIso",
-            "customers_email_address" => "eMail",
-        ),
+            "customers_email_address" => "eMail"
+        )
     );
 
     public function pull($data)

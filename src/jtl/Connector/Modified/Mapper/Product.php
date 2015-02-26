@@ -31,8 +31,9 @@ class Product extends BaseMapper
             "categories" => "Product2Category|addCategory",
             //"prices" => "ProductPrice|addPrice",
             "specialPrices" => "ProductSpecialPrice|addSpecialPrice",
-            //"variations" => "ProductVariation|addVariation",
+            "variations" => "ProductVariation|addVariation",
             "invisibilities" => "ProductInvisibility|addInvisibility",
+            "vat" => null
         ),
         "mapPush" => array(
             "products_id" => "id",
@@ -90,15 +91,16 @@ class Product extends BaseMapper
     {
         return $this->shopConfig['settings']['STOCK_ALLOW_CHECKOUT'];
     }
-    /*
-    protected function vat($data) {
+
+    protected function vat($data)
+    {
         $sql = $this->db->query('SELECT tax_rate FROM tax_rates WHERE tax_rates_id='.$this->connectorConfig->tax_rate);
         return floatval($sql[0]['tax_rate']);
     }
 
-    protected function products_tax_class_id($data) {
+    protected function products_tax_class_id($data)
+    {
         $sql = $this->db->query('SELECT tax_class_id FROM tax_rates WHERE tax_rates_id='.$this->connectorConfig->tax_rate);
         return $sql[0]['tax_class_id'];
     }
-    */
 }

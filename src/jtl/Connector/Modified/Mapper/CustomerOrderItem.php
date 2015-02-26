@@ -21,7 +21,7 @@ class CustomerOrderItem extends BaseMapper
             "vat" => "products_tax",
             "sku" => "products_model",
             "variations" => "CustomerOrderItemVariation|addVariation",
-            "type" => null,
+            "type" => null
         ),
         "mapPush" => array(
             "orders_products_id" => "id",

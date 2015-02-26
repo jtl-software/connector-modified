@@ -96,7 +96,6 @@ class BaseMapper
             $this->addData($model, $data);
         }
 
-        //return $this->type->isMain() ? $model->getPublic() : $model;
         return $model;
     }
 
@@ -179,27 +178,33 @@ class BaseMapper
             }
 
             if (!$addToParent) {
-                switch ($obj->getAction()) {
-                    case 'complete':
-                        if (isset($this->mapperConfig['where'])) {
+                //switch ($obj->getAction()) {
+                    //case 'complete':
+                        if (isset($this->mapperConfig['where'])) 
+                        {
                             $whereKey = $this->mapperConfig['where'];
                             $whereValue = $dbObj->{$this->mapperConfig['where']};
 
-                            if (is_array($whereKey)) {
+                            if (is_array($whereKey)) 
+                            {
                                 $whereValue = [];
-                                foreach ($whereKey as $key) {
+                                foreach ($whereKey as $key) 
+                                {
                                     $whereValue[] = $dbObj->{$key};
                                 }
                             }
 
-                            //$insertResult = $this->db->deleteInsertRow($dbObj,$this->mapperConfig['table'],$whereKey,$whereValue);
+                            $insertResult = $this->db->deleteInsertRow($dbObj, $this->mapperConfig['table'], $whereKey, $whereValue);
 
-                            if (isset($this->mapperConfig['identity'])) {
+                            if (isset($this->mapperConfig['identity'])) 
+                            {
                                 $obj->{$this->mapperConfig['identity']}()->setEndpoint($insertResult->getKey());
                             }
-                        }
-                        break;
 
+                            //var_dump($dbObj);
+                        }
+                        //break;
+                    /*
                     case 'insert':
                         //$insertResult = $this->db->insertRow($dbObj,$this->mapperConfig['table']);
 
@@ -240,8 +245,7 @@ class BaseMapper
                         }
                         break;
                 }
-
-                //if($obj->getAction()) var_dump($dbObj);
+                */
             } else {
                 foreach ($dbObj as $key => $value) {
                     $parentDbObj->$key = $value;
@@ -280,9 +284,9 @@ class BaseMapper
      * @param  integer $limit
      * @return array
      */
-    public function pull($parentData = null, $offset = 0, $limit = null)
+    public function pull($parentData = null, $limit = null)
     {
-        $limitQuery = isset($limit) ? ' LIMIT '.$offset.','.$limit : '';
+        $limitQuery = isset($limit) ? ' LIMIT '.$limit : '';
 
         if (isset($this->mapperConfig['query'])) {
             if (!is_null($parentData)) {

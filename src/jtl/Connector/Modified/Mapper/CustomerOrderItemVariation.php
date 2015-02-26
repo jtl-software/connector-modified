@@ -17,8 +17,8 @@ class CustomerOrderItemVariation extends BaseMapper
             "productVariationId" => "orders_products_options_id",
             "productVariationValueId" => "orders_products_options_values_id",
             "productVariationName" => "products_options",
-            "productVariationValueName" => "products_options_values",
-            "surcharge" => null,
+            "valueName" => "products_options_values",
+            //"surcharge" => null
         ),
         "mapPush" => array(
             "orders_products_attributes_id" => "id",
