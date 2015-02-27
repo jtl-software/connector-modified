@@ -15,6 +15,7 @@ use \jtl\Connector\Core\Config\Config;
 use \jtl\Connector\Core\Config\Loader\Json as ConfigJson;
 use \jtl\Connector\Core\Config\Loader\System as ConfigSystem;
 use \jtl\Connector\Result\Action;
+use \jtl\Connector\Modified\Auth\TokenLoader;
 
 class Modified extends BaseConnector
 {
@@ -57,6 +58,7 @@ class Modified extends BaseConnector
         }
 
         $this->setPrimaryKeyMapper(new PrimaryKeyMapper());
+        $this->setTokenLoader(new TokenLoader());
     }
 
     protected function initConnectorConfig()
@@ -78,14 +80,14 @@ class Modified extends BaseConnector
                     $json,
                     new ConfigSystem()
                 ));
-
-                $this->setConfig($config);
             }
         }
 
         if (!isset($_SESSION['config'])) {
             $_SESSION['config'] = $config;
         }
+
+        $this->setConfig($config);
     }
 
     private function readConfigFile()
@@ -178,10 +180,10 @@ class Modified extends BaseConnector
             E_WARNING => 'E_WARNING',
             E_PARSE => 'E_PARSE',
             E_NOTICE => 'E_NOTICE',
-            E_Connector_ERROR => 'E_Connector_ERROR',
-            E_Connector_WARNING => 'E_Connector_WARNING',
-            E_Connector_ERROR => 'E_COMPILE_ERROR',
-            E_Connector_WARNING => 'E_COMPILE_WARNING',
+            E_CORE_ERROR => 'E_Connector_ERROR',
+            E_CORE_WARNING => 'E_Connector_WARNING',
+            E_CORE_ERROR => 'E_COMPILE_ERROR',
+            E_CORE_WARNING => 'E_COMPILE_WARNING',
             E_USER_ERROR => 'E_USER_ERROR',
             E_USER_WARNING => 'E_USER_WARNING',
             E_USER_NOTICE => 'E_USER_NOTICE',

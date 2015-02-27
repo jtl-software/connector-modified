@@ -36,8 +36,13 @@ class PrimaryKeyMapper implements IPrimaryKeyMapper
     {
         $where = 'type = '.$type;
 
-        if ($endpointId) $where .= ' && endpointId = '.$endpointId;
-        if ($hostId) $where .= ' && hostId = '.$hostId;
+        if ($endpointId) {
+            $where .= ' && endpointId = '.$endpointId;
+        }
+
+        if ($hostId) {
+            $where .= ' && hostId = '.$hostId;
+        }
 
         $this->db->query('DELETE FROM jtl_connector_link WHERE '.$where);
     }

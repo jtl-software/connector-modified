@@ -2,7 +2,7 @@
 namespace jtl\Connector\Modified\Mapper;
 
 use jtl\Connector\Modified\Mapper\BaseMapper;
-use jtl\Core\Utilities\Language;
+use jtl\Connector\Core\Utilities\Language;
 
 class Customer extends BaseMapper
 {
@@ -61,9 +61,14 @@ class Customer extends BaseMapper
 
     public function push($data, $dbObj = null)
     {
+        if($data->getId()->getEndpoint() !== 0) {
+            $this->db->query('DELETE FROM address_book WHERE customers_id='.$data->getId()->getEndpoint());
+            $this->db->query('DELETE FROM customers_info WHERE customers_info_id='.$data->getId()->getEndpoint());
+        }
+
         $return = parent::push($data, $dbObj);
 
-        $iso = strtoupper(Language::map($data->getLocaleName()));
+        $iso = strtoupper(Language::map($data->getCountryIso()));
         $countryResult = $this->db->query('SELECT countries_id FROM countries WHERE countries_iso_code_2="'.$iso.'"');
 
         $entry = new \stdClass();
@@ -77,32 +82,24 @@ class Customer extends BaseMapper
         $entry->entry_postcode = $data->getZipCode();
         $entry->entry_city = $data->getCity();
         $entry->entry_state = $data->getState();
+        $entry->address_class = 'primary';
         $entry->entry_country_id = ($countryResult) ? $countryResult[0]['countries_id'] : '81'; // if country not found set to default xtc ID for germany
 
-        if ($data->getAction() == "update") {
-            $default = $this->db->query('SELECT customers_default_address_id FROM customers WHERE customers_id='.$data->getId()->getEndpoint());
-            if ($default) {
-                $entry->address_book_id = $default[0]['customers_default_address_id'];
-            }
+        $address = $this->db->insertRow($entry, 'address_book');
 
-            $entryUpdate = $this->db->updateRow($entry, 'address_book', 'address_book_id', $entry->address_book_id);
-        } elseif ($data->getAction() == "insert") {
-            $address = $this->db->insertRow($entry, 'address_book');
+        $customerUpdate = new \stdClass();
+        $customerUpdate->customers_default_address_id = $address->getKey();
 
-            $customerUpdate = new \stdClass();
-            $customerUpdate->customers_default_address_id = $address->getKey();
+        $insertResult = $this->db->updateRow($customerUpdate, $this->mapperConfig['table'], 'customers_id', $data->getId()->getEndpoint());
 
-            $insertResult = $this->db->updateRow($customerUpdate, $this->mapperConfig['table'], 'customers_id', $data->getId()->getEndpoint());
+        $addressUpdate = new \stdClass();
+        $addressUpdate->customers_id = $data->getId()->getEndpoint();
 
-            $addressUpdate = new \stdClass();
-            $addressUpdate->customers_id = $data->getId()->getEndpoint();
+        $this->db->updateRow($addressUpdate, 'address_book', 'address_book_id', $address->getKey());
 
-            $this->db->updateRow($addressUpdate, 'address_book', 'address_book_id', $address->getKey());
-
-            $infoObj = new \stdClass();
-            $infoObj->customers_info_id = $insertResult->getKey();
-            $this->db->insertRow($infoObj, 'customers_info');
-        }
+        $infoObj = new \stdClass();
+        $infoObj->customers_info_id = $insertResult->getKey();
+        $this->db->insertRow($infoObj, 'customers_info');
 
         return $return;
     }

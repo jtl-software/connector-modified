@@ -104,4 +104,9 @@ class BaseController extends Controller
             return $action;
         }
     }
+
+    public function delete(DataModel $model)
+    {
+
+    }
 }

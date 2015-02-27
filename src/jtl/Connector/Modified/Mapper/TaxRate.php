@@ -9,10 +9,8 @@ class TaxRate extends BaseMapper
         "table" => "tax_rates",
         "mapPull" => array(
             "id" => "tax_rates_id",
-            "taxZoneId" => "tax_zone_id",
-            "taxClassId" => "tax_class_id",
             "rate" => "tax_rate",
-            "priority" => "tax_priority",
-        ),
+            "priority" => "tax_priority"
+        )
     );
 }

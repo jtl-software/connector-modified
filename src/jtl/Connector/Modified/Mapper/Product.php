@@ -13,7 +13,7 @@ class Product extends BaseMapper
         "mapPull" => array(
             "id" => "products_id",
             "ean" => "products_ean",
-            //"stockLevel" => null,
+            "stockLevel" => "ProductStockLevel|setStockLevel",
             "sku" => "products_model",
             "sort" => "products_sort",
             "creationDate" => "products_date_added",
@@ -23,13 +23,14 @@ class Product extends BaseMapper
             "manufacturerNumber" => "products_manufacturers_model",
             "basePriceUnitId" => null,
             "basePriceDivisor" => "products_vpe_value",
+            "isActive" => "products_status",
             "isTopProduct" => "products_startpage",
             "considerStock" => null,
             "considerVariationStock" => null,
             "permitNegativeStock" => null,
             "i18ns" => "ProductI18n|addI18n",
             "categories" => "Product2Category|addCategory",
-            //"prices" => "ProductPrice|addPrice",
+            "prices" => "ProductPrice|addPrice",
             "specialPrices" => "ProductSpecialPrice|addSpecialPrice",
             "variations" => "ProductVariation|addVariation",
             "invisibilities" => "ProductInvisibility|addInvisibility",
@@ -48,8 +49,9 @@ class Product extends BaseMapper
             "products_manufacturers_model" => "manufacturerNumber",
             "products_vpe" => "basePriceUnitId",
             "products_vpe_value" => "basePriceDivisor",
+            "products_status" => "isActive",
             "products_startpage" => "isTopProduct",
-            //"products_tax_class_id" => null,
+            "products_tax_class_id" => null,
             "ProductI18n|addI18n" => "i18ns",
             "Product2Category|addCategory" => "categories",
             "ProductPrice|addPrice" => "prices",
@@ -58,14 +60,6 @@ class Product extends BaseMapper
             "ProductInvisibility|addInvisibility|true" => "invisibilities",
         ),
     );
-
-    protected function stockLevel($data)
-    {
-        $stockLevel = new ProductStockLevel();
-        $stockLevel->setStockLevel($data['products_quantity']);
-
-        return $stockLevel;
-    }
 
     protected function manufacturerId($data)
     {

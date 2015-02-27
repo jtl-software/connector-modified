@@ -163,16 +163,14 @@ class BaseMapper
                             $type = $this->type->getProperty($host)->getType();
                             if ($type == "DateTime") {
                                 $value = $value->format('Y-m-d H:i:s');
-                            } elseif ($type == "bool") {
+                            } elseif ($type == "boolean") {
                                 settype($value, "integer");
                             }
                         }
+
+                        $dbObj->$endpoint = $value;
                     } else {
                         throw new \Exception("There is no property or method to map ".$endpoint);
-                    }
-
-                    if (!empty($value)) {
-                        $dbObj->$endpoint = $value;
                     }
                 }
             }
@@ -200,8 +198,6 @@ class BaseMapper
                             {
                                 $obj->{$this->mapperConfig['identity']}()->setEndpoint($insertResult->getKey());
                             }
-
-                            //var_dump($dbObj);
                         }
                         //break;
                     /*
@@ -327,7 +323,7 @@ class BaseMapper
     {
         $parent = null;
 
-        if (method_exists($data, 'getAction') && $data->getAction() == 'complete' && method_exists(get_class($this), 'complete')) {
+        if (method_exists(get_class($this), 'complete')) {
             $this->complete($data);
         }
 

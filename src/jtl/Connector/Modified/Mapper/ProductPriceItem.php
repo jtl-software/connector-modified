@@ -23,7 +23,7 @@ class ProductPriceItem extends BaseMapper
 
         foreach ($pricesData as $priceData) {
             $return[] = $this->generateModel($priceData);
-            if ($data['customers_status_id'] == $this->shopConfig['settings']['DEFAULT_CUSTOMERS_STATUS_ID'] && $priceData['quantity'] == 1) {
+            if ($priceData['quantity'] == 1) {
                 $defaultSet = true;
             }
         }
