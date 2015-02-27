@@ -39,7 +39,6 @@ class Modified extends BaseConnector
             $session->connectorConfig = json_decode(@file_get_contents(CONNECTOR_DIR.'/config/config.json'));
         }
 
-        // get db singleton and connect
         $db = Mysql::getInstance();
 
         if (!$db->isConnected()) {
