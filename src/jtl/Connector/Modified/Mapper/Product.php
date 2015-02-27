@@ -39,7 +39,7 @@ class Product extends BaseMapper
         "mapPush" => array(
             "products_id" => "id",
             "products_ean" => "ean",
-            "products_quantity" => "stockLevel",
+            "products_quantity" => null,
             "products_model" => "sku",
             "products_sort" => "sort",
             "products_date_added" => "creationDate",
@@ -96,5 +96,10 @@ class Product extends BaseMapper
     {
         $sql = $this->db->query('SELECT tax_class_id FROM tax_rates WHERE tax_rates_id='.$this->connectorConfig->tax_rate);
         return $sql[0]['tax_class_id'];
+    }
+
+    protected function products_quantity($data)
+    {
+        return $data->getStockLevel()->getStockLevel();
     }
 }

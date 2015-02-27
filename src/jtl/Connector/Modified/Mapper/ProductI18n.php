@@ -17,7 +17,7 @@ class ProductI18n extends BaseMapper
             "languageISO" => null,
             "productId" => "products_id",
             "name" => "products_name",
-            //"urlPath" => "products_url",
+            "urlPath" => "products_url",
             "description" => "products_description",
             "metaDescription" => "products_meta_description",
             "metaKeywords" => "products_meta_keywords",
@@ -52,6 +52,10 @@ class ProductI18n extends BaseMapper
 
     public function push($parent, $dbObj)
     {
+        if (!empty($parent->getId()->getEndpoint())) {
+            $this->db->query('DELETE FROM products_description WHERE products_id='.$parent->getId()->getEndpoint());
+        }
+
         foreach ($parent->getI18ns() as $i18n) {
             $i18n->setProductId($parent->getId());
         }

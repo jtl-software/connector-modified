@@ -19,7 +19,8 @@ class CustomerOrderBillingAddress extends BaseMapper
             "city" => "billing_city",
             "state" => "billing_state",
             "countryIso" => "billing_country_iso_code_2",
-            "eMail" => "customers_email_address"
+            "eMail" => "customers_email_address",
+            "phone" => "customers_telephone"
         ),
         "mapPush" => array(
             "customers_name" => null,

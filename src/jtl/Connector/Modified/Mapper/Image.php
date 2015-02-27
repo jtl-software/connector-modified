@@ -76,9 +76,16 @@ class Image extends BaseMapper
         $totalImages = 0;
         $totalImages += parent::statistic();
 
-        $objs = $this->db->query("SELECT count(*) as count FROM products WHERE products_image != '' LIMIT 1", array("return" => "object"));
-        if ($objs !== null) {
-            $totalImages += intval($objs[0]->count);
+        $additionalProductImages = $this->db->query("SELECT count(*) as count FROM products WHERE products_image != '' LIMIT 1", array("return" => "object"));
+
+        if ($additionalProductImages !== null) {
+            $totalImages += intval($additionalProductImages[0]->count);
+        }
+
+        $categoryImages = $this->db->query("SELECT count(*) as count FROM categories WHERE categories_image != '' LIMIT 1", array("return" => "object"));
+
+        if ($categoryImages !== null) {
+            $totalImages += intval($categoryImages[0]->count);
         }
 
         return $totalImages;

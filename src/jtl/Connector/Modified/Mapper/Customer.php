@@ -8,7 +8,7 @@ class Customer extends BaseMapper
 {
     protected $mapperConfig = array(
         "table" => "customers",
-        "query" => "SELECT * FROM customers LEFT JOIN address_book ON customers.customers_default_address_id = address_book.address_book_id LEFT JOIN countries ON countries.countries_id = address_book.entry_country_id WHERE customers.customers_status > 0",
+        "query" => "SELECT * FROM customers LEFT JOIN address_book ON customers.customers_default_address_id = address_book.address_book_id LEFT JOIN countries ON countries.countries_id = address_book.entry_country_id",
         "where" => "customers_id",
         "identity" => "getId",
         "mapPull" => array(

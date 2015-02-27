@@ -24,6 +24,10 @@ class Product2Category extends BaseMapper
 
     public function push($parent, $dbObj)
     {
+        if (!empty($parent->getId()->getEndpoint())) {
+            $this->db->query('DELETE FROM products_to_categories WHERE products_id='.$parent->getId()->getEndpoint());
+        }
+
         foreach ($parent->getCategories() as $category) {
             $category->setProductId($parent->getId());
         }

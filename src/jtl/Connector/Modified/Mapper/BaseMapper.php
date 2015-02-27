@@ -178,28 +178,27 @@ class BaseMapper
             if (!$addToParent) {
                 //switch ($obj->getAction()) {
                     //case 'complete':
-                        if (isset($this->mapperConfig['where'])) 
-                        {
-                            $whereKey = $this->mapperConfig['where'];
-                            $whereValue = $dbObj->{$this->mapperConfig['where']};
+                $whereKey = null;
+                $whereValue = null;
 
-                            if (is_array($whereKey)) 
-                            {
-                                $whereValue = [];
-                                foreach ($whereKey as $key) 
-                                {
-                                    $whereValue[] = $dbObj->{$key};
-                                }
-                            }
+                if (isset($this->mapperConfig['where'])) {
+                    $whereKey = $this->mapperConfig['where'];
+                    $whereValue = $dbObj->{$this->mapperConfig['where']};
 
-                            $insertResult = $this->db->deleteInsertRow($dbObj, $this->mapperConfig['table'], $whereKey, $whereValue);
-
-                            if (isset($this->mapperConfig['identity'])) 
-                            {
-                                $obj->{$this->mapperConfig['identity']}()->setEndpoint($insertResult->getKey());
-                            }
+                    if (is_array($whereKey)) {
+                        $whereValue = [];
+                        foreach ($whereKey as $key) {
+                            $whereValue[] = $dbObj->{$key};
                         }
-                        //break;
+                    }
+                }
+
+                $insertResult = $this->db->deleteInsertRow($dbObj, $this->mapperConfig['table'], $whereKey, $whereValue);
+
+                if (isset($this->mapperConfig['identity'])) {
+                    $obj->{$this->mapperConfig['identity']}()->setEndpoint($insertResult->getKey());
+                }
+                    //break;
                     /*
                     case 'insert':
                         //$insertResult = $this->db->insertRow($dbObj,$this->mapperConfig['table']);
@@ -322,10 +321,6 @@ class BaseMapper
     public function push($data, $dbObj = null)
     {
         $parent = null;
-
-        if (method_exists(get_class($this), 'complete')) {
-            $this->complete($data);
-        }
 
         if (isset($this->mapperConfig['getMethod'])) {
             $subGetMethod = $this->mapperConfig['getMethod'];

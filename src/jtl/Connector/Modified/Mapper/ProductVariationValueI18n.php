@@ -12,7 +12,7 @@ class ProductVariationValueI18n extends BaseMapper
         "mapPull" => array(
             "productVariationValueId" => "products_options_values_id",
             "name" => "products_options_values_name",
-            "localeName" => null,
+            "languageISO" => null,
         ),
         "mapPush" => array(
             "products_options_values_id" => null,
@@ -21,14 +21,14 @@ class ProductVariationValueI18n extends BaseMapper
         ),
     );
 
-    protected function localeName($data)
+    protected function languageISO($data)
     {
         return $this->id2locale($data['language_id']);
     }
 
     protected function language_id($data)
     {
-        return $this->locale2id($data->getLocaleName());
+        return $this->locale2id($data->getLanguageISO());
     }
 
     public function push($parent, $dbObj)

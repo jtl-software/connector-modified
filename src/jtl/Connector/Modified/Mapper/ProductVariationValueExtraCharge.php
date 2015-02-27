@@ -11,7 +11,9 @@ class ProductVariationValueExtraCharge extends BaseMapper
         $return = [];
 
         if ($data['options_values_price'] != 0) {
-            foreach ($this->getCustomerGroups() as $groupId) {
+            foreach ($this->getCustomerGroups() as $group) {
+                $groupId = $group['customers_status_id'];
+
                 if ($groupId == $this->shopConfig['settings']['DEFAULT_CUSTOMERS_STATUS_ID']) {
                     $extraCharge = new ProductVariationValueExtraChargeModel();
                     $extraCharge->setCustomerGroupId($this->identity($groupId['customers_status_id']));

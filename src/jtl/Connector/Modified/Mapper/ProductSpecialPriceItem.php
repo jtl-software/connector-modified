@@ -20,7 +20,7 @@ class ProductSpecialPriceItem extends BaseMapper
 
     public function push($parent, $dbObj)
     {
-        $prices = $parent->getSpecialPrices();
+        $prices = $parent->getItems();
         $dbObj->specials_new_products_price = $prices[0]->getPriceNet();
     }
 

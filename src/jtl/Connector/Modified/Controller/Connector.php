@@ -64,6 +64,10 @@ class Connector extends Controller
     {
     }
 
+    public function delete(DataModel $model)
+    {
+    }
+
     public function identify()
     {
         $action = new Action();

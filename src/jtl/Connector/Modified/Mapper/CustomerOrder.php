@@ -40,7 +40,7 @@ class CustomerOrder extends BaseMapper
             "customers_address_format_id" => null,
             "billing_address_format_id" => null,
             "delivery_address_format_id" => null,
-            "shipping_class" => "shippingMethodCode",
+            "shipping_class" => "shippingMethodId",
             "shipping_method" => "shippingMethodName",
             "CustomerOrderItem|addItem" => "items",
         ),
@@ -133,6 +133,10 @@ class CustomerOrder extends BaseMapper
 
     public function push($data, $dbObj)
     {
+        if (!empty($data->getId()->getEndpoint())) {
+            $this->clear($data->getId()->getEndpoint());
+        }
+
         $return = parent::push($data, $dbObj);
 
         $orderHistory = new \stdClass();
@@ -145,13 +149,10 @@ class CustomerOrder extends BaseMapper
         return $return;
     }
 
-    public function complete($data)
+    public function clear($orderId)
     {
-        $orderId = $data->getId()->getEndpoint();
-
         $queries = array(
             'DELETE FROM orders_total WHERE orders_id='.$orderId,
-            'DELETE FROM orders_status_history WHERE orders_id='.$orderId,
             'DELETE FROM orders_products_attributes WHERE orders_id='.$orderId,
             'DELETE FROM orders_products WHERE orders_id='.$orderId,
             'DELETE FROM orders WHERE orders_id='.$orderId,
