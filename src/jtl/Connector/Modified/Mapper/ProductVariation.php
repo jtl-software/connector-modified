@@ -10,18 +10,16 @@ class ProductVariation extends BaseMapper
         "query" => 'SELECT * FROM products_attributes WHERE products_id=[[products_id]] GROUP BY options_id',
         "where" => "options_id",
         "getMethod" => "getVariations",
-        "identity" => "getId",
         "mapPull" => array(
             "id" => "options_id",
             "productId" => "products_id",
             "sort" => "sort_order",
             "i18ns" => "ProductVariationI18n|addI18n",
-            //"values" => "ProductVariationValue|addValue"
+            "values" => "ProductVariationValue|addValue"
         ),
         "mapPush" => array(
-            //"products_options_id" => "id",
             "ProductVariationI18n|addI18n" => "i18ns",
-            //"ProductVariationValue|addValue" => "values"
+            "ProductVariationValue|addValue" => "values"
         )
     );
 
@@ -45,12 +43,12 @@ class ProductVariation extends BaseMapper
             $variation->setId($this->identity($nextId));
             $variation->setProductId($parent->getId());
 
+            foreach ($variation->getI18ns() as $i18n) {
+                $i18n->getProductVariationId()->setEndpoint($nextId);
+            }
+
             $nextId++;
         }
-
-//!!!!!!!!!!!!!!! neue ID wird nicht in submapper übergeben
-var_dump($parent->getVariations());
-die();
 
         return parent::push($parent, $dbObj);
     }

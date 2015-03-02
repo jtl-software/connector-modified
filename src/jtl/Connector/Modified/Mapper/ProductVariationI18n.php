@@ -32,13 +32,6 @@ class ProductVariationI18n extends BaseMapper
 
     public function push($parent, $dbObj)
     {
-        var_dump($parent);
-        die();
-
-        foreach ($parent->getI18ns() as $i18n) {
-            $i18n->setProductVariationId($parent->getId());
-        }
-
         return parent::push($parent->getI18ns(), $dbObj);
     }
 }
