@@ -5,6 +5,9 @@ class Category extends \jtl\Connector\Modified\Mapper\BaseMapper
 {
     protected $mapperConfig = array(
         "table" => "categories",
+        "query" => "SELECT c.* FROM categories c
+            LEFT JOIN jtl_connector_link l ON c.categories_id = l.endpointId AND l.type = 0
+            WHERE l.hostId IS NULL",
         "where" => "categories_id",
         "identity" => "getId",
         "mapPull" => array(

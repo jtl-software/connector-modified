@@ -8,11 +8,15 @@ class Customer extends BaseMapper
 {
     protected $mapperConfig = array(
         "table" => "customers",
-        "query" => "SELECT * FROM customers LEFT JOIN address_book ON customers.customers_default_address_id = address_book.address_book_id LEFT JOIN countries ON countries.countries_id = address_book.entry_country_id",
+        "query" => "SELECT c.* FROM customers c
+            LEFT JOIN address_book a ON c.customers_default_address_id = a.address_book_id
+            LEFT JOIN countries co ON co.countries_id = a.entry_country_id
+            LEFT JOIN jtl_connector_link l ON c.customers_id = l.endpointId AND l.type = 16
+            WHERE l.hostId IS NULL",
         "where" => "customers_id",
         "identity" => "getId",
         "mapPull" => array(
-            "id" =>    "customers_id",
+            "id" => "customers_id",
             "customerGroupId" => null,
             "customerNumber" => "customers_cid",
             "salutation" => "customers_gender",

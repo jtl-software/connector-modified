@@ -7,6 +7,9 @@ class CustomerOrder extends BaseMapper
 {
     protected $mapperConfig = array(
         "table" => "orders",
+        "query" => "SELECT o.* FROM orders o
+            LEFT JOIN jtl_connector_link l ON o.orders_id = l.endpointId AND l.type = 21
+            WHERE l.hostId IS NULL",
         "where" => "orders_id",
         "identity" => "getId",
         "mapPull" => array(
@@ -72,8 +75,6 @@ class CustomerOrder extends BaseMapper
 
     public function pull($params)
     {
-        $this->mapperConfig['query'] = 'SELECT * FROM orders';
-
         return parent::pull(null, $params->limit);
     }
 

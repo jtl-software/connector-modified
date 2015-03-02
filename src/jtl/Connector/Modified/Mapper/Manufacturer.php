@@ -7,6 +7,9 @@ class Manufacturer extends BaseMapper
 {
     protected $mapperConfig = array(
         "table" => "manufacturers",
+        "query" => "SELECT m.* FROM manufacturers m
+            LEFT JOIN jtl_connector_link l ON m.manufacturers_id = l.endpointId AND l.type = 41
+            WHERE l.hostId IS NULL",
         "where" => "manufacturers_id",
         "identity" => "getId",
         "mapPull" => array(
