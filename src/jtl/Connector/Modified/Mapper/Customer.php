@@ -12,7 +12,8 @@ class Customer extends BaseMapper
             LEFT JOIN address_book a ON c.customers_default_address_id = a.address_book_id
             LEFT JOIN countries co ON co.countries_id = a.entry_country_id
             LEFT JOIN jtl_connector_link l ON c.customers_id = l.endpointId AND l.type = 16
-            WHERE l.hostId IS NULL",
+            WHERE l.hostId IS NULL
+            ORDER BY c.customers_date_added",
         "where" => "customers_id",
         "identity" => "getId",
         "mapPull" => array(
