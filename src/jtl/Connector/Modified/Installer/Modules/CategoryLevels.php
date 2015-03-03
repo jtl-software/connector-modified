@@ -7,17 +7,17 @@ class CategoryLevels extends Module
 {
     public static $name = '<span class="glyphicon glyphicon-th-list"></span> Category levels';
 
-    private $_tree = array();
+    private $tree = array();
 
     public function form()
     {
         $this->getChildren();
 
-        usort($this->_tree, function ($a, $b) {
+        usort($this->tree, function ($a, $b) {
             return $a['level'] - $b['level'];
         });
 
-        var_dump($this->_tree);
+        var_dump($this->tree);
     }
 
     public function save()
@@ -41,7 +41,7 @@ class CategoryLevels extends Module
                 $ids[] = $child['categories_id'];
 
                 $child['level'] = $level;
-                $this->_tree[] = $child;
+                $this->tree[] = $child;
             }
 
             $this->getChildren($ids, $level + 1);

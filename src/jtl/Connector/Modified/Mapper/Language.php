@@ -13,8 +13,8 @@ class Language extends BaseMapper
             "nameEnglish" => "name",
             "nameGerman" => "name",
             "languageISO" => null,
-            "isDefault" => null,
-        ),
+            "isDefault" => null
+        )
     );
 
     protected function languageISO($data)

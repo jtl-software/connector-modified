@@ -13,8 +13,8 @@ class CustomerGroup extends BaseMapper
             "id" => "customers_status_id",
             "discount" => "customers_status_discount",
             "isDefault" => null,
-            "i18ns" => "CustomerGroupI18n|addI18n",
-        ),
+            "i18ns" => "CustomerGroupI18n|addI18n"
+        )
     );
 
     protected function isDefault($data)

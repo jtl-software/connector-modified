@@ -18,7 +18,7 @@ class ProductSpecialPrice extends BaseMapper
             "stockLimit" => "specials_quantity",
             "considerStockLimit" => null,
             "considerDateLimit" => null,
-            "items" => "ProductSpecialPriceItem|addItem",
+            "items" => "ProductSpecialPriceItem|addItem"
         ),
         "mapPush" => array(
             "specials_id" => "id",
@@ -26,8 +26,8 @@ class ProductSpecialPrice extends BaseMapper
             "status" => "isActive",
             "expires_date" => "activeUntilDate",
             "specials_quantity" => "stockLimit",
-            "ProductSpecialPriceItem|addItem|true" => "items",
-        ),
+            "ProductSpecialPriceItem|addItem|true" => "items"
+        )
     );
 
     protected function considerStockLimit($data)

@@ -202,7 +202,6 @@ class BaseMapper
                 }
             }
 
-            // sub mapper
             foreach ($subMapper as $endpoint => $host) {
                 list($endpoint, $navSetMethod) = explode('|', $endpoint);
 
@@ -289,6 +288,21 @@ class BaseMapper
     }
 
     /**
+     * Default statistics
+     * @return number
+     */
+    public function statistic()
+    {
+        if (isset($this->mapperConfig['query'])) {
+            $objs = $this->db->query("SELECT count(*) as count FROM ({$this->mapperConfig['query']}) q LIMIT 1", array("return" => "object"));
+        } else {
+            $objs = $this->db->query("SELECT count(*) as count FROM {$this->mapperConfig['table']} LIMIT 1", array("return" => "object"));
+        }
+
+        return $objs !== null ? intval($objs[0]->count) : 0;
+    }
+
+    /**
      * Get full locale by ISO code
      * @param  string   $country
      * @return Ambigous <NULL, multitype:string , string>
@@ -330,21 +344,6 @@ class BaseMapper
     public function replaceZero($data)
     {
         return ($data == 0) ? '' : $data;
-    }
-
-    /**
-     * Default statistics
-     * @return number
-     */
-    public function statistic()
-    {
-        if (isset($this->mapperConfig['query'])) {
-            $objs = $this->db->query("SELECT count(*) as count FROM ({$this->mapperConfig['query']}) q LIMIT 1", array("return" => "object"));
-        } else {
-            $objs = $this->db->query("SELECT count(*) as count FROM {$this->mapperConfig['table']} LIMIT 1", array("return" => "object"));
-        }
-
-        return $objs !== null ? intval($objs[0]->count) : 0;
     }
 
     /**

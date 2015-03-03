@@ -8,13 +8,14 @@ class ProductPrice extends BaseMapper
     protected $mapperConfig = array(
         "getMethod" => "getPrices",
         "mapPull" => array(
+            "id" => null,
             "customerGroupId" => "customers_status_id",
             "productId" => "products_id",
-            "items" => "ProductPriceItem|addItem",
+            "items" => "ProductPriceItem|addItem"
         ),
         "mapPush" => array(
-            "ProductPriceItem|addItem" => "items",
-        ),
+            "ProductPriceItem|addItem" => "items"
+        )
     );
 
     public function pull($data)
@@ -32,5 +33,10 @@ class ProductPrice extends BaseMapper
         }
 
         return $return;
+    }
+
+    protected function id($data)
+    {
+        return $data['products_id'].'_'.$data['customers_status_id'];
     }
 }

@@ -12,9 +12,9 @@ class Image extends BaseMapper
             "id" => "image_id",
             "relationType" => null,
             "foreignKey" => null,
-            "filename" => null,
-            //"sort" => "image_nr",
-        ),
+            "filename" => null
+            //"sort" => "image_nr"
+        )
     );
 
     public function pull($data, $offset, $limit)

@@ -12,13 +12,13 @@ class ProductVariationValueI18n extends BaseMapper
         "mapPull" => array(
             "productVariationValueId" => "products_options_values_id",
             "name" => "products_options_values_name",
-            "languageISO" => null,
+            "languageISO" => null
         ),
         "mapPush" => array(
             "products_options_values_id" => null,
             "products_options_values_name" => "name",
-            "language_id" => null,
-        ),
+            "language_id" => null
+        )
     );
 
     protected function languageISO($data)

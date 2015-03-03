@@ -10,7 +10,7 @@ class Unit extends BaseMapper
         "table" => "products_vpe",
         "mapPull" => array(
             "id" => "products_vpe_id",
-            "i18ns" => "UnitI18n|addI18n",
-        ),
+            "i18ns" => "UnitI18n|addI18n"
+        )
     );
 }

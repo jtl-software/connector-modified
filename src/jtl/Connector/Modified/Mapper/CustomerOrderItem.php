@@ -34,8 +34,8 @@ class CustomerOrderItem extends BaseMapper
             "products_model" => "sku",
             "allow_tax" => null,
             "final_price" => null,
-            "CustomerOrderItemVariation|addVariation" => "variations",
-        ),
+            "CustomerOrderItemVariation|addVariation" => "variations"
+        )
     );
 
     public function push($parent, $dbObj)

@@ -19,8 +19,8 @@ use \jtl\Connector\Modified\Auth\TokenLoader;
 
 class Modified extends BaseConnector
 {
-    protected $_controller;
-    protected $_action;
+    protected $controller;
+    protected $action;
 
     public function initialize()
     {
@@ -133,10 +133,10 @@ class Modified extends BaseConnector
         $class = "\\jtl\\Connector\\Modified\\Controller\\{$controller}";
 
         if (class_exists($class)) {
-            $this->_controller = $class::getInstance();
-            $this->_action = RpcMethod::buildAction($this->getMethod()->getAction());
+            $this->controller = $class::getInstance();
+            $this->action = RpcMethod::buildAction($this->getMethod()->getAction());
 
-            return is_callable(array($this->_controller, $this->_action));
+            return is_callable(array($this->controller, $this->action));
         }
 
         return false;
@@ -144,11 +144,11 @@ class Modified extends BaseConnector
 
     public function handle(RequestPacket $requestpacket)
     {
-        $this->_controller->setMethod($this->getMethod());
+        $this->controller->setMethod($this->getMethod());
 
         $result = array();
 
-        if ($this->_action != Method::ACTION_PULL && $this->_action != 'identify' && $this->_action != 'statistic') {
+        if ($this->action != Method::ACTION_PULL && $this->action != 'identify' && $this->action != 'statistic') {
             if (!is_array($requestpacket->getParams())) {
                 throw new \Exception('data is not an array');
             }
@@ -158,7 +158,7 @@ class Modified extends BaseConnector
             $errors = array();
 
             foreach ($requestpacket->getParams() as $param) {
-                $result = $this->_controller->{$this->_action}($param);
+                $result = $this->controller->{$this->action}($param);
                 $results[] = $result->getResult();
 
                 $action->setHandled(true)
@@ -168,7 +168,7 @@ class Modified extends BaseConnector
 
             return $action;
         } else {
-            return $this->_controller->{$this->_action}($requestpacket->getParams());
+            return $this->controller->{$this->action}($requestpacket->getParams());
         }
     }
 

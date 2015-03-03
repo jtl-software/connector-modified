@@ -8,10 +8,10 @@ class ProductPriceItem extends BaseMapper
     protected $mapperConfig = array(
         "getMethod" => "getItems",
         "mapPull" => array(
-            "productPriceId" => "products_id",
+            "productPriceId" => null,
             "netPrice" => "personal_offer",
-            "quantity" => "quantity",
-        ),
+            "quantity" => "quantity"
+        )
     );
 
     public function pull($data)
@@ -22,6 +22,7 @@ class ProductPriceItem extends BaseMapper
         $pricesData = $this->db->query("SELECT * FROM personal_offers_by_customers_status_".$data['customers_status_id']." WHERE products_id = ".$data['products_id']." && personal_offer > 0");
 
         foreach ($pricesData as $priceData) {
+            $priceData['customers_status_id'] = $data['customers_status_id'];
             $return[] = $this->generateModel($priceData);
             if ($priceData['quantity'] == 1) {
                 $defaultSet = true;
@@ -31,8 +32,9 @@ class ProductPriceItem extends BaseMapper
         if (!$defaultSet) {
             $defaultPrice = array(
                 'products_id' => $data['products_id'],
+                'customers_status_id' => $data['customers_status_id'],
                 'personal_offer' => $data['default_price'],
-                'quantity' => 1,
+                'quantity' => 1
             );
 
             $return[] = $this->generateModel($defaultPrice);
@@ -65,5 +67,10 @@ class ProductPriceItem extends BaseMapper
                 $this->db->insertRow($obj, 'personal_offers_by_customers_status_'.$data->getCustomerGroupId()->getEndpoint());
             }
         }
+    }
+
+    protected function productPriceId($data)
+    {
+        return $data['products_id'].'_'.$data['customers_status_id'];
     }
 }

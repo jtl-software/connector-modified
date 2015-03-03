@@ -14,11 +14,11 @@ class Manufacturer extends BaseMapper
         "identity" => "getId",
         "mapPull" => array(
             "id" => "manufacturers_id",
-            "i18ns" => "ManufacturerI18n|addI18n",
+            "i18ns" => "ManufacturerI18n|addI18n"
         ),
         "mapPush" => array(
             "manufacturers_id" => "id",
-            "ManufacturerI18n|addI18n|true" => "i18ns",
-        ),
+            "ManufacturerI18n|addI18n|true" => "i18ns"
+        )
     );
 }

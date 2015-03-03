@@ -60,8 +60,8 @@ class Product extends BaseMapper
             "ProductPrice|addPrice" => "prices",
             "ProductSpecialPrice|addSpecialPrice" => "specialPrices",
             "ProductVariation|addVariation" => "variations",
-            "ProductInvisibility|addInvisibility|true" => "invisibilities",
-        ),
+            "ProductInvisibility|addInvisibility|true" => "invisibilities"
+        )
     );
 
     protected function manufacturerId($data)

@@ -33,8 +33,8 @@ class CustomerOrderShippingAddress extends BaseMapper
             "delivery_postcode" => "zipCode",
             "delivery_city" => "city",
             "delivery_state" => "state",
-            "delivery_country_iso_code_2" => "countryIso",
-        ),
+            "delivery_country_iso_code_2" => "countryIso"
+        )
     );
 
     public function pull($data)

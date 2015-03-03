@@ -9,8 +9,8 @@ class ProductSpecialPriceItem extends BaseMapper
         "mapPull" => array(
             "customerGroupId" => null,
             "productSpecialPriceId" => "specials_id",
-            "priceNet" => "specials_new_products_price",
-        ),
+            "priceNet" => "specials_new_products_price"
+        )
     );
 
     public function pull($data)

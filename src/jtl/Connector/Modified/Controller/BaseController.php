@@ -93,7 +93,7 @@ class BaseController extends Controller
                 $statModel->setPending(0);
                 $statModel->setControllerName(lcfirst($reflect->getShortName()));
 
-                $action->setResult($statModel->getPublic());
+                $action->setResult($statModel);
             } catch (\Exception $exc) {
                 $err = new Error();
                 $err->setCode($exc->getCode());

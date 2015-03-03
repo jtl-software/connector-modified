@@ -45,8 +45,8 @@ class CustomerOrder extends BaseMapper
             "delivery_address_format_id" => null,
             "shipping_class" => "shippingMethodId",
             "shipping_method" => "shippingMethodName",
-            "CustomerOrderItem|addItem" => "items",
-        ),
+            "CustomerOrderItem|addItem" => "items"
+        )
     );
 
     private $paymentMapping = array(
@@ -70,7 +70,7 @@ class CustomerOrder extends BaseMapper
         'moneybookers_wlt' => 'pm_skrill_wlt',
         'invoice' => 'pm_invoice',
         'pn_sofortueberweisung' => 'pm_sofort',
-        'worldpay' => 'pm_worldpay',
+        'worldpay' => 'pm_worldpay'
     );
 
     public function pull($params)
@@ -156,7 +156,7 @@ class CustomerOrder extends BaseMapper
             'DELETE FROM orders_total WHERE orders_id='.$orderId,
             'DELETE FROM orders_products_attributes WHERE orders_id='.$orderId,
             'DELETE FROM orders_products WHERE orders_id='.$orderId,
-            'DELETE FROM orders WHERE orders_id='.$orderId,
+            'DELETE FROM orders WHERE orders_id='.$orderId
         );
 
         foreach ($queries as $query) {

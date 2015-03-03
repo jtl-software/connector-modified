@@ -13,8 +13,8 @@ class Currency extends BaseMapper
             "factor" => "value",
             "delimiterCent" => "decimal_point",
             "delimiterThousand" => "thousands_point",
-            "isDefault" => null,
-        ),
+            "isDefault" => null
+        )
     );
 
     protected function isDefault($data)

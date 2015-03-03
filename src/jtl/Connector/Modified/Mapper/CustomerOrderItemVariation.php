@@ -18,7 +18,7 @@ class CustomerOrderItemVariation extends BaseMapper
             "productVariationValueId" => "orders_products_options_values_id",
             "productVariationName" => "products_options",
             "valueName" => "products_options_values",
-            //"surcharge" => null
+            "surcharge" => null
         ),
         "mapPush" => array(
             "orders_products_attributes_id" => "id",
@@ -29,8 +29,8 @@ class CustomerOrderItemVariation extends BaseMapper
             "options_values_price" => null,
             "orders_products_options_id" => null,
             "orders_products_options_values_id" => null,
-            "orders_id" => null,
-        ),
+            "orders_id" => null
+        )
     );
 
     protected function surcharge($data)

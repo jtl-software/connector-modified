@@ -11,7 +11,7 @@ class Installer
         'connector' => 'Connector',
         //'levels' => 'CategoryLevels',
         'tax_rate' => 'TaxRate',
-        'order_status' => 'OrderStatus',
+        'order_status' => 'OrderStatus'
     );
 
     private $connectorConfig = null;
@@ -122,7 +122,7 @@ class Installer
             ),
             'img' => array(
                 'original' => DIR_WS_ORIGINAL_IMAGES,
-            ),
+            )
         );
     }
 }

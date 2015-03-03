@@ -14,12 +14,12 @@ class Product2Category extends BaseMapper
         "mapPull" => array(
             "id" => "id",
             "categoryId" => "categories_id",
-            "productId" => "products_id",
+            "productId" => "products_id"
         ),
         "mapPush" => array(
             "categories_id" => "categoryId",
-            "products_id" => "productId",
-        ),
+            "products_id" => "productId"
+        )
     );
 
     public function push($parent, $dbObj)

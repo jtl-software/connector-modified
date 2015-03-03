@@ -12,8 +12,8 @@ class CustomerGroupI18n extends BaseMapper
         "mapPull" => array(
             "customerGroupId" => "customers_status_id",
             "name" => null,
-            "languageISO" => null,
-        ),
+            "languageISO" => null
+        )
     );
 
     protected function languageISO($data)

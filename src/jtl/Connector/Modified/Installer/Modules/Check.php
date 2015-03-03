@@ -7,11 +7,11 @@ class Check extends Module
 {
     public static $name = '<span class="glyphicon glyphicon-check"></span> System check';
 
-    private $_hasPassed = true;
-    private $_checkResults = null;
+    private $hasPassed = true;
+    private $checkResults = null;
 
     private static $checks = array(
-        'php_version' => array(
+        'phpVersion' => array(
             'title' => 'PHP version',
             'info' => 'PHP 5.3 or higher is recommend to run the JTL connector.',
             'ok' => 'Your version is: %s',
@@ -23,25 +23,25 @@ class Check extends Module
             'ok' => 'GDLib Extension is available',
             'fault' => 'GDLib extension is not available',
         ),
-        'config_file' => array(
+        'configFile' => array(
             'title' => 'Connector config file',
             'info' => 'The config folder or file "%s" must be writable.',
             'ok' => 'Config is writable',
             'fault' => 'Config is not writable',
         ),
-        'db_file' => array(
+        'dbFile' => array(
             'title' => 'Connector sqlite session database',
             'info' => 'The database file "%s" must be writable.',
             'ok' => 'Database is writable',
             'fault' => 'Database is not writable',
         ),
-        'connector_log' => array(
+        'connectorLog' => array(
             'title' => 'Connector logs folder',
             'info' => 'The logs folder "%s" must be writable.',
             'ok' => 'Logs folder is writable',
             'fault' => 'Logs folder is not writable',
         ),
-        'connector_table' => array(
+        'connectorTable' => array(
             'title' => 'Connector mapping table',
             'info' => 'The mapping table must be available in the shop database.',
             'ok' => 'Table was created',
@@ -58,9 +58,9 @@ class Check extends Module
     public function runChecks()
     {
         foreach (self::$checks as $check => $data) {
-            $this->_checkResults[$check] = $this->$check();
-            if (!$this->_checkResults[$check][0]) {
-                $this->_hasPassed = false;
+            $this->checkResults[$check] = $this->$check();
+            if (!$this->checkResults[$check][0]) {
+                $this->hasPassed = false;
             }
         }
     }
@@ -69,7 +69,7 @@ class Check extends Module
     {
         $html = '<table class="table table-striped"><tbody>';
         foreach (self::$checks as $check => $data) {
-            $result = $this->_checkResults[$check];
+            $result = $this->checkResults[$check];
 
             $html .= '<tr class="'.($result[0] === true ? '' : 'danger').'"><td><b>'.$data['title'].'</b><br/>'.vsprintf($data['info'], $result[1]).'</td><td><h4 class="pull-right">';
             $html .= $result[0] ? '<span class="label label-success"><span class="glyphicon glyphicon-ok"></span> '.vsprintf($data['ok'], $result[1]).'</span>' : '<span class="label label-danger"><span class="glyphicon glyphicon-warning-sign"></span> '.vsprintf($data['fault'], $result[1]).'</span>';
@@ -80,7 +80,7 @@ class Check extends Module
         return $html;
     }
 
-    private function php_version()
+    private function phpVersion()
     {
         return array((version_compare(PHP_VERSION, '5.3') >= 0),array(PHP_VERSION));
     }
@@ -90,31 +90,31 @@ class Check extends Module
         return array((extension_loaded('gd') && function_exists('gd_info')));
     }
 
-    private function config_file()
+    private function configFile()
     {
         $path = CONNECTOR_DIR.'/config';
         if (file_exists($path.'/config.json')) {
             $path = $path.'/config.json';
         }
 
-        return array(is_writable($path),array($path));
+        return array(is_writable($path), array($path));
     }
 
-    private function db_file()
+    private function dbFile()
     {
         $path = CONNECTOR_DIR.'/db/connector.s3db';
 
-        return array(is_writable($path),array($path));
+        return array(is_writable($path), array($path));
     }
 
-    private function connector_log()
+    private function connectorLog()
     {
         $path = CONNECTOR_DIR.'/logs';
 
-        return array(is_writable($path),array($path));
+        return array(is_writable($path), array($path));
     }
 
-    private function connector_table()
+    private function connectorTable()
     {
         if (count($this->db->query("SHOW TABLES LIKE 'jtl_connector_link'")) == 0) {
             $sql = "
@@ -145,6 +145,6 @@ class Check extends Module
 
     public function hasPassed()
     {
-        return $this->_hasPassed;
+        return $this->hasPassed;
     }
 }
