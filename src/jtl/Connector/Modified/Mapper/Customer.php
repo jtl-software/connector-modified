@@ -8,7 +8,7 @@ class Customer extends BaseMapper
 {
     protected $mapperConfig = array(
         "table" => "customers",
-        "query" => "SELECT c.* FROM customers c
+        "query" => "SELECT * FROM customers c
             LEFT JOIN address_book a ON c.customers_default_address_id = a.address_book_id
             LEFT JOIN countries co ON co.countries_id = a.entry_country_id
             LEFT JOIN jtl_connector_link l ON c.customers_id = l.endpointId AND l.type = 16
@@ -17,7 +17,7 @@ class Customer extends BaseMapper
         "identity" => "getId",
         "mapPull" => array(
             "id" => "customers_id",
-            "customerGroupId" => null,
+            "customerGroupId" => "customers_status",
             "customerNumber" => "customers_cid",
             "salutation" => "customers_gender",
             "birthday" => "customers_dob",
@@ -28,7 +28,8 @@ class Customer extends BaseMapper
             "extraAddressLine" => "entry_suburb",
             "zipCode" => "entry_postcode",
             "city" => "entry_city",
-            "countryIso" => "countries_iso_code_2",
+            "countryIso" => null,
+            "languageISO" => null,
             "phone" => "customers_telephone",
             "fax" => "customers_fax",
             "eMail" => "customers_email_address",
@@ -53,9 +54,14 @@ class Customer extends BaseMapper
         )
     );
 
-    protected function customerGroupId($data)
+    protected function languageISO($data)
     {
-        return $this->replaceZero($data['customers_status']);
+        return $this->fullLocale(strtolower($data['countries_iso_code_2']));
+    }
+
+    protected function countryIso($data)
+    {
+        return $this->fullLocale(strtolower($data['countries_iso_code_2']));
     }
 
     protected function hasNewsletterSubscription($data)

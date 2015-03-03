@@ -21,7 +21,7 @@ class ProductI18n extends BaseMapper
             "description" => "products_description",
             "metaDescription" => "products_meta_description",
             "metaKeywords" => "products_meta_keywords",
-            "shortDescription" => null
+            "shortDescription" => "products_short_description"
         ),
         "mapPush" => array(
             "language_id" => null,
@@ -38,11 +38,6 @@ class ProductI18n extends BaseMapper
     protected function languageISO($data)
     {
         return $this->fullLocale($data['code']);
-    }
-
-    protected function shortDescription($data)
-    {
-        return !is_null($data['products_short_description']) ? $data['products_short_description'] : '';
     }
 
     protected function language_id($data)
