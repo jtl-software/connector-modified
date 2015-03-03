@@ -22,7 +22,6 @@ class Connector extends Controller
             'Category',
             'Customer',
             'CustomerOrder',
-            'GlobalData',
             'Image',
             'Product',
             'Manufacturer',
