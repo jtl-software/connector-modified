@@ -180,9 +180,6 @@ class CustomerOrder extends BaseMapper
         $totalData = $this->db->query('SELECT class,value FROM orders_total WHERE orders_id='.$data['orders_id']);
 
         foreach ($totalData as $total) {
-            if ($total['class'] == 'ot_shipping') {
-                $shipping->setPrice(floatval($total['value']));
-            }
             if ($total['class'] == 'ot_total') {
                 $sum += floatval($total['value']);
             }

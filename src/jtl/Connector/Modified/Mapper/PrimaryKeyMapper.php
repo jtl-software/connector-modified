@@ -50,5 +50,7 @@ class PrimaryKeyMapper implements IPrimaryKeyMapper
     public function clear()
     {
         $this->db->query('TRUNCATE TABLE jtl_connector_link');
+
+        return true;
     }
 }

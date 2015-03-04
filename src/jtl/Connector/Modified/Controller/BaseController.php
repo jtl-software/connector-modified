@@ -11,11 +11,11 @@ use jtl\Connector\Core\Model\QueryFilter;
 
 class BaseController extends Controller
 {
-    protected $_db;
+    protected $db;
 
     public function __construct()
     {
-        $this->_db = Mysql::getInstance();
+        $this->db = Mysql::getInstance();
     }
 
     public function pull(QueryFilter $queryfilter)
