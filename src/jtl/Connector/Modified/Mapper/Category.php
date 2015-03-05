@@ -36,25 +36,33 @@ class Category extends \jtl\Connector\Modified\Mapper\BaseMapper
         return $this->replaceZero($data['parent_id']);
     }
 
-    public function pull($params)
+    public function pull($parent, $limit = null)
     {
         $this->tree = array();
 
-        $this->getChildren();
+        $this->getChildren(null, 0, $limit);
 
         usort($this->tree, function ($a, $b) {
             return $a['level'] - $b['level'];
         });
 
+        $resultCount = 0;
+
         foreach ($this->tree as $category) {
+            if ($resultCount >= $limit) break;
+
             $result[] = $this->generateModel($category);
+
+            $resultCount++;
         }
 
         return $result;
     }
 
-    private function getChildren($ids = null, $level = 0)
+    private function getChildren($ids = null, $level = 0, $limit)
     {
+        if (count($this->tree) >= $limit) return;
+
         if (is_null($ids)) {
             $sql = 'c.parent_id=0';
         } else {
@@ -74,7 +82,7 @@ class Category extends \jtl\Connector\Modified\Mapper\BaseMapper
                 $this->tree[] = $child;
             }
 
-            $this->getChildren($ids, $level + 1);
+            $this->getChildren($ids, $level + 1, $limit);
         }
     }
 }
