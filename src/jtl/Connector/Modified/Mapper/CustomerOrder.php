@@ -8,7 +8,7 @@ class CustomerOrder extends BaseMapper
     protected $mapperConfig = array(
         "table" => "orders",
         "query" => "SELECT o.* FROM orders o
-            LEFT JOIN jtl_connector_link l ON o.orders_id = l.endpointId AND l.type = 21
+            LEFT JOIN jtl_connector_link l ON o.orders_id = l.endpointId AND l.type = 4
             WHERE l.hostId IS NULL",
         "where" => "orders_id",
         "identity" => "getId",

@@ -37,7 +37,6 @@ class Connector extends Controller
                     $statModel = new Statistic();
 
                     $statModel->setAvailable($mapper->statistic());
-                    $statModel->setPending(0);
                     $statModel->setControllerName(lcfirst($controller));
 
                     $return[] = $statModel->getPublic();

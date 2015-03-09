@@ -9,7 +9,7 @@ class Product extends BaseMapper
     protected $mapperConfig = array(
         "table" => "products",
         "query" => "SELECT p.* FROM products p
-            LEFT JOIN jtl_connector_link l ON p.products_id = l.endpointId AND l.type = 50
+            LEFT JOIN jtl_connector_link l ON p.products_id = l.endpointId AND l.type = 64
             WHERE l.hostId IS NULL",
         "where" => "products_id",
         "identity" => "getId",

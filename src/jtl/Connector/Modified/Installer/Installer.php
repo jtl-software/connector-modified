@@ -6,7 +6,7 @@ use jtl\Connector\Modified\Installer\Config;
 
 class Installer
 {
-    private $_modules = array(
+    private $modules = array(
         'check' => 'Check',
         'connector' => 'Connector',
         'tax_rate' => 'TaxRate',
@@ -38,7 +38,7 @@ class Installer
 
         $moduleInstances = array();
 
-        foreach ($this->_modules as $id => $module) {
+        foreach ($this->modules as $id => $module) {
             $className = '\\jtl\\Connector\\Modified\\Installer\\Modules\\'.$module;
             $moduleInstances[$id] = new $className($db, $this->connectorConfig);
         }

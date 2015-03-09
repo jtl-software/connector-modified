@@ -10,8 +10,8 @@ class Image extends BaseMapper
         "identity" => "getId",
         "mapPull" => array(
             "id" => "image_id",
-            "relationType" => null,
-            "foreignKey" => null,
+            "relationType" => "type",
+            "foreignKey" => "foreignKey",
             "filename" => null
             //"sort" => "image_nr"
         )
@@ -21,34 +21,29 @@ class Image extends BaseMapper
     {
         $result = [];
 
-        // get additional images
-        $query = 'SELECT * FROM products_images';
-        // get default product images
-        $defaultQuery = 'SELECT products_id,products_image as image_name FROM products WHERE products_image IS NOT NULL';
-        // get category images
-        $categoriesQuery = 'SELECT categories_id,categories_image as image_name FROM categories WHERE categories_image IS NOT NULL';
+        $query = 'SELECT p.*, p.products_id foreignKey, "product" type
+            FROM products_images p
+            LEFT JOIN jtl_connector_link l ON p.image_id = l.endpointId AND l.type = 16
+            WHERE l.hostId IS NULL';
+        $defaultQuery = 'SELECT CONCAT("pID_",p.products_id) image_id, p.products_image image_name, p.products_id foreignKey, 0 image_nr, "product" type
+            FROM products p
+            LEFT JOIN jtl_connector_link l ON CONCAT("pID_",p.products_id) = l.endpointId AND l.type = 16
+            WHERE l.hostId IS NULL && p.products_image IS NOT NULL';
+        $categoriesQuery = 'SELECT CONCAT("cID_",p.categories_id) image_id, p.categories_image as image_name, p.categories_id foreignKey, "category" type, 0 image_nr
+            FROM categories p
+            LEFT JOIN jtl_connector_link l ON CONCAT("cID_",p.categories_id) = l.endpointId AND l.type = 16
+            WHERE l.hostId IS NULL && p.categories_image IS NOT NULL';
 
         $dbResult = $this->db->query($query);
-        $dbResultSub = $this->db->query($defaultQuery);
+        $dbResultDefault = $this->db->query($defaultQuery);
         $dbResultCategories = $this->db->query($categoriesQuery);
 
-        $dbResult = array_merge($dbResult, $dbResultSub, $dbResultCategories);
+        $dbResult = array_merge($dbResult, $dbResultDefault, $dbResultCategories);
 
         //$current = array_slice($dbResult, $offset, $limit);
         $current = $dbResult;
 
         foreach ($current as $modelData) {
-            if (!isset($modelData['image_id'])) {
-                if (isset($modelData['products_id'])) {
-                    $modelData['image_id'] = 'pID_'.$modelData['products_id'];
-                } else {
-                    $modelData['image_id'] = 'cID_'.$modelData['categories_id'];
-                }
-            }
-            if (!isset($modelData['image_nr'])) {
-                $modelData['image_nr'] = 0;
-            }
-
             $model = $this->generateModel($modelData);
 
             $result[] = $model;
@@ -57,32 +52,18 @@ class Image extends BaseMapper
         return $result;
     }
 
-    protected function relationType($data)
-    {
-        if (isset($data['categories_id'])) {
-            return 'category';
-        } else {
-            return 'product';
-        }
-    }
-
-    protected function foreignKey($data)
-    {
-        return isset($data['categories_id']) ? $data['categories_id'] : $data['products_id'];
-    }
-
     public function statistic()
     {
         $totalImages = 0;
         $totalImages += parent::statistic();
 
-        $additionalProductImages = $this->db->query("SELECT count(*) as count FROM products WHERE products_image != '' LIMIT 1", array("return" => "object"));
+        $defaultProductImages = $this->db->query("SELECT count(*) as count FROM products WHERE products_image IS NOT NULL LIMIT 1", array("return" => "object"));
 
-        if ($additionalProductImages !== null) {
-            $totalImages += intval($additionalProductImages[0]->count);
+        if ($defaultProductImages !== null) {
+            $totalImages += intval($defaultProductImages[0]->count);
         }
 
-        $categoryImages = $this->db->query("SELECT count(*) as count FROM categories WHERE categories_image != '' LIMIT 1", array("return" => "object"));
+        $categoryImages = $this->db->query("SELECT count(*) as count FROM categories WHERE categories_image IS NOT NULL LIMIT 1", array("return" => "object"));
 
         if ($categoryImages !== null) {
             $totalImages += intval($categoryImages[0]->count);
@@ -93,7 +74,7 @@ class Image extends BaseMapper
 
     protected function filename($data)
     {
-        if (isset($data['categories_id'])) {
+        if ($data['type'] == 'category') {
             return $this->shopConfig['shop']['fullUrl'].'images/categories/'.$data['image_name'];
         } else {
             return $this->shopConfig['shop']['fullUrl'].$this->shopConfig['img']['original'].$data['image_name'];
