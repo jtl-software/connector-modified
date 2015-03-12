@@ -152,7 +152,12 @@ class BaseMapper
 
                     $getMethod = 'get'.ucfirst($host);
                     $setMethod = 'set'.ucfirst($host);
-                    $value = $obj->$getMethod();
+
+                    if (isset($obj) && method_exists($obj, $getMethod)) {
+                        $value = $obj->$getMethod();
+                    } else {
+                        throw new \Exception("Cannot call get method '".$getMethod."' in entity '".$this->model."'");
+                    }
 
                     if (isset($value)) {
                         if ($this->type->getProperty($host)->isIdentity()) {
@@ -223,7 +228,8 @@ class BaseMapper
             $return[] = $model->getPublic();
         }
 
-        return is_array($data) ? $return : $return[0];
+        //return is_array($data) ? $return : $return[0];
+        return count($return) > 1 ? $return : $return[0];
     }
 
     /**

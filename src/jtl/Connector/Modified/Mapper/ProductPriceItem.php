@@ -17,28 +17,22 @@ class ProductPriceItem extends BaseMapper
     public function pull($data)
     {
         $return = [];
-        $defaultSet = false;
 
         $pricesData = $this->db->query("SELECT * FROM personal_offers_by_customers_status_".$data['customers_status_id']." WHERE products_id = ".$data['products_id']." && personal_offer > 0");
 
         foreach ($pricesData as $priceData) {
             $priceData['customers_status_id'] = $data['customers_status_id'];
             $return[] = $this->generateModel($priceData);
-            if ($priceData['quantity'] == 1) {
-                $defaultSet = true;
-            }
         }
 
-        if (!$defaultSet) {
-            $defaultPrice = array(
-                'products_id' => $data['products_id'],
-                'customers_status_id' => $data['customers_status_id'],
-                'personal_offer' => $data['default_price'],
-                'quantity' => 1
-            );
+        $defaultPrice = array(
+            'products_id' => $data['products_id'],
+            'customers_status_id' => $data['customers_status_id'],
+            'personal_offer' => $data['default_price'],
+            'quantity' => 0
+        );
 
-            $return[] = $this->generateModel($defaultPrice);
-        }
+        $return[] = $this->generateModel($defaultPrice);
 
         return $return;
     }

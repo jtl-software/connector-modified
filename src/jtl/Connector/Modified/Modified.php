@@ -160,11 +160,11 @@ class Modified extends BaseConnector
             foreach ($requestpacket->getParams() as $param) {
                 $result = $this->controller->{$this->action}($param);
                 $results[] = $result->getResult();
+            }
 
-                $action->setHandled(true)
+            $action->setHandled(true)
                     ->setResult($results)
                     ->setError($result->getError());
-            }
 
             return $action;
         } else {

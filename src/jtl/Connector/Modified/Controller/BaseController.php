@@ -8,6 +8,8 @@ use jtl\Connector\Core\Rpc\Error;
 use jtl\Connector\Model\Statistic;
 use jtl\Connector\Core\Model\DataModel;
 use jtl\Connector\Core\Model\QueryFilter;
+use jtl\Connector\Core\Logger\Logger;
+use jtl\Connector\Formatter\ExceptionFormatter;
 
 class BaseController extends Controller
 {
@@ -37,6 +39,8 @@ class BaseController extends Controller
 
             $action->setResult($result);
         } catch (\Exception $exc) {
+            Logger::write(ExceptionFormatter::format($exc), Logger::WARNING, 'controller');
+
             $err = new Error();
             $err->setCode($exc->getCode());
             $err->setMessage($exc->getFile().' ('.$exc->getLine().'):'.$exc->getMessage());
@@ -66,6 +70,8 @@ class BaseController extends Controller
 
             $action->setResult($result);
         } catch (\Exception $exc) {
+            Logger::write(ExceptionFormatter::format($exc), Logger::WARNING, 'controller');
+
             $err = new Error();
             $err->setCode($exc->getCode());
             $err->setMessage($exc->getFile().' ('.$exc->getLine().'):'.$exc->getMessage());
@@ -94,6 +100,8 @@ class BaseController extends Controller
 
                 $action->setResult($statModel);
             } catch (\Exception $exc) {
+                Logger::write(ExceptionFormatter::format($exc), Logger::WARNING, 'controller');
+
                 $err = new Error();
                 $err->setCode($exc->getCode());
                 $err->setMessage($exc->getMessage());

@@ -49,7 +49,9 @@ class Category extends \jtl\Connector\Modified\Mapper\BaseMapper
         $resultCount = 0;
 
         foreach ($this->tree as $category) {
-            if ($resultCount >= $limit) break;
+            if ($resultCount >= $limit) {
+                break;
+            }
 
             $result[] = $this->generateModel($category);
 
@@ -61,7 +63,9 @@ class Category extends \jtl\Connector\Modified\Mapper\BaseMapper
 
     private function getChildren($ids = null, $level = 0, $limit)
     {
-        if (count($this->tree) >= $limit) return;
+        if (count($this->tree) >= $limit) {
+            return;
+        }
 
         if (is_null($ids)) {
             $sql = 'c.parent_id=0';
@@ -69,7 +73,8 @@ class Category extends \jtl\Connector\Modified\Mapper\BaseMapper
             $sql = 'c.parent_id IN ('.implode(',', $ids).')';
         }
 
-        $children = $this->db->query('SELECT c.* FROM categories c LEFT JOIN jtl_connector_link l ON c.categories_id = l.endpointId AND l.type = 1
+        $children = $this->db->query('SELECT c.* FROM categories c 
+            LEFT JOIN jtl_connector_link l ON c.categories_id = l.endpointId AND l.type = 1
             WHERE l.hostId IS NULL && '.$sql);
 
         if (count($children) > 0) {
