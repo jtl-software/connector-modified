@@ -148,7 +148,7 @@ class Modified extends BaseConnector
 
         $result = array();
 
-        if ($this->action != Method::ACTION_PULL && $this->action != 'identify' && $this->action != 'statistic') {
+        if ($this->action === Method::ACTION_PUSH || $this->action === Method::ACTION_DELETE) {
             if (!is_array($requestpacket->getParams())) {
                 throw new \Exception('data is not an array');
             }

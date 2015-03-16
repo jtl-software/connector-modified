@@ -22,6 +22,8 @@
         }
     },
     "flags" : {
-        "var_combination_child_first" : false
+        "var_combination_child_first" : false,
+        "can_reactivate_customer_order" : false,
+        "can_update_customer_order" : false
     }
 }

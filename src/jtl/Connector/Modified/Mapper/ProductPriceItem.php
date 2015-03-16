@@ -41,18 +41,18 @@ class ProductPriceItem extends BaseMapper
     {
         $productId = $data->getProductId()->getEndpoint();
 
-        if (!empty($productId)) {
-            foreach ($this->getCustomerGroups() as $group) {
-                $this->db->query('DELETE FROM personal_offers_by_customers_status_'.$group['customers_status_id'].' WHERE products_id='.$productId);
-            }
-        }
+        $defaultSet = false;
 
         foreach ($data->getItems() as $price) {
             $obj = new \stdClass();
 
-            if ($price->getQuantity() == 1 && $data->getCustomerGroupId()->getEndpoint() == $this->shopConfig['settings']['DEFAULT_CUSTOMERS_STATUS_ID']) {
-                $obj->products_price = $price->getNetprice();
-                $this->db->updateRow($obj, 'products', 'products_id', $productId);
+            if (is_null($data->getCustomerGroupId()->getEndpoint())) {
+                if (!$defaultSet) {
+                    $obj->products_price = $price->getNetprice();
+                    $this->db->updateRow($obj, 'products', 'products_id', $productId);
+
+                    $defaultSet = true;
+                }
             } else {
                 $obj->products_id = $productId;
                 $obj->personal_offer = $price->getNetprice();

@@ -228,8 +228,11 @@ class BaseMapper
             $return[] = $model->getPublic();
         }
 
-        //return is_array($data) ? $return : $return[0];
-        return count($return) > 1 ? $return : $return[0];
+        if (is_null($parentObj)) {
+            return count($return) > 1 ? $return : $return[0];
+        } else {
+            return is_array($data) ? $return : $return[0];
+        }
     }
 
     /**
