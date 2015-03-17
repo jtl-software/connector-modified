@@ -16,6 +16,7 @@ use \jtl\Connector\Core\Config\Loader\Json as ConfigJson;
 use \jtl\Connector\Core\Config\Loader\System as ConfigSystem;
 use \jtl\Connector\Result\Action;
 use \jtl\Connector\Modified\Auth\TokenLoader;
+use \jtl\Connector\Modified\Checksum\ChecksumLoader;
 
 class Modified extends BaseConnector
 {
@@ -58,6 +59,7 @@ class Modified extends BaseConnector
 
         $this->setPrimaryKeyMapper(new PrimaryKeyMapper());
         $this->setTokenLoader(new TokenLoader());
+        $this->setChecksumLoader(new ChecksumLoader());
     }
 
     protected function initConnectorConfig()

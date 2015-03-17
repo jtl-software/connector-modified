@@ -72,7 +72,7 @@ class Customer extends BaseMapper
 
     public function push($data, $dbObj = null)
     {
-        if($data->getId()->getEndpoint() !== 0) {
+        if ($data->getId()->getEndpoint() !== 0) {
             $this->db->query('DELETE FROM address_book WHERE customers_id='.$data->getId()->getEndpoint());
             $this->db->query('DELETE FROM customers_info WHERE customers_info_id='.$data->getId()->getEndpoint());
         }

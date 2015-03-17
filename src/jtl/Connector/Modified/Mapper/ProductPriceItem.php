@@ -9,8 +9,8 @@ class ProductPriceItem extends BaseMapper
         "getMethod" => "getItems",
         "mapPull" => array(
             "productPriceId" => null,
-            "netPrice" => "personal_offer",
-            "quantity" => "quantity"
+            "netPrice" => null,
+            "quantity" => null
         )
     );
 
@@ -22,17 +22,10 @@ class ProductPriceItem extends BaseMapper
 
         foreach ($pricesData as $priceData) {
             $priceData['customers_status_id'] = $data['customers_status_id'];
+
             $return[] = $this->generateModel($priceData);
+
         }
-
-        $defaultPrice = array(
-            'products_id' => $data['products_id'],
-            'customers_status_id' => $data['customers_status_id'],
-            'personal_offer' => $data['default_price'],
-            'quantity' => 0
-        );
-
-        $return[] = $this->generateModel($defaultPrice);
 
         return $return;
     }
@@ -41,26 +34,31 @@ class ProductPriceItem extends BaseMapper
     {
         $productId = $data->getProductId()->getEndpoint();
 
-        $defaultSet = false;
-
         foreach ($data->getItems() as $price) {
             $obj = new \stdClass();
 
-            if (is_null($data->getCustomerGroupId()->getEndpoint())) {
-                if (!$defaultSet) {
-                    $obj->products_price = $price->getNetprice();
-                    $this->db->updateRow($obj, 'products', 'products_id', $productId);
+            if (is_null($data->getCustomerGroupId()->getEndpoint()) || $data->getCustomerGroupId()->getEndpoint() == '') {
+                $obj->products_price = $price->getNetPrice();
 
-                    $defaultSet = true;
-                }
+                $this->db->updateRow($obj, 'products', 'products_id', $productId);
             } else {
                 $obj->products_id = $productId;
                 $obj->personal_offer = $price->getNetprice();
-                $obj->quantity = $price->getQuantity();
+                $obj->quantity = ($price->getQuantity() == 0) ? 1 : $price->getQuantity();
 
                 $this->db->insertRow($obj, 'personal_offers_by_customers_status_'.$data->getCustomerGroupId()->getEndpoint());
             }
         }
+    }
+
+    protected function quantity($data)
+    {
+        return $data['quantity'] == 1 ? 0 : $data['quantity'];
+    }
+
+    protected function netPrice($data)
+    {
+        return floatval($data['personal_offer']);
     }
 
     protected function productPriceId($data)

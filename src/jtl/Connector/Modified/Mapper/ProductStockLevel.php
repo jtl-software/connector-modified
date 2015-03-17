@@ -14,4 +14,17 @@ class ProductStockLevel extends BaseMapper
 
         return array($stockLevel);
     }
+
+    public function push(ProductStockLevelModel $stockLevel)
+    {
+        $productId = (int) $stockLevel->getProductId()->getEndpoint();
+
+        if ($productId > 0) {
+            $this->db->query('UPDATE products SET products_quantity='.round($stockLevel->getStockLevel()).' WHERE products_id='.$productId);
+
+            return true;
+        }
+
+        return false;
+    }
 }

@@ -28,37 +28,37 @@ class ProductPrice extends BaseMapper
 
         foreach ($customerGroups as $groupData) {
             $groupData['products_id'] = $data['products_id'];
-            $groupData['default_price'] = $data['products_price'];
 
-            $return[] = $this->generateModel($groupData);
+            $price = $this->generateModel($groupData);
+
+            if (count($price->getItems()) > 0) {
+                $return[] = $price;
+            }
         }
 
-        /*
         $default = new ProductPriceModel();
         $default->setId($this->identity($data['products_id'].'_default'));
         $default->setProductId($this->identity($data['products_id']));
+        $default->setCustomerGroupId($this->identity(null));
 
         $defaultItem = new ProductPriceItemModel();
         $defaultItem->setProductPriceId($default->getId());
-        //$defaultItem->setQuantity(0);
         $defaultItem->setNetPrice(floatval($data['products_price']));
 
         $default->addItem($defaultItem);
 
         $return[] = $default;
-        */
 
         return $return;
     }
 
     public function push($parent, $dbObj)
     {
-        $productId = $parent->getId()->getEndpoint();
-
-        if (!empty($productId)) {
-            foreach ($this->getCustomerGroups() as $group) {
-                $this->db->query('DELETE FROM personal_offers_by_customers_status_'.$group['customers_status_id'].' WHERE products_id='.$productId);
-            }
+        if (get_class($parent) == 'jtl\Connector\Model\Product') {
+            $productId = $parent->getId()->getEndpoint();
+        } else {
+            $productId = $parent->getProductId()->getEndpoint();
+            unset($this->mapperConfig['getMethod']);
         }
 
         return parent::push($parent, $dbObj);

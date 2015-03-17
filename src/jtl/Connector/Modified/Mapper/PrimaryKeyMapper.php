@@ -17,14 +17,22 @@ class PrimaryKeyMapper implements IPrimaryKeyMapper
     {
         $dbResult = $this->db->query('SELECT hostId FROM jtl_connector_link WHERE endpointId = '.$endpointId.' AND type = '.$type);
 
-        return (count($dbResult) > 0) ? $dbResult[0]['hostId'] : null;
+        $hostId = (count($dbResult) > 0) ? $dbResult[0]['hostId'] : null;
+
+        $this->hostIdCache[$type][$endpointId] = $hostId;
+
+        return $hostId;
     }
 
     public function getEndpointId($hostId, $type)
     {
         $dbResult = $this->db->query('SELECT endpointId FROM jtl_connector_link WHERE hostId = '.$hostId.' AND type = '.$type);
 
-        return (count($dbResult) > 0) ? $dbResult[0]['endpointId'] : null;
+        $endpointId = (count($dbResult) > 0) ? $dbResult[0]['endpointId'] : null;
+
+        $this->endpointIdCache[$type][$hostId] = $endpointId;
+
+        return $endpointId;
     }
 
     public function save($endpointId, $hostId, $type)
