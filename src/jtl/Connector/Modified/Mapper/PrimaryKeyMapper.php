@@ -19,8 +19,6 @@ class PrimaryKeyMapper implements IPrimaryKeyMapper
 
         $hostId = (count($dbResult) > 0) ? $dbResult[0]['hostId'] : null;
 
-        $this->hostIdCache[$type][$endpointId] = $hostId;
-
         return $hostId;
     }
 
@@ -29,8 +27,6 @@ class PrimaryKeyMapper implements IPrimaryKeyMapper
         $dbResult = $this->db->query('SELECT endpointId FROM jtl_connector_link WHERE hostId = '.$hostId.' AND type = '.$type);
 
         $endpointId = (count($dbResult) > 0) ? $dbResult[0]['endpointId'] : null;
-
-        $this->endpointIdCache[$type][$hostId] = $endpointId;
 
         return $endpointId;
     }
