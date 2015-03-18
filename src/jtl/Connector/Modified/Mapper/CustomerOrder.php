@@ -186,6 +186,9 @@ class CustomerOrder extends BaseMapper
             if ($total['class'] == 'ot_tax') {
                 $sum -= floatval($total['value']);
             }
+            if ($total['class'] == 'ot_shipping') {
+                $shipping->setPrice(floatval($total['value']));
+            }
         }
 
         $model->setTotalSum($sum);

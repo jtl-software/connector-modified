@@ -47,6 +47,12 @@ class Check extends Module
             'ok' => 'Table was created',
             'fault' => 'Failed to create table',
         ),
+        'checksumTable' => array(
+            'title' => 'Checksum table',
+            'info' => 'The checksum table must be available in the shop database.',
+            'ok' => 'Table was created',
+            'fault' => 'Failed to create table',
+        )
     );
 
     public function __construct($db, $config)
@@ -118,11 +124,35 @@ class Check extends Module
     {
         if (count($this->db->query("SHOW TABLES LIKE 'jtl_connector_link'")) == 0) {
             $sql = "
-                CREATE TABLE IF NOT EXISTS `jtl_connector_link` (
-                  `endpointId` int(10) NOT NULL,
-                  `hostId` int(10) NOT NULL,
-                  `type` int(10),
-                  PRIMARY KEY (`endpointId`,`hostId`,`type`)
+                CREATE TABLE IF NOT EXISTS jtl_connector_link (
+                    endpointId int(10) NOT NULL,
+                    hostId int(10) NOT NULL,
+                    type int(10),
+                    PRIMARY KEY (endpointId, hostId, type)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+            ";
+
+            try {
+                $this->db->query($sql);
+
+                return array(true);
+            } catch (\Exception $e) {
+                return array(false);
+            }
+        }
+
+        return array(true);
+    }
+
+    private function checksumTable()
+    {
+        if (count($this->db->query("SHOW TABLES LIKE 'jtl_connector_product_checksum'")) == 0) {
+            $sql = "
+                CREATE TABLE IF NOT EXISTS jtl_connector_product_checksum (
+                    endpoint_id int(10) unsigned NOT NULL,
+                    type tinyint unsigned NOT NULL,
+                    checksum varchar(255) NOT NULL,
+                    PRIMARY KEY (endpoint_id)
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
             ";
 

@@ -37,6 +37,7 @@ class Product extends BaseMapper
             "specialPrices" => "ProductSpecialPrice|addSpecialPrice",
             "variations" => "ProductVariation|addVariation",
             "invisibilities" => "ProductInvisibility|addInvisibility",
+            "crossSellings" => "ProductCrossSelling|addCrossSelling",
             "vat" => null
         ),
         "mapPush" => array(
@@ -60,7 +61,8 @@ class Product extends BaseMapper
             "ProductPrice|addPrice" => "prices",
             "ProductSpecialPrice|addSpecialPrice" => "specialPrices",
             "ProductVariation|addVariation" => "variations",
-            "ProductInvisibility|addInvisibility|true" => "invisibilities"
+            "ProductInvisibility|addInvisibility|true" => "invisibilities",
+            "ProductCrossSelling|addCrossSelling" => "crossSellings"
         )
     );
 
@@ -72,7 +74,19 @@ class Product extends BaseMapper
             }
         }
 
-        $return = parent::push($data, $dbObj);
+        return parent::push($data, $dbObj);
+    }
+
+    public function delete($data)
+    {
+        $this->db->query('DELETE FROM products WHERE products_id='.$data->getId()->getEndpoint());
+        $this->db->query('DELETE FROM products_to_categories WHERE products_id='.$data->getId()->getEndpoint());
+        $this->db->query('DELETE FROM products_description WHERE products_id='.$data->getId()->getEndpoint());
+        $this->db->query('DELETE FROM products_images WHERE products_id='.$data->getId()->getEndpoint());
+        $this->db->query('DELETE FROM products_attributes WHERE products_id='.$data->getId()->getEndpoint());
+        $this->db->query('DELETE FROM products_xsell WHERE products_id='.$data->getId()->getEndpoint().' OR xsell_id='.$data->getId()->getEndpoint());
+
+        return true;
     }
 
     protected function manufacturerId($data)

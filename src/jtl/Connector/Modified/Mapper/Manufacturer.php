@@ -21,4 +21,12 @@ class Manufacturer extends BaseMapper
             "ManufacturerI18n|addI18n|true" => "i18ns"
         )
     );
+
+    public function delete($data)
+    {
+        $this->db->query('DELETE FROM manufacturers WHERE manufacturers_id='.$data->getId()->getEndpoint());
+        $this->db->query('DELETE FROM manufacturers_info WHERE manufacturers_id='.$data->getId()->getEndpoint());
+
+        return true;
+    }
 }

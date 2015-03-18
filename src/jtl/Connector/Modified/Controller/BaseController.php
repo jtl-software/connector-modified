@@ -114,6 +114,32 @@ class BaseController extends Controller
 
     public function delete(DataModel $model)
     {
+        $action = new Action();
 
+        $action->setHandled(true);
+
+        try {
+            $reflect = new \ReflectionClass($this);
+            $class = "\\jtl\\Connector\\Modified\\Mapper\\{$reflect->getShortName()}";
+
+            if (!class_exists($class)) {
+                throw new \Exception("Class ".$class." not available");
+            }
+
+            $mapper = new $class();
+
+            $result = $mapper->delete($model);
+
+            $action->setResult($result);
+        } catch (\Exception $exc) {
+            Logger::write(ExceptionFormatter::format($exc), Logger::WARNING, 'controller');
+
+            $err = new Error();
+            $err->setCode($exc->getCode());
+            $err->setMessage($exc->getFile().' ('.$exc->getLine().'):'.$exc->getMessage());
+            $action->setError($err);
+        }
+
+        return $action;
     }
 }

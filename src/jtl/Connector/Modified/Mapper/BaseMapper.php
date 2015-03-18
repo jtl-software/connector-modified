@@ -297,6 +297,15 @@ class BaseMapper
     }
 
     /**
+     * Default delete method
+     * @param  unknown        $data
+     * @return multitype:NULL
+     */
+    public function delete($data)
+    {
+    }
+
+    /**
      * Default statistics
      * @return number
      */
