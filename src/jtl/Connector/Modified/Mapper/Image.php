@@ -2,6 +2,7 @@
 namespace jtl\Connector\Modified\Mapper;
 
 use jtl\Connector\Modified\Mapper\BaseMapper;
+use jtl\Connector\Drawing\ImageRelationType;
 
 class Image extends BaseMapper
 {
@@ -12,12 +13,12 @@ class Image extends BaseMapper
             "id" => "image_id",
             "relationType" => "type",
             "foreignKey" => "foreignKey",
-            "filename" => null
-            //"sort" => "image_nr"
+            "remoteUrl" => null,
+            "sort" => "image_nr"
         )
     );
 
-    public function pull($data, $offset, $limit)
+    public function pull($data, $limit)
     {
         $result = [];
 
@@ -40,8 +41,8 @@ class Image extends BaseMapper
 
         $dbResult = array_merge($dbResult, $dbResultDefault, $dbResultCategories);
 
-        //$current = array_slice($dbResult, $offset, $limit);
-        $current = $dbResult;
+        $current = array_slice($dbResult, 0, $limit);
+        //$current = $dbResult;
 
         foreach ($current as $modelData) {
             $model = $this->generateModel($modelData);
@@ -50,6 +51,92 @@ class Image extends BaseMapper
         }
 
         return $result;
+    }
+
+    public function push($data, $dbObj = null)
+    {
+        if (get_class($data) === 'jtl\Connector\Model\Image') {
+            switch ($data->getRelationType()) {
+                case ImageRelationType::TYPE_CATEGORY:
+                    break;
+
+                case ImageRelationType::TYPE_PRODUCT:
+                    if ($data->getSort() == 0) {
+                        $oldImage = $this->db->query('SELECT products_image FROM products WHERE products_id = '.$data->getForeignKey()->getEndpoint());
+                        $oldImage = $oldImage[0]['products_image'];
+
+                        if (isset($oldImage)) {
+                            if (!unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$oldImage)) {
+                                throw new \Exception('Cannot delete previous image file');
+                            }
+                        }
+
+                        $imgFileName = substr($data->getFilename(), strrpos($data->getFilename(), '/') + 1);
+
+                        if (!rename($data->getFilename(), $this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$imgFileName)) {
+                            throw new \Exception('Cannot move uploaded image file');
+                        }
+
+                        $this->generateThumbs($imgFileName, $oldImage);
+
+                        $productsObj = new \stdClass();
+                        $productsObj->products_image = $imgFileName;
+
+                        $this->db->updateRow($productsObj,'products','products_id', $data->getForeignKey()->getEndpoint());
+                    } else {
+                        if (empty($data->getId()->getEndpoint())) {
+                            $imgFileName = substr($data->getFilename(), strrpos($data->getFilename(), '/') + 1);
+
+                            if (!rename($data->getFilename(), $this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$imgFileName)) {
+                                throw new \Exception('Cannot move uploaded image file');
+                            }
+
+                            $this->generateThumbs($imgFileName);
+
+                            $nextNr = $this->db->query('SELECT max(image_nr) + 1 AS nextNr FROM products_images');
+                            $nextNr = is_null($nextNr[0]['nextNr']) || $nextNr[0]['nextNr'] === 0 ? 1 : $nextNr[0]['nextNr'];
+
+                            $imgObj = new \stdClass();
+                            $imgObj->products_id = $data->getForeignKey()->getEndpoint();
+                            $imgObj->image_name = $imgFileName;
+                            $imgObj->image_nr = $nextNr;
+
+                            $insertResult = $this->db->insertRow($imgObj,'products_images');
+
+                            $data->getId()->setEndpoint($insertResult->getKey());
+                        } else {
+                            $oldImage = $this->db->query('SELECT image_name FROM products_images WHERE image_id = '.$data->getId()->getEndpoint());
+                            $oldImage = $oldImage[0]['image_name'];
+
+                            $imgFileName = substr($data->getFilename(), strrpos($data->getFilename(), '/') + 1);
+
+                            if (!rename($data->getFilename(), $this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$imgFileName)) {
+                                throw new \Exception('Cannot move uploaded image file');
+                            }
+
+                            if (!unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$oldImage)) {
+                                throw new \Exception('Cannot delete previous image file');
+                            }
+
+                            $this->generateThumbs($imgFileName, $oldImage);
+
+                            $imgObj = new \stdClass();
+                            $imgObj->image_id = $data->getId()->getEndpoint();
+                            $imgObj->products_id = $data->getForeignKey()->getEndpoint();
+                            $imgObj->image_name = $imgFileName;
+                            $imgObj->image_nr = 1;
+
+                            $this->db->deleteInsertRow($imgObj,'products_images','image_id',$imgObj->image_id);
+                        }
+                    }
+
+                    break;
+            }
+
+            return $data;
+        } else {
+            throw new \Exception('Pushed data is not an image object');
+        }
     }
 
     public function statistic()
@@ -72,12 +159,71 @@ class Image extends BaseMapper
         return $totalImages;
     }
 
-    protected function filename($data)
+    protected function remoteUrl($data)
     {
-        if ($data['type'] == 'category') {
+        if ($data['type'] == ImageRelationType::TYPE_CATEGORY) {
             return $this->shopConfig['shop']['fullUrl'].'images/categories/'.$data['image_name'];
         } else {
             return $this->shopConfig['shop']['fullUrl'].$this->shopConfig['img']['original'].$data['image_name'];
+        }
+    }
+
+    private function generateThumbs($fileName, $oldImage = null)
+    {
+        $config = array(
+            'info' => array(
+                $this->shopConfig['settings']['PRODUCT_IMAGE_INFO_WIDTH'],
+                $this->shopConfig['settings']['PRODUCT_IMAGE_INFO_HEIGHT']
+            ),
+            'popup' => array(
+                $this->shopConfig['settings']['PRODUCT_IMAGE_POPUP_WIDTH'],
+                $this->shopConfig['settings']['PRODUCT_IMAGE_POPUP_HEIGHT']
+            ),
+            'thumbnails' => array(
+                $this->shopConfig['settings']['PRODUCT_IMAGE_THUMBNAIL_WIDTH'],
+                $this->shopConfig['settings']['PRODUCT_IMAGE_THUMBNAIL_HEIGHT']
+            )
+        );
+
+        $image = imagecreatefromjpeg($this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$fileName);
+        $width = imagesx($image);
+        $height = imagesy($image);
+        $original_aspect = $width / $height;
+
+        foreach ($config as $folder => $sizes) {
+            if (!is_null($oldImage)) {
+                unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img'][$folder].$oldImage);
+            }
+
+            $thumb_width = $sizes[0];
+            $thumb_height = $sizes[1];
+
+            $thumb_aspect = $thumb_width / $thumb_height;
+
+            if ($original_aspect >= $thumb_aspect) {
+                $new_height = $thumb_height;
+                $new_width = $width / ($height / $thumb_height);
+            } else {
+                $new_width = $thumb_width;
+                $new_height = $height / ($width / $thumb_width);
+            }
+
+            $thumb = imagecreatetruecolor($thumb_width, $thumb_height);
+
+            imagecopyresampled(
+                $thumb,
+                $image,
+                0 - ($new_width - $thumb_width) / 2,
+                0 - ($new_height - $thumb_height) / 2,
+                0,
+                0,
+                $new_width,
+                $new_height,
+                $width,
+                $height
+            );
+
+            imagejpeg($thumb, $this->connectorConfig->connector_root.'/'.$this->shopConfig['img'][$folder].$fileName, 80);
         }
     }
 }

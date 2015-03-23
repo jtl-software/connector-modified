@@ -36,7 +36,7 @@ class Category extends \jtl\Connector\Modified\Mapper\BaseMapper
         return $this->replaceZero($data['parent_id']);
     }
 
-    public function pull($parent, $limit = null)
+    public function pull($parent = null, $limit = null)
     {
         $this->tree = array();
 

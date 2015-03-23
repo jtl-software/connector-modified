@@ -17,6 +17,7 @@ use \jtl\Connector\Core\Config\Loader\System as ConfigSystem;
 use \jtl\Connector\Result\Action;
 use \jtl\Connector\Modified\Auth\TokenLoader;
 use \jtl\Connector\Modified\Checksum\ChecksumLoader;
+use \jtl\Connector\Core\Logger\Logger;
 
 class Modified extends BaseConnector
 {
@@ -109,7 +110,10 @@ class Modified extends BaseConnector
                 'pass' => DB_SERVER_PASSWORD
             ),
             'img' => array(
-                'original' => DIR_WS_ORIGINAL_IMAGES
+                'original' => DIR_WS_ORIGINAL_IMAGES,
+                'thumbnails' => DIR_WS_THUMBNAIL_IMAGES,
+                'info' => DIR_WS_INFO_IMAGES,
+                'popup' => DIR_WS_POPUP_IMAGES
             )
         );
     }
@@ -150,7 +154,18 @@ class Modified extends BaseConnector
 
         $result = array();
 
-        if ($this->action === Method::ACTION_PUSH || $this->action === Method::ACTION_DELETE) {
+        if ($requestpacket->getMethod() == 'image.push') {
+            $action = new Action();
+
+            $result = $this->controller->{$this->action}($requestpacket->getParams());
+
+            $action->setHandled(true)
+                ->setResult($result->getResult())
+                ->setError($result->getError());
+
+            return $action;
+
+        } elseif ($this->action === Method::ACTION_PUSH || $this->action === Method::ACTION_DELETE) {
             if (!is_array($requestpacket->getParams())) {
                 throw new \Exception('data is not an array');
             }
@@ -165,8 +180,8 @@ class Modified extends BaseConnector
             }
 
             $action->setHandled(true)
-                    ->setResult($results)
-                    ->setError($result->getError());
+                ->setResult($results)
+                ->setError($result->getError());
 
             return $action;
         } else {
@@ -177,24 +192,29 @@ class Modified extends BaseConnector
     public function errorHandler($errno, $errstr, $errfile, $errline, $errcontext)
     {
         $types = array(
-            E_ERROR => 'E_ERROR',
-            E_WARNING => 'E_WARNING',
-            E_PARSE => 'E_PARSE',
-            E_NOTICE => 'E_NOTICE',
-            E_CORE_ERROR => 'E_Connector_ERROR',
-            E_CORE_WARNING => 'E_Connector_WARNING',
-            E_CORE_ERROR => 'E_COMPILE_ERROR',
-            E_CORE_WARNING => 'E_COMPILE_WARNING',
-            E_USER_ERROR => 'E_USER_ERROR',
-            E_USER_WARNING => 'E_USER_WARNING',
-            E_USER_NOTICE => 'E_USER_NOTICE',
-            E_STRICT => 'E_STRICT',
-            E_RECOVERABLE_ERROR => 'E_RECOVERABLE_ERROR',
-            E_DEPRECATED => 'E_DEPRECATED',
-            E_USER_DEPRECATED => 'E_USER_DEPRECATED'
+            E_ERROR => array(Logger::ERROR, 'E_ERROR'),
+            E_WARNING => array(Logger::WARNING, 'E_WARNING'),
+            E_PARSE => array(Logger::WARNING, 'E_PARSE'),
+            E_NOTICE => array(Logger::NOTICE, 'E_NOTICE'),
+            E_CORE_ERROR => array(Logger::ERROR, 'E_CORE_ERROR'),
+            E_CORE_WARNING => array(Logger::WARNING, 'E_CORE_WARNING'),
+            E_CORE_ERROR => array(Logger::ERROR, 'E_COMPILE_ERROR'),
+            E_CORE_WARNING => array(Logger::WARNING, 'E_COMPILE_WARNING'),
+            E_USER_ERROR => array(Logger::ERROR, 'E_USER_ERROR'),
+            E_USER_WARNING => array(Logger::WARNING, 'E_USER_WARNING'),
+            E_USER_NOTICE => array(Logger::NOTICE, 'E_USER_NOTICE'),
+            E_STRICT => array(Logger::NOTICE, 'E_STRICT'),
+            E_RECOVERABLE_ERROR => array(Logger::ERROR, 'E_RECOVERABLE_ERROR'),
+            E_DEPRECATED => array(Logger::INFO, 'E_DEPRECATED'),
+            E_USER_DEPRECATED => array(Logger::INFO, 'E_USER_DEPRECATED')
         );
 
-        file_put_contents("/tmp/error.log", date("[Y-m-d H:i:s] ") . "(" . $types[$errno] . ") File ({$errfile}, {$errline}): {$errstr}\n", FILE_APPEND);
+        if (isset($types[$errno])) {
+            $err = "(" . $types[$errno][1] . ") File ({$errfile}, {$errline}): {$errstr}";
+            Logger::write($err, $types[$errno][0], 'global');
+        } else {
+            Logger::write("File ({$errfile}, {$errline}): {$errstr}", Logger::ERROR, 'global');
+        }
     }
 
     public function exceptionHandler(\Exception $exception)

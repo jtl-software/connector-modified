@@ -2,6 +2,7 @@
 namespace jtl\Connector\Modified\Mapper;
 
 use \jtl\Connector\Modified\Mapper\BaseMapper;
+use \jtl\Connector\Linker\ChecksumLinker;
 
 class ProductVariation extends BaseMapper
 {
@@ -25,6 +26,8 @@ class ProductVariation extends BaseMapper
 
     public function push($parent, $dbObj)
     {
+        $checksum = ChecksumLinker::find($parent, 1);
+
         $nextId = $this->db->query('SELECT max(products_options_id) + 1 AS nextID FROM products_options');
         $nextId = is_null($nextId[0]['nextID']) || $nextId[0]['nextID'] === 0 ? 1 : $nextId[0]['nextID'];
 

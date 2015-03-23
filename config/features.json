@@ -2,28 +2,34 @@
     "entities" : {
         "Category" : {
             "pull" : true,
-            "push" : true
+            "push" : true,
+            "delete" : true
         },
         "Product" : {
             "pull" : true,
-            "push" : true
+            "push" : true,
+            "delete" : true
         },
         "Customer" : {
             "pull" : true,
-            "push" : true
+            "push" : true,
+            "delete" : true
         },
         "CustomerOrder" : {
             "pull" : true,
-            "push" : false
+            "push" : false,
+            "delete" : false
         },
         "Image" : {
             "pull" : true,
-            "push" : true
+            "push" : true,
+            "delete" : true
         }
     },
     "flags" : {
         "var_combination_child_first" : false,
         "can_reactivate_customer_order" : false,
-        "can_update_customer_order" : false
+        "can_update_customer_order" : false,
+        "customer_order_partially_payable": false
     }
 }
