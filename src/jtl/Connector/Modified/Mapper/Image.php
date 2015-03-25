@@ -58,6 +58,26 @@ class Image extends BaseMapper
         if (get_class($data) === 'jtl\Connector\Model\Image') {
             switch ($data->getRelationType()) {
                 case ImageRelationType::TYPE_CATEGORY:
+                    $oldImage = $this->db->query('SELECT categories_image FROM categories WHERE categories_id = '.$data->getForeignKey()->getEndpoint());
+                    $oldImage = $oldImage[0]['categories_image'];
+
+                    if (isset($oldImage)) {
+                        if (!unlink($this->connectorConfig->connector_root.'/images/categories/'.$oldImage)) {
+                            throw new \Exception('Cannot delete previous image file');
+                        }
+                    }
+
+                    $imgFileName = substr($data->getFilename(), strrpos($data->getFilename(), '/') + 1);
+
+                    if (!rename($data->getFilename(), $this->connectorConfig->connector_root.'/images/categories/'.$imgFileName)) {
+                        throw new \Exception('Cannot move uploaded image file');
+                    }
+
+                    $categoryObj = new \stdClass();
+                    $categoryObj->categories_image = $imgFileName;
+
+                    $this->db->updateRow($categoryObj,'categories','categories_id', $data->getForeignKey()->getEndpoint());
+
                     break;
 
                 case ImageRelationType::TYPE_PRODUCT:
