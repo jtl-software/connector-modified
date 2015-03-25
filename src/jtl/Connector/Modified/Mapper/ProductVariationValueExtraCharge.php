@@ -27,14 +27,4 @@ class ProductVariationValueExtraCharge extends BaseMapper
 
         return $return;
     }
-
-    public function push($parent, $dbObj)
-    {
-        foreach ($parent->getExtraCharges() as $extraCharge) {
-            if ($extraCharge->getCustomerGroupId()->getEndpoint() == $this->shopConfig['settings']['DEFAULT_CUSTOMERS_STATUS_ID']) {
-                $dbObj->price_prefix = $extraCharge->getExtraChargeNet() < 0 ? '-' : '+';
-                $dbObj->options_values_price = abs($extraCharge->getExtraChargeNet());
-            }
-        }
-    }
 }

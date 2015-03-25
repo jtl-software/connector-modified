@@ -196,10 +196,12 @@ class BaseMapper
                     }
                 }
 
-                $insertResult = $this->db->deleteInsertRow($dbObj, $this->mapperConfig['table'], $whereKey, $whereValue);
+                if (!empty((array) $dbObj)) {
+                    $insertResult = $this->db->deleteInsertRow($dbObj, $this->mapperConfig['table'], $whereKey, $whereValue);
 
-                if (isset($this->mapperConfig['identity'])) {
-                    $obj->{$this->mapperConfig['identity']}()->setEndpoint($insertResult->getKey());
+                    if (isset($this->mapperConfig['identity'])) {
+                        $obj->{$this->mapperConfig['identity']}()->setEndpoint($insertResult->getKey());
+                    }
                 }
             } else {
                 foreach ($dbObj as $key => $value) {

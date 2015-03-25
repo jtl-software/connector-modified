@@ -21,11 +21,8 @@ class CustomerOrder extends BaseMapper
             "status" => null,
             "paymentModuleCode" => null,
             "currencyIso" => "currency",
-            "shippingAddressId" => null,
-            "billingAddressId" => null,
             "billingAddress" => "CustomerOrderBillingAddress|setBillingAddress",
             "shippingAddress" => "CustomerOrderShippingAddress|setShippingAddress",
-            "shippingMethodId" => "shipping_class",
             "shippingMethodName" => "shipping_method",
             "items" => "CustomerOrderItem|addItem"
         ),
@@ -86,16 +83,6 @@ class CustomerOrder extends BaseMapper
     protected function orders_status($data)
     {
         return $this->connectorConfig->mapping->{$data->getStatus()};
-    }
-
-    protected function shippingAddressId($data)
-    {
-        return 'cID_'.$data['customers_id'];
-    }
-
-    protected function billingAddressId($data)
-    {
-        return 'cID_'.$data['customers_id'];
     }
 
     protected function paymentModuleCode($data)

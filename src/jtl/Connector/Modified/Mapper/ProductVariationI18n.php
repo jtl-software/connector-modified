@@ -12,26 +12,11 @@ class ProductVariationI18n extends BaseMapper
             "productVariationId" => "products_options_id",
             "name" => "products_options_name",
             "languageISO" => null
-        ),
-        "mapPush" => array(
-            "products_options_id" => "productVariationId",
-            "products_options_name" => "name",
-            "language_id" => null
         )
     );
 
     protected function languageISO($data)
     {
         return $this->id2locale($data['language_id']);
-    }
-
-    protected function language_id($data)
-    {
-        return $this->locale2id($data->getLanguageISO());
-    }
-
-    public function push($parent, $dbObj)
-    {
-        return parent::push($parent->getI18ns(), $dbObj);
     }
 }
