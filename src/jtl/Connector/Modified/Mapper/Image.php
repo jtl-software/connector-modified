@@ -42,7 +42,6 @@ class Image extends BaseMapper
         $dbResult = array_merge($dbResult, $dbResultDefault, $dbResultCategories);
 
         $current = array_slice($dbResult, 0, $limit);
-        //$current = $dbResult;
 
         foreach ($current as $modelData) {
             $model = $this->generateModel($modelData);
@@ -76,7 +75,7 @@ class Image extends BaseMapper
                     $categoryObj = new \stdClass();
                     $categoryObj->categories_image = $imgFileName;
 
-                    $this->db->updateRow($categoryObj,'categories','categories_id', $data->getForeignKey()->getEndpoint());
+                    $this->db->updateRow($categoryObj, 'categories', 'categories_id', $data->getForeignKey()->getEndpoint());
 
                     break;
 
@@ -102,7 +101,7 @@ class Image extends BaseMapper
                         $productsObj = new \stdClass();
                         $productsObj->products_image = $imgFileName;
 
-                        $this->db->updateRow($productsObj,'products','products_id', $data->getForeignKey()->getEndpoint());
+                        $this->db->updateRow($productsObj, 'products', 'products_id', $data->getForeignKey()->getEndpoint());
                     } else {
                         if (empty($data->getId()->getEndpoint())) {
                             $imgFileName = substr($data->getFilename(), strrpos($data->getFilename(), '/') + 1);
@@ -121,7 +120,7 @@ class Image extends BaseMapper
                             $imgObj->image_name = $imgFileName;
                             $imgObj->image_nr = $nextNr;
 
-                            $insertResult = $this->db->insertRow($imgObj,'products_images');
+                            $insertResult = $this->db->insertRow($imgObj, 'products_images');
 
                             $data->getId()->setEndpoint($insertResult->getKey());
                         } else {
@@ -146,7 +145,7 @@ class Image extends BaseMapper
                             $imgObj->image_name = $imgFileName;
                             $imgObj->image_nr = 1;
 
-                            $this->db->deleteInsertRow($imgObj,'products_images','image_id',$imgObj->image_id);
+                            $this->db->deleteInsertRow($imgObj, 'products_images', 'image_id', $imgObj->image_id);
                         }
                     }
 

@@ -27,19 +27,9 @@ class CategoryInvisibility extends \jtl\Connector\Modified\Mapper\BaseMapper
 
     public function push($data, $dbObj)
     {
-        //$return = [];
-
         $inactiveGroups = [];
 
         foreach ($data->getInvisibilities() as $invisibility) {
-            /*
-            $categoryInvisibility = new CategoryInvisibilityModel();
-            $categoryInvisibility->setCustomerGroupId($invisibility->getCustomerGroupId());
-            $categoryInvisibility->setCategoryId($data->getId());
-
-            $return[] = $categoryInvisibility;
-            */
-
             $inactiveGroups[] = $invisibility->getCustomerGroupId()->getEndpoint();
         }
 
@@ -52,6 +42,6 @@ class CategoryInvisibility extends \jtl\Connector\Modified\Mapper\BaseMapper
             $dbObj->$property = in_array($groupId, $inactiveGroups) ? 0 : 1;
         }
 
-        //return $return;
+        return $data->getInvisibilities();
     }
 }
