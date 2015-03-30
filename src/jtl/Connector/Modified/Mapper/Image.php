@@ -190,7 +190,7 @@ class Image extends BaseMapper
 
                     if (isset($oldImage)) {
                         if (!unlink($this->connectorConfig->connector_root.'/images/categories/'.$oldImage)) {
-                            throw new \Exception('Cannot delete previous image file');
+                            throw new \Exception('Cannot delete image file');
                         }
                     }
 
@@ -221,10 +221,10 @@ class Image extends BaseMapper
                         $oldImage = $oldImage[0]['image_name'];
 
                         if (!unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$oldImage)) {
-                            throw new \Exception('Cannot delete previous image file');
+                            throw new \Exception('Cannot delete image file');
                         }
 
-                        $this->db->deleteRow('products_images', 'image_id', $data->getId()->getEndpoint());
+                        $this->db->query('DELETE FROM products_images WHERE image_id='.$data->getId()->getEndpoint());
                     }
 
                     break;
