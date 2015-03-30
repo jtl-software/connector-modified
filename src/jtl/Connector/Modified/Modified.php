@@ -154,7 +154,7 @@ class Modified extends BaseConnector
 
         $result = array();
 
-        if ($requestpacket->getMethod() == 'image.push') {
+        if ($requestpacket->getMethod() == 'image.push' || $requestpacket->getMethod() == 'image.delete') {
             $action = new Action();
 
             $result = $this->controller->{$this->action}($requestpacket->getParams());

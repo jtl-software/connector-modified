@@ -18,6 +18,28 @@ class Image extends BaseMapper
         )
     );
 
+    private $thumbConfig;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->thumbConfig = array(
+            'info' => array(
+                $this->shopConfig['settings']['PRODUCT_IMAGE_INFO_WIDTH'],
+                $this->shopConfig['settings']['PRODUCT_IMAGE_INFO_HEIGHT']
+            ),
+            'popup' => array(
+                $this->shopConfig['settings']['PRODUCT_IMAGE_POPUP_WIDTH'],
+                $this->shopConfig['settings']['PRODUCT_IMAGE_POPUP_HEIGHT']
+            ),
+            'thumbnails' => array(
+                $this->shopConfig['settings']['PRODUCT_IMAGE_THUMBNAIL_WIDTH'],
+                $this->shopConfig['settings']['PRODUCT_IMAGE_THUMBNAIL_HEIGHT']
+            )
+        );
+    }
+
     public function pull($data, $limit)
     {
         $result = [];
@@ -158,6 +180,68 @@ class Image extends BaseMapper
         }
     }
 
+    public function delete($data)
+    {
+        if (get_class($data) === 'jtl\Connector\Model\Image') {
+            switch ($data->getRelationType()) {
+                case ImageRelationType::TYPE_CATEGORY:
+                    $oldImage = $this->db->query('SELECT categories_image FROM categories WHERE categories_id = '.$data->getForeignKey()->getEndpoint());
+                    $oldImage = $oldImage[0]['categories_image'];
+
+                    if (isset($oldImage)) {
+                        if (!unlink($this->connectorConfig->connector_root.'/images/categories/'.$oldImage)) {
+                            throw new \Exception('Cannot delete previous image file');
+                        }
+                    }
+
+                    $categoryObj = new \stdClass();
+                    $categoryObj->categories_image = null;
+
+                    $this->db->updateRow($categoryObj, 'categories', 'categories_id', $data->getForeignKey()->getEndpoint());
+
+                    break;
+
+                case ImageRelationType::TYPE_PRODUCT:
+                    if ($data->getSort() == 0) {
+                        $oldImage = $this->db->query('SELECT products_image FROM products WHERE products_id = '.$data->getForeignKey()->getEndpoint());
+                        $oldImage = $oldImage[0]['products_image'];
+
+                        if (isset($oldImage)) {
+                            if (!unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$oldImage)) {
+                                throw new \Exception('Cannot delete image file');
+                            }
+                        }
+
+                        $productsObj = new \stdClass();
+                        $productsObj->products_image = null;
+
+                        $this->db->updateRow($productsObj, 'products', 'products_id', $data->getForeignKey()->getEndpoint());
+                    } else {
+                        $oldImage = $this->db->query('SELECT image_name FROM products_images WHERE image_id = '.$data->getId()->getEndpoint());
+                        $oldImage = $oldImage[0]['image_name'];
+
+                        if (!unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$oldImage)) {
+                            throw new \Exception('Cannot delete previous image file');
+                        }
+
+                        $this->db->deleteRow('products_images', 'image_id', $data->getId()->getEndpoint());
+                    }
+
+                    break;
+            }
+
+            foreach ($this->thumbConfig as $folder => $sizes) {
+                if (!is_null($oldImage)) {
+                    unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img'][$folder].$oldImage);
+                }
+            }
+
+            return $data;
+        } else {
+            throw new \Exception('Pushed data is not an image object');
+        }
+    }
+
     public function statistic()
     {
         $totalImages = 0;
@@ -189,27 +273,12 @@ class Image extends BaseMapper
 
     private function generateThumbs($fileName, $oldImage = null)
     {
-        $config = array(
-            'info' => array(
-                $this->shopConfig['settings']['PRODUCT_IMAGE_INFO_WIDTH'],
-                $this->shopConfig['settings']['PRODUCT_IMAGE_INFO_HEIGHT']
-            ),
-            'popup' => array(
-                $this->shopConfig['settings']['PRODUCT_IMAGE_POPUP_WIDTH'],
-                $this->shopConfig['settings']['PRODUCT_IMAGE_POPUP_HEIGHT']
-            ),
-            'thumbnails' => array(
-                $this->shopConfig['settings']['PRODUCT_IMAGE_THUMBNAIL_WIDTH'],
-                $this->shopConfig['settings']['PRODUCT_IMAGE_THUMBNAIL_HEIGHT']
-            )
-        );
-
         $image = imagecreatefromjpeg($this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$fileName);
         $width = imagesx($image);
         $height = imagesy($image);
         $original_aspect = $width / $height;
 
-        foreach ($config as $folder => $sizes) {
+        foreach ($this->thumbConfig as $folder => $sizes) {
             if (!is_null($oldImage)) {
                 unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img'][$folder].$oldImage);
             }

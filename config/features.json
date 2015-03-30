@@ -109,6 +109,9 @@
         "specific_images_supported": false,
         "specific_value_images_supported": false,
         "config_group_images_supported": false,
-        "product_variation_value_images_supported": false
+        "product_variation_value_images_supported": false,
+        "can_reactivate_customer_order" : false,
+        "can_update_customer_order" : false,
+        "customer_order_partially_payable": false
     }
 }

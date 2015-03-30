@@ -51,7 +51,8 @@ class Customer extends BaseMapper
             "customers_email_address" => "eMail",
             "customers_vat_id" => "vatNumber",
             "customers_newsletter" => "hasNewsletterSubscription",
-            "customers_date_added" => "creationDate"
+            "customers_date_added" => "creationDate",
+            "customers_password" => null
         )
     );
 
@@ -68,6 +69,16 @@ class Customer extends BaseMapper
     protected function hasNewsletterSubscription($data)
     {
         return (is_null($data['customers_newsletter']) || $data['customers_newsletter'] == 0) ? false : true;
+    }
+
+    protected function customers_password($data)
+    {
+        if ($data->getId()->getEndpoint() !== 0) {
+            $password = $this->db->query('SELECT customers_password FROM customers WHERE customers_id = '.$data->getId()->getEndpoint());
+            $password = $password[0]['customers_password'];
+        }
+
+        return isset($password) ? $password : null;
     }
 
     public function push($data, $dbObj = null)
