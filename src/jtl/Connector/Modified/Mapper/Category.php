@@ -21,7 +21,7 @@ class Category extends \jtl\Connector\Modified\Mapper\BaseMapper
         ),
         "mapPush" => array(
             "categories_id" => "id",
-            "parent_id" => "parentCategoryId",
+            "parent_id" => null,
             "sort_order" => "sort",
             "categories_status" => "isActive",
             "CategoryI18n|addI18n" => "i18ns",
@@ -34,6 +34,11 @@ class Category extends \jtl\Connector\Modified\Mapper\BaseMapper
     protected function parentCategoryId($data)
     {
         return $this->replaceZero($data['parent_id']);
+    }
+
+    protected function parent_id($data)
+    {
+        return is_null($data->getParentCategoryId()->getEndpoint()) ? 0 : $data->getParentCategoryId()->getEndpoint();
     }
 
     public function pull($parent = null, $limit = null)

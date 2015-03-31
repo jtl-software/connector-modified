@@ -68,7 +68,7 @@ class Product extends BaseMapper
 
     public function push($data, $dbObj = null)
     {
-        if ($data->getId()->getEndpoint() !== 0) {
+        if (!is_null($data->getId()->getEndpoint())) {
             foreach ($this->getCustomerGroups() as $group) {
                 $this->db->query('DELETE FROM personal_offers_by_customers_status_'.$group['customers_status_id'].' WHERE products_id='.$data->getId()->getEndpoint());
             }

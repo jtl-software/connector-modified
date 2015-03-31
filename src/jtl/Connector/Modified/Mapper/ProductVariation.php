@@ -25,7 +25,7 @@ class ProductVariation extends BaseMapper
         if (count($parent->getVariations()) > 0) {
             $checksum = ChecksumLinker::find($parent, 1);
 
-            if (!$checksum || $checksum->hasChanged() === true) {
+            if ($checksum === null || $checksum->hasChanged() === true) {
                 // clear existing product variations
                 $this->db->query('DELETE FROM products_attributes WHERE products_id='.$parent->getId()->getEndpoint());
 

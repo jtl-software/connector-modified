@@ -25,7 +25,7 @@ class CategoryInvisibility extends \jtl\Connector\Modified\Mapper\BaseMapper
         return $return;
     }
 
-    public function push($data, $dbObj)
+    public function push($data, $dbObj = null)
     {
         $inactiveGroups = [];
 

@@ -39,7 +39,7 @@ class Connector extends Controller
                     $statModel->setAvailable($mapper->statistic());
                     $statModel->setControllerName(lcfirst($controller));
 
-                    $return[] = $statModel->getPublic();
+                    $return[] = $statModel;
                 } catch (\Exception $exc) {
                     $err = new Error();
                     $err->setCode($exc->getCode());

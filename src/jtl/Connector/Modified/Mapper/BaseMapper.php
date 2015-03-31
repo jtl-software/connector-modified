@@ -227,7 +227,7 @@ class BaseMapper
                 }
             }
 
-            $return[] = $model->getPublic();
+            $return[] = $model;
         }
 
         if (is_null($parentObj)) {
