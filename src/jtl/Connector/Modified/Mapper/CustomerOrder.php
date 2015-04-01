@@ -70,9 +70,9 @@ class CustomerOrder extends BaseMapper
         'worldpay' => 'pm_worldpay'
     );
 
-    public function pull($params)
+    public function pull($data = null, $limit = null)
     {
-        return parent::pull(null, $params->limit);
+        return parent::pull(null, $limit);
     }
 
     protected function status($data)

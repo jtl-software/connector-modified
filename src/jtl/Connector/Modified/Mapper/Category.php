@@ -30,6 +30,7 @@ class Category extends \jtl\Connector\Modified\Mapper\BaseMapper
     );
 
     private $tree = array();
+    private static $idCache = array();
 
     protected function parentCategoryId($data)
     {
@@ -64,6 +65,20 @@ class Category extends \jtl\Connector\Modified\Mapper\BaseMapper
         }
 
         return $result;
+    }
+
+    public function push($data, $dbObj = null)
+    {
+        if (isset(static::$idCache[$data->getParentCategoryId()->getHost()])) {
+            $data->getParentCategoryId()->setEndpoint(static::$idCache[$data->getParentCategoryId()->getHost()]);
+        }
+
+        return parent::push($data, $dbObj);
+    }
+
+    public function pushDone($model, $dbObj)
+    {
+        static::$idCache[$model->getId()->getHost()] = $model->getId()->getEndpoint();
     }
 
     private function getChildren($ids = null, $level = 0, $limit)

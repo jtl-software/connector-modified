@@ -20,7 +20,7 @@ class ProductPrice extends BaseMapper
         )
     );
 
-    public function pull($data)
+    public function pull($data = null, $limit = null)
     {
         $customerGroups = $this->getCustomerGroups();
 
