@@ -40,7 +40,7 @@ class Image extends BaseMapper
         );
     }
 
-    public function pull($data, $limit)
+    public function pull($data = null, $limit = null)
     {
         $result = [];
 
@@ -102,7 +102,7 @@ class Image extends BaseMapper
                     break;
 
                 case ImageRelationType::TYPE_PRODUCT:
-                    if ($data->getSort() == 0) {
+                    if ($data->getSort() == 1) {
                         $oldImage = $this->db->query('SELECT products_image FROM products WHERE products_id = '.$data->getForeignKey()->getEndpoint());
                         $oldImage = $oldImage[0]['products_image'];
 
@@ -146,8 +146,19 @@ class Image extends BaseMapper
 
                             $data->getId()->setEndpoint($insertResult->getKey());
                         } else {
-                            $oldImage = $this->db->query('SELECT image_name FROM products_images WHERE image_id = '.$data->getId()->getEndpoint());
-                            $oldImage = $oldImage[0]['image_name'];
+                            $oldImage = null;
+                            $imgObj = new \stdClass();
+
+                            if (strpos($data->getId()->getEndpoint(), 'pID') === false) {
+                                $oldImage = $this->db->query('SELECT image_name FROM products_images WHERE image_id = '.$data->getId()->getEndpoint());
+                                $oldImage = $oldImage[0]['image_name'];
+
+                                if (!unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$oldImage)) {
+                                    throw new \Exception('Cannot delete previous image file');
+                                }
+
+                                $imgObj->image_id = $data->getId()->getEndpoint();
+                            }
 
                             $imgFileName = substr($data->getFilename(), strrpos($data->getFilename(), '/') + 1);
 
@@ -155,19 +166,19 @@ class Image extends BaseMapper
                                 throw new \Exception('Cannot move uploaded image file');
                             }
 
-                            if (!unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$oldImage)) {
-                                throw new \Exception('Cannot delete previous image file');
-                            }
-
                             $this->generateThumbs($imgFileName, $oldImage);
 
-                            $imgObj = new \stdClass();
-                            $imgObj->image_id = $data->getId()->getEndpoint();
                             $imgObj->products_id = $data->getForeignKey()->getEndpoint();
                             $imgObj->image_name = $imgFileName;
-                            $imgObj->image_nr = 1;
+                            $imgObj->image_nr = $data->getSort() - 1;
 
-                            $this->db->deleteInsertRow($imgObj, 'products_images', 'image_id', $imgObj->image_id);
+                            $newIdQuery = $this->db->deleteInsertRow($imgObj, 'products_images', array('image_nr', 'products_id'), array($imgObj->image_nr, $imgObj->products_id));
+                            $newId = $newIdQuery->getKey();
+
+                            if (strpos($data->getId()->getEndpoint(), 'pID') !== false) {
+                                $this->db->query('UPDATE jtl_connector_link SET endpointId="'.$newId.'" WHERE endpointId="'.$data->getId()->getEndpoint().'" && type=16');
+                                $data->getId()->setEndpoint($newId);
+                            }
                         }
                     }
 

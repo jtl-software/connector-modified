@@ -16,7 +16,7 @@ class PrimaryKeyMapper implements IPrimaryKeyMapper
 
     public function getHostId($endpointId, $type)
     {
-        $dbResult = $this->db->query('SELECT hostId FROM jtl_connector_link WHERE endpointId = '.$endpointId.' AND type = '.$type);
+        $dbResult = $this->db->query('SELECT hostId FROM jtl_connector_link WHERE endpointId = "'.$endpointId.'" AND type = '.$type);
 
         $hostId = (count($dbResult) > 0) ? $dbResult[0]['hostId'] : null;
 
@@ -40,7 +40,7 @@ class PrimaryKeyMapper implements IPrimaryKeyMapper
     {
         Logger::write(sprintf('Save link with endpointId (%s), hostId (%s) and type (%s)', $endpointId, $hostId, $type), Logger::DEBUG, 'linker');
 
-        $this->db->query('INSERT IGNORE INTO jtl_connector_link (endpointId, hostId, type) VALUES ('.$endpointId.','.$hostId.','.$type.')');
+        $this->db->query('INSERT IGNORE INTO jtl_connector_link (endpointId, hostId, type) VALUES ("'.$endpointId.'",'.$hostId.','.$type.')');
     }
 
     public function delete($endpointId = null, $hostId = null, $type)
@@ -50,7 +50,7 @@ class PrimaryKeyMapper implements IPrimaryKeyMapper
         $where = 'type = '.$type;
 
         if ($endpointId) {
-            $where .= ' && endpointId = '.$endpointId;
+            $where .= ' && endpointId = "'.$endpointId.'"';
         }
 
         if ($hostId) {
