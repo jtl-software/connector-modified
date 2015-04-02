@@ -196,7 +196,9 @@ class BaseMapper
                     }
                 }
 
-                if (!empty((array) $dbObj)) {
+                $checkEmpty = get_object_vars($dbObj);
+
+                if (!empty($checkEmpty)) {
                     $insertResult = $this->db->deleteInsertRow($dbObj, $this->mapperConfig['table'], $whereKey, $whereValue);
 
                     if (isset($this->mapperConfig['identity'])) {
