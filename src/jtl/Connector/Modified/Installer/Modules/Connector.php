@@ -13,7 +13,7 @@ class Connector extends Module
             $this->config->platform_root = realpath(CONNECTOR_DIR.'/../');
         }
         if (is_null($this->config->auth_token)) {
-            $this->config->auth_token = sha1(uniqid());
+            $this->config->auth_token = substr(sha1(uniqid()), 0, 16);
         }
 
         $html = '
