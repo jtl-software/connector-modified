@@ -132,6 +132,6 @@ class Customer extends BaseMapper
         $this->db->query('DELETE FROM address_book WHERE customers_id='.$data->getId()->getEndpoint());
         $this->db->query('DELETE FROM customers_info WHERE customers_info_id='.$data->getId()->getEndpoint());
 
-        return true;
+        return $data;
     }
 }

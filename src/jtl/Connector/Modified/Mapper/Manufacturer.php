@@ -27,6 +27,6 @@ class Manufacturer extends BaseMapper
         $this->db->query('DELETE FROM manufacturers WHERE manufacturers_id='.$data->getId()->getEndpoint());
         $this->db->query('DELETE FROM manufacturers_info WHERE manufacturers_id='.$data->getId()->getEndpoint());
 
-        return true;
+        return $data;
     }
 }

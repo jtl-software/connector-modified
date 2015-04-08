@@ -125,7 +125,9 @@ class Image extends BaseMapper
 
                         $this->db->updateRow($productsObj, 'products', 'products_id', $data->getForeignKey()->getEndpoint());
                     } else {
-                        if (empty($data->getId()->getEndpoint())) {
+                        $id = $data->getId()->getEndpoint();
+
+                        if (empty($id)) {
                             $imgFileName = substr($data->getFilename(), strrpos($data->getFilename(), '/') + 1);
 
                             if (!rename($data->getFilename(), $this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$imgFileName)) {

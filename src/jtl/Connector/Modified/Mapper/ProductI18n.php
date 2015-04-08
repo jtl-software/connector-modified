@@ -47,8 +47,10 @@ class ProductI18n extends BaseMapper
 
     public function push($parent, $dbObj)
     {
-        if (!empty($parent->getId()->getEndpoint())) {
-            $this->db->query('DELETE FROM products_description WHERE products_id='.$parent->getId()->getEndpoint());
+        $id = $parent->getId()->getEndpoint();
+
+        if (!empty($id)) {
+            $this->db->query('DELETE FROM products_description WHERE products_id='.$id);
         }
 
         foreach ($parent->getI18ns() as $i18n) {

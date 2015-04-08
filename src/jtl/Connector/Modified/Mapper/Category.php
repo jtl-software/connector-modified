@@ -117,6 +117,6 @@ class Category extends \jtl\Connector\Modified\Mapper\BaseMapper
         $this->db->query('DELETE FROM categories_description WHERE categories_id='.$data->getId()->getEndpoint());
         $this->db->query('DELETE FROM products_to_categories WHERE categories_id='.$data->getId()->getEndpoint());
 
-        return true;
+        return $data;
     }
 }

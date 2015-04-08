@@ -112,6 +112,9 @@
         "product_variation_value_images_supported": false,
         "can_reactivate_customer_order" : false,
         "can_update_customer_order" : false,
-        "customer_order_partially_payable": false
+        "customer_order_partially_payable": false,
+        "variation_products_supported": true,
+        "variation_combinations_supported": false,
+        "set_articles_supported": false
     }
 }

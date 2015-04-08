@@ -86,7 +86,7 @@ class Product extends BaseMapper
         $this->db->query('DELETE FROM products_attributes WHERE products_id='.$data->getId()->getEndpoint());
         $this->db->query('DELETE FROM products_xsell WHERE products_id='.$data->getId()->getEndpoint().' OR xsell_id='.$data->getId()->getEndpoint());
 
-        return true;
+        return $data;
     }
 
     protected function manufacturerId($data)
