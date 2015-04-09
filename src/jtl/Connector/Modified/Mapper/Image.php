@@ -151,7 +151,9 @@ class Image extends BaseMapper
                                 $oldImage = $this->db->query('SELECT image_name FROM products_images WHERE image_id = '.$data->getId()->getEndpoint());
                                 $oldImage = $oldImage[0]['image_name'];
 
-                                @unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$oldImage);
+                                if (!empty($oldImage)) {
+                                    @unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$oldImage);
+                                }
 
                                 $imgObj->image_id = $data->getId()->getEndpoint();
                             }
