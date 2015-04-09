@@ -56,13 +56,13 @@ class ProductPrice extends BaseMapper
     {
         if (get_class($parent) == 'jtl\Connector\Model\Product') {
             $productId = $parent->getId();
+			
+			foreach ($parent->getPrices() as $price) {
+				$price->setProductId($productId);
+			}
         } else {
             $productId = $parent->getProductId();
             unset($this->mapperConfig['getMethod']);
-        }
-
-        foreach ($parent->getPrices() as $price) {
-            $price->setProductId($productId);
         }
 
         return parent::push($parent, $dbObj);

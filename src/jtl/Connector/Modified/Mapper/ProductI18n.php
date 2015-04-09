@@ -45,7 +45,7 @@ class ProductI18n extends BaseMapper
         return $this->locale2id($data->getLanguageISO());
     }
 
-    public function push($parent, $dbObj)
+    public function push($parent, $dbObj = null)
     {
         $id = $parent->getId()->getEndpoint();
 

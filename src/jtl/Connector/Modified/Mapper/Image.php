@@ -238,6 +238,8 @@ class Image extends BaseMapper
                     unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img'][$folder].$oldImage);
                 }
             }
+			
+			$this->db->query('DELETE FROM jtl_connector_link WHERE type=16 && endpointId='.$data->getId()->getEndpoint());
 
             return $data;
         } else {
