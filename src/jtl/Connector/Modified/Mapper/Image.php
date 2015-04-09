@@ -83,9 +83,7 @@ class Image extends BaseMapper
                     $oldImage = $oldImage[0]['categories_image'];
 
                     if (isset($oldImage)) {
-                        if (!unlink($this->connectorConfig->connector_root.'/images/categories/'.$oldImage)) {
-                            throw new \Exception('Cannot delete previous image file');
-                        }
+                        @unlink($this->connectorConfig->connector_root.'/images/categories/'.$oldImage);
                     }
 
                     $imgFileName = substr($data->getFilename(), strrpos($data->getFilename(), '/') + 1);
@@ -107,9 +105,7 @@ class Image extends BaseMapper
                         $oldImage = $oldImage[0]['products_image'];
 
                         if (isset($oldImage)) {
-                            if (!unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$oldImage)) {
-                                throw new \Exception('Cannot delete previous image file');
-                            }
+                            @unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$oldImage);
                         }
 
                         $imgFileName = substr($data->getFilename(), strrpos($data->getFilename(), '/') + 1);
@@ -155,9 +151,7 @@ class Image extends BaseMapper
                                 $oldImage = $this->db->query('SELECT image_name FROM products_images WHERE image_id = '.$data->getId()->getEndpoint());
                                 $oldImage = $oldImage[0]['image_name'];
 
-                                if (!unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$oldImage)) {
-                                    throw new \Exception('Cannot delete previous image file');
-                                }
+                                @unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$oldImage);
 
                                 $imgObj->image_id = $data->getId()->getEndpoint();
                             }
@@ -202,9 +196,7 @@ class Image extends BaseMapper
                     $oldImage = $oldImage[0]['categories_image'];
 
                     if (isset($oldImage)) {
-                        if (!unlink($this->connectorConfig->connector_root.'/images/categories/'.$oldImage)) {
-                            throw new \Exception('Cannot delete image file');
-                        }
+                        @unlink($this->connectorConfig->connector_root.'/images/categories/'.$oldImage);
                     }
 
                     $categoryObj = new \stdClass();
@@ -220,9 +212,7 @@ class Image extends BaseMapper
                         $oldImage = $oldImage[0]['products_image'];
 
                         if (isset($oldImage)) {
-                            if (!unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$oldImage)) {
-                                throw new \Exception('Cannot delete image file');
-                            }
+                            @unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$oldImage);
                         }
 
                         $productsObj = new \stdClass();
@@ -233,9 +223,7 @@ class Image extends BaseMapper
                         $oldImage = $this->db->query('SELECT image_name FROM products_images WHERE image_id = '.$data->getId()->getEndpoint());
                         $oldImage = $oldImage[0]['image_name'];
 
-                        if (!unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$oldImage)) {
-                            throw new \Exception('Cannot delete image file');
-                        }
+                        @unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$oldImage);
 
                         $this->db->query('DELETE FROM products_images WHERE image_id='.$data->getId()->getEndpoint());
                     }
