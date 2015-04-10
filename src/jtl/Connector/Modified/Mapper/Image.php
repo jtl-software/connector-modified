@@ -97,6 +97,8 @@ class Image extends BaseMapper
 
                     $this->db->updateRow($categoryObj, 'categories', 'categories_id', $data->getForeignKey()->getEndpoint());
 
+                    $data->getId()->setEndpoint('cID_'.$data->getForeignKey()->getEndpoint());
+
                     break;
 
                 case ImageRelationType::TYPE_PRODUCT:
@@ -120,6 +122,8 @@ class Image extends BaseMapper
                         $productsObj->products_image = $imgFileName;
 
                         $this->db->updateRow($productsObj, 'products', 'products_id', $data->getForeignKey()->getEndpoint());
+
+                        $data->getId()->setEndpoint('pID_'.$data->getForeignKey()->getEndpoint());
                     } else {
                         $id = $data->getId()->getEndpoint();
 
@@ -209,7 +213,7 @@ class Image extends BaseMapper
                     break;
 
                 case ImageRelationType::TYPE_PRODUCT:
-                    if ($data->getSort() == 0) {
+                    if ($data->getSort() == 1) {
                         $oldImage = $this->db->query('SELECT products_image FROM products WHERE products_id = '.$data->getForeignKey()->getEndpoint());
                         $oldImage = $oldImage[0]['products_image'];
 
@@ -238,8 +242,8 @@ class Image extends BaseMapper
                     unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img'][$folder].$oldImage);
                 }
             }
-			
-			$this->db->query('DELETE FROM jtl_connector_link WHERE type=16 && endpointId='.$data->getId()->getEndpoint());
+
+            $this->db->query('DELETE FROM jtl_connector_link WHERE type=16 && endpointId='.$data->getId()->getEndpoint());
 
             return $data;
         } else {

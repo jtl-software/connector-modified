@@ -56,12 +56,17 @@ class ProductPrice extends BaseMapper
     {
         if (get_class($parent) == 'jtl\Connector\Model\Product') {
             $productId = $parent->getId();
-			
-			foreach ($parent->getPrices() as $price) {
-				$price->setProductId($productId);
-			}
+
+            foreach ($parent->getPrices() as $price) {
+                $price->setProductId($productId);
+            }
         } else {
-            $productId = $parent->getProductId();
+            $customerGrp = $parent->getCustomerGroupId()->getEndpoint();
+
+            if (!empty($customerGrp)) {
+                $this->db->query('DELETE FROM personal_offers_by_customers_status_'.$customerGrp.' WHERE products_id='.$parent->getProductId()->getEndpoint());
+            }
+
             unset($this->mapperConfig['getMethod']);
         }
 
