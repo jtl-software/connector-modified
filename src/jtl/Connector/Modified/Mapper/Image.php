@@ -243,7 +243,7 @@ class Image extends BaseMapper
                 }
             }
 
-            $this->db->query('DELETE FROM jtl_connector_link WHERE type=16 && endpointId='.$data->getId()->getEndpoint());
+            $this->db->query('DELETE FROM jtl_connector_link WHERE type=16 && endpointId="'.$data->getId()->getEndpoint().'"');
 
             return $data;
         } else {

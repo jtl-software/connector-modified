@@ -4,3 +4,4 @@ config/config.json
 logs/**
 build/**
 dist/**
+db/connector.s3db
