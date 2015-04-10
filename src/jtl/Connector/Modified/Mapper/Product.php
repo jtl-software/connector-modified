@@ -62,7 +62,8 @@ class Product extends BaseMapper
             "ProductSpecialPrice|addSpecialPrice" => "specialPrices",
             "ProductVariation|addVariation" => "variations",
             "ProductInvisibility|addInvisibility|true" => "invisibilities",
-            "ProductCrossSelling|addCrossSelling" => "crossSellings"
+            "ProductCrossSelling|addCrossSelling" => "crossSellings",
+            "products_image" => null
         )
     );
 
@@ -89,6 +90,22 @@ class Product extends BaseMapper
         $this->db->query('DELETE FROM jtl_connector_link WHERE type=64 && endpointId='.$data->getId()->getEndpoint());
 
         return $data;
+    }
+
+    protected function products_image($data)
+    {
+        $id = $data->getId()->getEndpoint();
+
+        if (!empty($id)) {
+            $img = $this->db->query('SELECT products_image FROM products WHERE products_id ='.$id);
+            $img = $img[0]['products_image'];
+
+            if (isset($img)) {
+                return $img;
+            }
+        }
+
+        return '';
     }
 
     protected function manufacturerId($data)
