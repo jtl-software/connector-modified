@@ -101,7 +101,7 @@ class ProductVariation extends BaseMapper
                         $pVarObj->products_id = $parent->getId()->getEndpoint();
                         $pVarObj->options_id = $variationId;
                         $pVarObj->options_values_id = $valueId;
-                        $pVarObj->attributes_stock = $value->getStockLevel();
+                        $pVarObj->attributes_stock = round($value->getStockLevel());
                         $pVarObj->options_values_weight = abs($value->getExtraWeight());
                         $pVarObj->weight_prefix = $value->getExtraWeight() < 0 ? '-' : '+';
                         $pVarObj->sortorder = $value->getSort();

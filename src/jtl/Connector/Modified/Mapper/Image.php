@@ -144,7 +144,7 @@ class Image extends BaseMapper
                             $imgObj->image_name = $imgFileName;
                             $imgObj->image_nr = $nextNr;
 
-                            $insertResult = $this->db->insertRow($imgObj, 'products_images');
+                            $insertResult = $this->db->deleteInsertRow($imgObj, 'products_images', array('image_nr', 'products_id'), array($imgObj->image_nr, $imgObj->products_id));
 
                             $data->getId()->setEndpoint($insertResult->getKey());
                         } else {
@@ -254,19 +254,38 @@ class Image extends BaseMapper
     public function statistic()
     {
         $totalImages = 0;
-        $totalImages += parent::statistic();
 
-        $defaultProductImages = $this->db->query("SELECT count(*) as count FROM products WHERE products_image IS NOT NULL LIMIT 1", array("return" => "object"));
+        $productQuery = $this->db->query("
+            SELECT p.*
+            FROM (
+                SELECT CONCAT('pID_',p.products_id) as imgId
+                FROM products p
+                WHERE p.products_image IS NOT NULL && p.products_image != ''
+            ) p
+            LEFT JOIN jtl_connector_link l ON p.imgId = l.endpointId AND l.type = 16
+            WHERE l.hostId IS NULL
+        ");
 
-        if ($defaultProductImages !== null) {
-            $totalImages += intval($defaultProductImages[0]->count);
-        }
+        $categoryQuery = $this->db->query("
+            SELECT c.*
+            FROM (
+                SELECT CONCAT('cID_',c.categories_id) as imgId
+                FROM categories c
+                WHERE c.categories_image IS NOT NULL && c.categories_image != ''
+            ) c
+            LEFT JOIN jtl_connector_link l ON c.imgId = l.endpointId AND l.type = 16
+            WHERE l.hostId IS NULL
+        ");
 
-        $categoryImages = $this->db->query("SELECT count(*) as count FROM categories WHERE categories_image IS NOT NULL LIMIT 1", array("return" => "object"));
+        $imageQuery = $this->db->query("
+            SELECT i.* FROM products_images i
+            LEFT JOIN jtl_connector_link l ON i.image_id = l.endpointId AND l.type = 16
+            WHERE l.hostId IS NULL
+        ");
 
-        if ($categoryImages !== null) {
-            $totalImages += intval($categoryImages[0]->count);
-        }
+        $totalImages += count($productQuery);
+        $totalImages += count($categoryQuery);
+        $totalImages += count($imageQuery);
 
         return $totalImages;
     }
