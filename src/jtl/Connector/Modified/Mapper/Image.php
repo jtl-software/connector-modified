@@ -124,64 +124,42 @@ class Image extends BaseMapper
                         $this->db->updateRow($productsObj, 'products', 'products_id', $data->getForeignKey()->getEndpoint());
 
                         $data->getId()->setEndpoint('pID_'.$data->getForeignKey()->getEndpoint());
+
+                        $this->db->query('DELETE FROM jtl_connector_link WHERE endpointId="'.$data->getId()->getEndpoint().'"');
+                        $this->db->query('DELETE FROM jtl_connector_link WHERE hostId='.$data->getId()->getHost().' && type=16');
+                        $this->db->query('INSERT INTO jtl_connector_link SET hostId="'.$data->getId()->getHost().'", endpointId="'.$data->getId()->getEndpoint().'" , type=16');
                     } else {
-                        $id = $data->getId()->getEndpoint();
+                        $oldImage = null;
+                        $imgObj = new \stdClass();
 
-                        if (empty($id)) {
-                            $imgFileName = substr($data->getFilename(), strrpos($data->getFilename(), '/') + 1);
+                        $oldImage = $this->db->query('SELECT image_name FROM products_images WHERE products_id = '.$data->getForeignKey()->getEndpoint().' && image_nr='.($data->getSort() - 1));
+                        $oldImage = $oldImage[0]['image_name'];
 
-                            if (!rename($data->getFilename(), $this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$imgFileName)) {
-                                throw new \Exception('Cannot move uploaded image file');
-                            }
-
-                            $this->generateThumbs($imgFileName);
-
-                            $nextNr = $this->db->query('SELECT max(image_nr) + 1 AS nextNr FROM products_images');
-                            $nextNr = is_null($nextNr[0]['nextNr']) || $nextNr[0]['nextNr'] === 0 ? 1 : $nextNr[0]['nextNr'];
-
-                            $imgObj = new \stdClass();
-                            $imgObj->products_id = $data->getForeignKey()->getEndpoint();
-                            $imgObj->image_name = $imgFileName;
-                            $imgObj->image_nr = $nextNr;
-
-                            $insertResult = $this->db->deleteInsertRow($imgObj, 'products_images', array('image_nr', 'products_id'), array($imgObj->image_nr, $imgObj->products_id));
-
-                            $data->getId()->setEndpoint($insertResult->getKey());
-                        } else {
-                            $oldImage = null;
-                            $imgObj = new \stdClass();
-
-                            if (strpos($data->getId()->getEndpoint(), 'pID') === false) {
-                                $oldImage = $this->db->query('SELECT image_name FROM products_images WHERE image_id = '.$data->getId()->getEndpoint());
-                                $oldImage = $oldImage[0]['image_name'];
-
-                                if (!empty($oldImage)) {
-                                    @unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$oldImage);
-                                }
-
-                                $imgObj->image_id = $data->getId()->getEndpoint();
-                            }
-
-                            $imgFileName = substr($data->getFilename(), strrpos($data->getFilename(), '/') + 1);
-
-                            if (!rename($data->getFilename(), $this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$imgFileName)) {
-                                throw new \Exception('Cannot move uploaded image file');
-                            }
-
-                            $this->generateThumbs($imgFileName, $oldImage);
-
-                            $imgObj->products_id = $data->getForeignKey()->getEndpoint();
-                            $imgObj->image_name = $imgFileName;
-                            $imgObj->image_nr = $data->getSort() - 1;
-
-                            $newIdQuery = $this->db->deleteInsertRow($imgObj, 'products_images', array('image_nr', 'products_id'), array($imgObj->image_nr, $imgObj->products_id));
-                            $newId = $newIdQuery->getKey();
-
-                            if (strpos($data->getId()->getEndpoint(), 'pID') !== false) {
-                                $this->db->query('UPDATE jtl_connector_link SET endpointId="'.$newId.'" WHERE endpointId="'.$data->getId()->getEndpoint().'" && type=16');
-                                $data->getId()->setEndpoint($newId);
-                            }
+                        if (!empty($oldImage)) {
+                            @unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$oldImage);
                         }
+
+                        $imgObj->image_id = $data->getId()->getEndpoint();
+
+                        $imgFileName = substr($data->getFilename(), strrpos($data->getFilename(), '/') + 1);
+
+                        if (!rename($data->getFilename(), $this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$imgFileName)) {
+                            throw new \Exception('Cannot move uploaded image file');
+                        }
+
+                        $this->generateThumbs($imgFileName, $oldImage);
+
+                        $imgObj->products_id = $data->getForeignKey()->getEndpoint();
+                        $imgObj->image_name = $imgFileName;
+                        $imgObj->image_nr = ($data->getSort() - 1);
+
+                        $newIdQuery = $this->db->deleteInsertRow($imgObj, 'products_images', array('image_nr', 'products_id'), array($imgObj->image_nr, $imgObj->products_id));
+                        $newId = $newIdQuery->getKey();
+
+                        $this->db->query('DELETE FROM jtl_connector_link WHERE hostId='.$data->getId()->getHost().' && type=16');
+                        $this->db->query('INSERT INTO jtl_connector_link SET hostId="'.$data->getId()->getHost().'", endpointId="'.$newId.'" , type=16');
+
+                        $data->getId()->setEndpoint($newId);
                     }
 
                     break;
