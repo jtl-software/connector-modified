@@ -99,6 +99,11 @@
             "push": false,
             "pull": false,
             "delete": false
+        },
+        "StatusChange" : {
+            "pull" : false,
+            "push" : true,
+            "delete" : false
         }
     },
     "flags": {
@@ -115,6 +120,8 @@
         "customer_order_partially_payable": false,
         "variation_products_supported": true,
         "variation_combinations_supported": false,
-        "set_articles_supported": false
+        "set_articles_supported": false,
+        "needs_finish_call" : false,
+        "free_field_supported" : false
     }
 }
