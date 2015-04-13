@@ -87,6 +87,10 @@ class Product extends BaseMapper
         $this->db->query('DELETE FROM products_attributes WHERE products_id='.$data->getId()->getEndpoint());
         $this->db->query('DELETE FROM products_xsell WHERE products_id='.$data->getId()->getEndpoint().' OR xsell_id='.$data->getId()->getEndpoint());
 
+        foreach ($this->getCustomerGroups() as $group) {
+            $this->db->query('DELETE FROM personal_offers_by_customers_status_'.$group['customers_status_id'].' WHERE products_id='.$data->getId()->getEndpoint());
+        }
+
         $this->db->query('DELETE FROM jtl_connector_link WHERE type=64 && endpointId='.$data->getId()->getEndpoint());
 
         return $data;

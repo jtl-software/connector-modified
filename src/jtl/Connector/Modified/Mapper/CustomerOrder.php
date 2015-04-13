@@ -121,14 +121,16 @@ class CustomerOrder extends BaseMapper
 
     public function push($data, $dbObj)
     {
-        if (!empty($data->getId()->getEndpoint())) {
+        $id = $data->getId()->getEndpoint();
+
+        if (!empty($id)) {
             $this->clear($data->getId()->getEndpoint());
         }
 
         $return = parent::push($data, $dbObj);
 
         $orderHistory = new \stdClass();
-        $orderHistory->orders_id = $data->getId()->getEndpoint();
+        $orderHistory->orders_id = $id;
         $orderHistory->orders_status_id = $this->orders_status($data);
         $orderHistory->date_added = date('Y-m-d H:i:s');
 
