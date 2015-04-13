@@ -52,12 +52,24 @@ class Check extends Module
             'info' => 'The checksum table must be available in the shop database.',
             'ok' => 'Table was created',
             'fault' => 'Failed to create table',
+        ),
+        'additionalImages' => array(
+            'title' => 'Additional product images',
+            'info' => 'You need to allow additional product images in the <a href="%sadmin/configuration.php?gID=4">modified configuration</a> to use this feature',
+            'ok' => '%s additional images enabled',
+            'fault' => 'Additional images disabled',
+        ),
+        'groups' => array(
+            'title' => 'Customer group based visibilities and graduated prices',
+            'info' => 'The additional module "Group Check" must be enabled in the <a href="%sadmin/configuration.php?gID=17">modified configuration</a> to use group specific features',
+            'ok' => 'Module enabled',
+            'fault' => 'Module disabled',
         )
     );
 
-    public function __construct($db, $config)
+    public function __construct($db, $config, $shopConfig)
     {
-        parent::__construct($db, $config);
+        parent::__construct($db, $config, $shopConfig);
         $this->runChecks();
     }
 
@@ -166,6 +178,24 @@ class Check extends Module
         }
 
         return array(true);
+    }
+
+    private function additionalImages()
+    {
+        $additionalImages = $this->db->query('SELECT configuration_value FROM configuration WHERE configuration_key="MO_PICS"');
+
+        static::$checks['additionalImages']['info'] = sprintf(static::$checks['additionalImages']['info'], $this->shopConfig['shop']['fullUrl']);
+
+        return array(intval($additionalImages[0]['configuration_value']) > 0, $additionalImages[0]['configuration_value']);
+    }
+
+    private function groups()
+    {
+        $groups = $this->db->query('SELECT configuration_value FROM configuration WHERE configuration_key="GROUP_CHECK"');
+
+        static::$checks['groups']['info'] = sprintf(static::$checks['groups']['info'], $this->shopConfig['shop']['fullUrl']);
+
+        return array($groups[0]['configuration_value'] == 'true');
     }
 
     public function save()

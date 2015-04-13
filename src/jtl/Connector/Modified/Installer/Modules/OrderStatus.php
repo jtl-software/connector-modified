@@ -10,9 +10,9 @@ class OrderStatus extends Module
     private $jtlStats = null;
     private $modifiedStats = null;
 
-    public function __construct($db, $config)
+    public function __construct($db, $config, $shopConfig)
     {
-        parent::__construct($db, $config);
+        parent::__construct($db, $config, $shopConfig);
 
         $customerOrderModel = new \ReflectionClass('\jtl\Connector\Model\CustomerOrder');
         $this->jtlStats =  $customerOrderModel->getConstants();

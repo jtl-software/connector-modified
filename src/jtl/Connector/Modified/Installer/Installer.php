@@ -40,7 +40,7 @@ class Installer
 
         foreach ($this->modules as $id => $module) {
             $className = '\\jtl\\Connector\\Modified\\Installer\\Modules\\'.$module;
-            $moduleInstances[$id] = new $className($db, $this->connectorConfig);
+            $moduleInstances[$id] = new $className($db, $this->connectorConfig, $shopConfig);
         }
 
         if ($moduleInstances['check']->hasPassed()) {
