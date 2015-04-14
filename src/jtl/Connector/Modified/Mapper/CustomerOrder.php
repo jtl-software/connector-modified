@@ -19,6 +19,7 @@ class CustomerOrder extends BaseMapper
             "creationDate" => "date_purchased",
             "note" => "comments",
             "status" => null,
+            "paymentStatus" => null,
             "paymentModuleCode" => null,
             "currencyIso" => "currency",
             "billingAddress" => "CustomerOrderBillingAddress|setBillingAddress",
@@ -77,7 +78,28 @@ class CustomerOrder extends BaseMapper
 
     protected function status($data)
     {
-        return array_search($data['orders_status'], (array) $this->connectorConfig->mapping);
+        $mappings = (array) $this->connectorConfig->mapping;
+        $combo = $mappings['status_'.$data['orders_status']];
+
+        if (!is_null($combo)) {
+            $return = explode('|', $combo);
+            if (isset($return[0])) {
+                return $return[0];
+            }
+        }
+    }
+
+    protected function paymentStatus($data)
+    {
+        $mappings = (array) $this->connectorConfig->mapping;
+        $combo = $mappings['status_'.$data['orders_status']];
+
+        if (!is_null($combo)) {
+            $return = explode('|', $combo);
+            if (isset($return[1])) {
+                return $return[1];
+            }
+        }
     }
 
     protected function orders_status($data)
@@ -119,7 +141,7 @@ class CustomerOrder extends BaseMapper
         return 5;
     }
 
-    public function push($data, $dbObj)
+    public function push($data = null, $dbObj = null)
     {
         $id = $data->getId()->getEndpoint();
 

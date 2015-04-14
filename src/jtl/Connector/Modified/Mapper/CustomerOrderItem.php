@@ -38,7 +38,7 @@ class CustomerOrderItem extends BaseMapper
         )
     );
 
-    public function push($parent, $dbObj)
+    public function push($parent, $dbObj = null)
     {
         $return = [];
 

@@ -10,7 +10,7 @@ class Installer
         'check' => 'Check',
         'connector' => 'Connector',
         'tax_rate' => 'TaxRate',
-        'order_status' => 'OrderStatus'
+        'status' => 'Status'
     );
 
     private $connectorConfig = null;

@@ -46,7 +46,7 @@ class CustomerOrderBillingAddress extends BaseMapper
         )
     );
 
-    public function pull($data)
+    public function pull($data = null, $limit = null)
     {
         return array($this->generateModel($data));
     }
@@ -56,7 +56,7 @@ class CustomerOrderBillingAddress extends BaseMapper
         return "cID_".$data['customers_id'];
     }
 
-    public function push($parent, $dbObj)
+    public function push($parent, $dbObj = null)
     {
         $this->generateDbObj($parent->getBillingAddress(), $dbObj, null, true);
     }

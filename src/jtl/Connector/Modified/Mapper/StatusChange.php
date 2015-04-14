@@ -11,27 +11,25 @@ class StatusChange extends BaseMapper
         $customerOrderId = (int) $status->getCustomerOrderId()->getEndpoint();
 
         if ($customerOrderId > 0) {
-            /*
-            if ($status->getPaymentStatus() !== null && strlen($status->getPaymentStatus()) > 0) {
-            }
-            */
+            $combo = $status->getOrderStatus().'|'.$status->getPaymentStatus();
 
-            if ($status->getOrderStatus() !== null && strlen($status->getOrderStatus()) > 0) {
-                $newStatus = $this->connectorConfig->mapping->{$status->getOrderStatus()};
+            $mapping = array_flip((array) $this->connectorConfig->mapping);
 
-                $this->db->query('UPDATE orders SET orders_status='.$newStatus.' WHERE orders_id='.$customerOrderId);
+            if (!is_null($mapping[$combo])) {
+                $newStatus = substr($mapping[$combo], strpos($mapping[$combo], '_') + 1, strlen($mapping[$combo]));
+                if (!is_null($newStatus)) {
+                    $this->db->query('UPDATE orders SET orders_status='.$newStatus.' WHERE orders_id='.$customerOrderId);
 
-                $orderHistory = new \stdClass();
-                $orderHistory->orders_id = $customerOrderId;
-                $orderHistory->orders_status_id = $newStatus;
-                $orderHistory->date_added = date('Y-m-d H:i:s');
+                    $orderHistory = new \stdClass();
+                    $orderHistory->orders_id = $customerOrderId;
+                    $orderHistory->orders_status_id = $newStatus;
+                    $orderHistory->date_added = date('Y-m-d H:i:s');
 
-                $this->db->insertRow($orderHistory, 'orders_status_history');
-
-                return true;
+                    $this->db->insertRow($orderHistory, 'orders_status_history');
+                }
             }
         }
 
-        return false;
+        return $status;
     }
 }
