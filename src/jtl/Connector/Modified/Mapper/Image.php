@@ -226,12 +226,14 @@ class Image extends BaseMapper
 
                         $this->db->updateRow($productsObj, 'products', 'products_id', $data->getForeignKey()->getEndpoint());
                     } else {
-                        $oldImage = $this->db->query('SELECT image_name FROM products_images WHERE image_id = "'.$data->getId()->getEndpoint().'"');
-                        $oldImage = $oldImage[0]['image_name'];
+                        if ($data->getId()->getEndpoint() != '') {
+                            $oldImage = $this->db->query('SELECT image_name FROM products_images WHERE image_id = "'.$data->getId()->getEndpoint().'"');
+                            $oldImage = $oldImage[0]['image_name'];
 
-                        @unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$oldImage);
+                            @unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$oldImage);
 
-                        $this->db->query('DELETE FROM products_images WHERE image_id="'.$data->getId()->getEndpoint().'"');
+                            $this->db->query('DELETE FROM products_images WHERE image_id="'.$data->getId()->getEndpoint().'"');
+                        }
                     }
 
                     break;

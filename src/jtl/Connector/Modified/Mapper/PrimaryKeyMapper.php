@@ -49,7 +49,7 @@ class PrimaryKeyMapper implements IPrimaryKeyMapper
 
         $where = 'type = '.$type;
 
-        if ($endpointId) {
+        if ($endpointId && $endpointId != '') {
             $where .= ' && endpointId = "'.$endpointId.'"';
         }
 
