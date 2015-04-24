@@ -14,20 +14,24 @@ class Manufacturer extends BaseMapper
         "identity" => "getId",
         "mapPull" => array(
             "id" => "manufacturers_id",
-            "i18ns" => "ManufacturerI18n|addI18n"
+            "name" => "manufacturers_name"
         ),
         "mapPush" => array(
             "manufacturers_id" => "id",
-            "ManufacturerI18n|addI18n|true" => "i18ns"
+            "manufacturers_name" => "name"
         )
     );
 
     public function delete($data)
     {
-        $this->db->query('DELETE FROM manufacturers WHERE manufacturers_id='.$data->getId()->getEndpoint());
-        $this->db->query('DELETE FROM manufacturers_info WHERE manufacturers_id='.$data->getId()->getEndpoint());
+        $id = $data->getId()->getEndpoint();
 
-        $this->db->query('DELETE FROM jtl_connector_link WHERE type=32 && endpointId='.$data->getId()->getEndpoint());
+        if (!empty($id) && $id != '') {
+            $this->db->query('DELETE FROM manufacturers WHERE manufacturers_id='.$id);
+            $this->db->query('DELETE FROM manufacturers_info WHERE manufacturers_id='.$id);
+
+            $this->db->query('DELETE FROM jtl_connector_link WHERE type=32 && endpointId="'.$id.'"');
+        }
 
         return $data;
     }
