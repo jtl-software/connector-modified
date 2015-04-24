@@ -27,6 +27,8 @@ class ProductVariation extends BaseMapper
             $checksum = ChecksumLinker::find($parent, 1);
 
             if ($checksum === null || $checksum->hasChanged() === true) {
+                $totalStock = 0;
+
                 // clear existing product variations
                 $this->db->query('DELETE FROM products_attributes WHERE products_id='.$parent->getId()->getEndpoint());
 
@@ -107,6 +109,8 @@ class ProductVariation extends BaseMapper
                         $pVarObj->sortorder = $value->getSort();
                         $pVarObj->attributes_ean = $value->getSku();
 
+                        $totalStock += $pVarObj->attributes_stock;
+
                         // get product variation price for default customer group
                         foreach ($value->getExtraCharges() as $extraCharge) {
                             if ($extraCharge->getCustomerGroupId()->getEndpoint() == $this->shopConfig['settings']['DEFAULT_CUSTOMERS_STATUS_ID']) {
@@ -117,6 +121,10 @@ class ProductVariation extends BaseMapper
 
                         $this->db->insertRow($pVarObj, 'products_attributes');
                     }
+                }
+
+                if ($parent->getStockLevel()->getStockLevel() == 0) {
+                    $this->db->query('UPDATE products SET products_quantity='.$totalStock.' WHERE products_id='.$parent->getId()->getEndpoint());
                 }
             }
         }
