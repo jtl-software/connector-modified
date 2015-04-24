@@ -175,7 +175,7 @@ class BaseMapper
 
                         $dbObj->$endpoint = $value;
                     } else {
-                        throw new \Exception("There is no property or method to map ".$endpoint);
+                        //throw new \Exception("There is no property or method to map ".$endpoint);
                     }
                 }
             }
