@@ -5,7 +5,7 @@ use jtl\Connector\Modified\Installer\Module;
 
 class TaxRate extends Module
 {
-    public static $name = '<span class="glyphicon glyphicon-euro"></span> Default tax rate';
+    public static $name = '<span class="glyphicon glyphicon-euro"></span>Standard Steuer-Rate';
 
     public function form()
     {
@@ -17,11 +17,11 @@ class TaxRate extends Module
         }
 
         $data['tax'] .= '<div class="form-group">
-            <label for="tax_rate" class="col-xs-2 control-label">Default tax rate</label>
+            <label for="tax_rate" class="col-xs-2 control-label">Standard Steuer-Rate</label>
                 <div class="col-xs-6">
                     <select class="form-control" name="tax_rate" id="tax_rate">'.$options.'</select>
                     <span id="helpBlock" class="help-block">
-                        Please select the tax rate which should be used by default.
+                        Bitte wählen Sie die Steuer-Rate die als Standard verwedent werden soll.
                     </span>
                 </div>
         </div>';

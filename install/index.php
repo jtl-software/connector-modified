@@ -26,7 +26,7 @@
         <div class="panel panel-primary">
             <div class="panel-heading">
                 <h3 class="panel-title">
-                    <span class="glyphicon glyphicon-transfer"></span> JTL-Connector configuration for Modified Shop
+                    <span class="glyphicon glyphicon-transfer"></span> JTL-Connector Konfiguration für den Modified Shop
                 </h3>
             </div>
             <div class="panel-body">

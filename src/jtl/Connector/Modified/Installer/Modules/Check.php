@@ -5,65 +5,65 @@ use jtl\Connector\Modified\Installer\Module;
 
 class Check extends Module
 {
-    public static $name = '<span class="glyphicon glyphicon-check"></span> System check';
+    public static $name = '<span class="glyphicon glyphicon-check"></span> System Check';
 
     private $hasPassed = true;
     private $checkResults = null;
 
     private static $checks = array(
         'phpVersion' => array(
-            'title' => 'PHP version',
-            'info' => 'PHP 5.3 or higher is recommend to run the JTL connector.',
-            'ok' => 'Your version is: %s',
-            'fault' => 'Your version is: %s',
+            'title' => 'PHP Version',
+            'info' => 'PHP 5.3 oder neuer ist für den JTL Connector notwendig.',
+            'ok' => 'Ihre version ist: %s',
+            'fault' => 'Ihre Version ist: %s',
         ),
         'gdlib' => array(
             'title' => 'GDLib',
-            'info' => 'The PHP GDLib Extension is required to scale images and generate thumbnails.',
-            'ok' => 'GDLib Extension is available',
-            'fault' => 'GDLib extension is not available',
+            'info' => 'Die PHP GDLib Extension wird benötigt um Thumbnails zu generieren.',
+            'ok' => 'GDLib Extension ist verfügbar',
+            'fault' => 'GDLib extension ist nicht verfügbar',
         ),
         'configFile' => array(
-            'title' => 'Connector config file',
-            'info' => 'The config folder or file "%s" must be writable.',
-            'ok' => 'Config is writable',
-            'fault' => 'Config is not writable',
+            'title' => 'Connector Config Datei',
+            'info' => 'Das config Verzeichnis oder die datei "%s" müssen beschreibar sein.',
+            'ok' => 'Config beschreibbar',
+            'fault' => 'Config nicht beschreibbar',
         ),
         'dbFile' => array(
-            'title' => 'Connector sqlite session database',
-            'info' => 'The database file "%s" must be writable.',
-            'ok' => 'Database is writable',
-            'fault' => 'Database is not writable',
+            'title' => 'Connector SQLite Session Datenbank',
+            'info' => 'Die Datenbank-Datei "%s" muss beschreibbar sein.',
+            'ok' => 'Datenbank ist beschreibbar',
+            'fault' => 'Datenbank ist nicht beschreibbar',
         ),
         'connectorLog' => array(
-            'title' => 'Connector logs folder',
-            'info' => 'The logs folder "%s" must be writable.',
-            'ok' => 'Logs folder is writable',
-            'fault' => 'Logs folder is not writable',
+            'title' => 'Connector Log-Verzeichnis',
+            'info' => 'Das Log-Verzeichnis "%s" muss beschreibbar sein.',
+            'ok' => 'Log-Verzeichnis ist beschreibbar',
+            'fault' => 'Log-Verzeichnis nicht beschreibbar',
         ),
         'connectorTable' => array(
-            'title' => 'Connector mapping table',
-            'info' => 'The mapping table must be available in the shop database.',
-            'ok' => 'Table was created',
-            'fault' => 'Failed to create table',
+            'title' => 'Mapping-Tabelle',
+            'info' => 'Die Mapping-Tabelle muss in der Shop-Datenbank verfügbar sein.',
+            'ok' => 'Tabelle wurde erstellt',
+            'fault' => 'Fehler beim erstellen',
         ),
         'checksumTable' => array(
-            'title' => 'Checksum table',
-            'info' => 'The checksum table must be available in the shop database.',
-            'ok' => 'Table was created',
-            'fault' => 'Failed to create table',
+            'title' => 'Checksum-Tabelle',
+            'info' => 'Die Checksum-Tabelle muss in der Shop-Datenbank verfügbar sein.',
+            'ok' => 'Tabelle wurde erstellt',
+            'fault' => 'Fehler beim erstellen',
         ),
         'additionalImages' => array(
-            'title' => 'Additional product images',
-            'info' => 'You need to allow additional product images in the <a href="%sadmin/configuration.php?gID=4">modified configuration</a> to use this feature',
-            'ok' => '%s additional images enabled',
-            'fault' => 'Additional images disabled',
+            'title' => 'Zusätzliche Produkt-Bilder',
+            'info' => 'Um diese Funktion zu nutzen müssen zusätzliche Produkt-Bilder in der <a href="%sadmin/configuration.php?gID=4">modified Konfiguration</a> eingestellt werden.',
+            'ok' => '%s zusätzliche Bilder',
+            'fault' => 'Zusätzliche Bilder deaktiviert',
         ),
         'groups' => array(
-            'title' => 'Customer group based visibilities and graduated prices',
-            'info' => 'The additional module "Group Check" must be enabled in the <a href="%sadmin/configuration.php?gID=17">modified configuration</a> to use group specific features',
-            'ok' => 'Module enabled',
-            'fault' => 'Module disabled',
+            'title' => 'Kundengruppen-Sichtbarkeiten und Staffel-Preise',
+            'info' => 'Das Zusatz-Modul "Kundengruppencheck" muss in der <a href="%sadmin/configuration.php?gID=17">modified Konfiguration</a> eingestellt sein.',
+            'ok' => 'Modul aktiviert',
+            'fault' => 'Modul deaktiviert',
         )
     );
 

@@ -77,12 +77,12 @@ class Installer
             if (isset($_REQUEST['save'])) {
                 if (count($moduleErrors) == 0) {
                     if (!$this->connectorConfig->save()) {
-                        echo '<div class="alert alert-danger">Error writing the config.json file.</div>';
+                        echo '<div class="alert alert-danger">Fehler beim Schreiben der config.json Datei.</div>';
                     } else {
-                        echo '<div class="alert alert-success">Connector configuration was successfully saved.</div>';
+                        echo '<div class="alert alert-success">Connector Konfiguration wurde gespeichert.</div>';
                     }
                 } else {
-                    echo '<div class="alert alert-danger">The following errors occured:
+                    echo '<div class="alert alert-danger">Folgende Fehler traten auf:
 		        		<br>
 		        		<ul>';
 
@@ -96,9 +96,9 @@ class Installer
                 }
             }
 
-            echo '<button type="submit" name="save" class="btn btn-primary btn-block"><span class="glyphicon glyphicon-save"></span> Save connector configuration</button>';
+            echo '<button type="submit" name="save" class="btn btn-primary btn-block"><span class="glyphicon glyphicon-save"></span> Connector Konfiguration speichern</button>';
         } else {
-            echo '<div class="alert alert-danger">Please fix the following errors before you can continue to configure the connector.</div>';
+            echo '<div class="alert alert-danger">Bitte beheben Sie die angezeigten Fehler bevor Sie mit der Konfiguration fortfahren können.</div>';
             echo $moduleInstances['check']->form();
         }
     }

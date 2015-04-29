@@ -5,7 +5,7 @@ use jtl\Connector\Modified\Installer\Module;
 
 class Connector extends Module
 {
-    public static $name = '<span class="glyphicon glyphicon-transfer"></span> Connector configuration';
+    public static $name = '<span class="glyphicon glyphicon-transfer"></span> Connector Konfiguration';
 
     public function form()
     {
@@ -18,20 +18,20 @@ class Connector extends Module
 
         $html = '
             <div class="form-group">
-                <label class="control-label col-xs-2">Platform root</label>
+                <label class="control-label col-xs-2">Platform Verzeichnis</label>
                 <div class="col-xs-10">
                     <input type="text" class="form-control" name="config[platform_root]" value="'.$this->config->platform_root.'"/>
                     <span id="helpBlock" class="help-block">
-                        Please enter the server path to your modified shop root folder. If you installed the connector into the default "jtlconnector" folder within your shop folder, this should be detected automatically.
+                        Bitte geben Sie hier den Server-Pfad zu Ihrem modified Shop an. Wenn Sie den Connector in das Standard-Verzeichnis "jtlconnector" in Ihrem Shop installiert haben, sollte der Pfad automatisch erkannt werden.
                     </span>
                 </div>
             </div>
             <div class="form-group">
-                <label class="control-label col-xs-2">Auth token</label>
+                <label class="control-label col-xs-2">Auth Token</label>
                 <div class="col-xs-10">
                     <input type="text" class="form-control" name="config[auth_token]" value="'.$this->config->auth_token.'" readonly/>
                     <span id="helpBlock" class="help-block">
-                        This is the auth token which was generated for the connector. You need this to setup the connector in the JTL Wawi. You should always keep this token secret and make sure that the config.json file is not public readable.
+                        Dies ist der Auth-Token der für den Connector generiert wurde. Sie benötigen diesen um den Connector in Ihrer Wawi einzurichten. Bitte achten Sie darauf den Token sicher aufzubewahren und die config.json Datei und den Installer nicht öffentlich zugänglich zu machen.
                     </span>
                 </div>
             </div>';

@@ -5,11 +5,17 @@ use jtl\Connector\Modified\Installer\Module;
 
 class Status extends Module
 {
-    public static $name = '<span class="glyphicon glyphicon-random"></span> Status mapping';
+    public static $name = '<span class="glyphicon glyphicon-random"></span> Status Zuordnung';
 
-    private $jtlOrderStats = null;
-    private $jtlPaymentStats = null;
+    private $jtlStats = null;
     private $modifiedStats = null;
+
+    private $translation = array(
+        'cancelled' => 'Abgebrochen',
+        'paid' => 'Bezahlt',
+        'shipped' => 'Versendet',
+        'completed' => 'Abgeschlossen'
+    );
 
     public function __construct($db, $config, $shopConfig)
     {
@@ -18,10 +24,8 @@ class Status extends Module
         $customerOrderModel = new \ReflectionClass('\jtl\Connector\Model\CustomerOrder');
 
         foreach ($customerOrderModel->getConstants() as $key => $value) {
-            if (strpos($key, 'PAYMENT') !== false) {
-                $this->jtlPaymentStats[$key] = $value;
-            } else {
-                $this->jtlOrderStats[$key] = $value;
+            if (strpos($key, 'COMBO') !== false || strpos($key, 'STATUS_CANCELLED') !== false) {
+                $this->jtlStats[$key] = $value;
             }
         }
 
@@ -32,43 +36,27 @@ class Status extends Module
     {
         $html = '<div class="form-group">
                         <div class="col-sm-2">
-                            <b>Modified shop status</b>
+                            <b>Wawi Status</b>
                         </div>
                         <div class="col-sm-3">
-                            <b>Wawi Order status</b>
-                        </div>
-                        <div class="col-sm-3">
-                            <b>Wawi Payment status</b>
+                            <b>Modified Status</b>
                         </div>
                 </div>';
 
-        foreach ($this->modifiedStats as $status) {
-            $id = 'status_'.$status['orders_status_id'];
-
+        foreach ($this->jtlStats as $status) {
             $mapping = (array) $this->config->mapping;
 
-            $currentValues = explode('|', $mapping[$id]);
-
-            $orderStats = '';
-            $paymentStats = '';
-
-            foreach ($this->jtlOrderStats as $key => $value) {
-                $selected = ($currentValues[0] == $value) ? ' selected="selected"' : '';
-                $orderStats .= '<option value="'.$value.'"'.$selected.'>'.ucfirst(str_replace('_', ' ', $value)).'</option>';
-            }
-
-            foreach ($this->jtlPaymentStats as $key => $value) {
-                $selected = ($currentValues[1] == $value) ? ' selected="selected"' : '';
-                $paymentStats .= '<option value="'.$value.'"'.$selected.'>'.ucfirst(str_replace('_', ' ', $value)).'</option>';
+            $stats = '';
+            
+            foreach ($this->modifiedStats as $modified) {
+                $selected = ($mapping[$status] == $modified['orders_status_id']) ? ' selected="selected"' : '';
+                $stats .= '<option value="'.$modified['orders_status_id'].'"'.$selected.'>'.$modified['orders_status_name'].'</option>';
             }
 
             $html .= '<div class="form-group">
-                    <label class="col-sm-2 control-label">'.$status['orders_status_name'].'</label>
+                    <label class="col-sm-2 control-label">'.$this->translation[$status].'</label>
                         <div class="col-sm-3">
-                            <select class="form-control" name="status['.$id.'][order]" id="order_'.$id.'">'.$orderStats.'</select>
-                        </div>
-                        <div class="col-sm-3">
-                            <select class="form-control" name="status['.$id.'][payment]" id="payment_'.$id.'">'.$paymentStats.'</select>
+                            <select class="form-control" name="status['.$status.']">'.$stats.'</select>
                         </div>
                 </div>';
         }
@@ -78,13 +66,7 @@ class Status extends Module
 
     public function save()
     {
-        $mapping = array();
-
-        foreach ($_REQUEST['status'] as $modified => $host) {
-            $mapping[$modified] = implode($host, '|');
-        }
-
-        $this->config->mapping = $mapping;
+        $this->config->mapping = $_REQUEST['status'];
 
         return true;
     }
