@@ -148,7 +148,12 @@ class Product extends BaseMapper
 
     protected function products_tax_class_id($data)
     {
-        $sql = $this->db->query('SELECT tax_class_id FROM tax_rates WHERE tax_rates_id='.$this->connectorConfig->tax_rate);
+        $sql = $this->db->query('SELECT tax_class_id FROM tax_rates WHERE tax_rate='.$data->getVat());
+        
+        if (empty($sql)) {
+            $sql = $this->db->query('SELECT tax_class_id FROM tax_rates WHERE tax_rates_id='.$this->connectorConfig->tax_rate);
+        }
+
         return $sql[0]['tax_class_id'];
     }
 
