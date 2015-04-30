@@ -17,21 +17,23 @@ class ProductI18n extends BaseMapper
             "languageISO" => null,
             "productId" => "products_id",
             "name" => "products_name",
-            "urlPath" => "products_url",
+            //"urlPath" => "products_url",
             "description" => "products_description",
             "metaDescription" => "products_meta_description",
             "metaKeywords" => "products_meta_keywords",
-            "shortDescription" => "products_short_description"
+            "shortDescription" => "products_short_description",
+            "titleTag" => "products_meta_title"
         ),
         "mapPush" => array(
             "language_id" => null,
             "products_id" => "productId",
             "products_name" => "name",
-            "products_url" => "urlPath",
+            //"products_url" => "urlPath",
             "products_description" => "description",
             "products_meta_description" => "metaDescription",
             "products_meta_keywords" => "metaKeywords",
-            "products_short_description" => "shortDescription"
+            "products_short_description" => "shortDescription",
+            "products_meta_title" => "titleTag"
         )
     );
 

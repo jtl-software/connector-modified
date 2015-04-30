@@ -35,4 +35,25 @@ class Manufacturer extends BaseMapper
 
         return $data;
     }
+
+    public function push($data, $dbObj = null)
+    {
+        $id = $data->getId()->getEndpoint();
+
+        if (!empty($id) && $id != '') {
+            $this->db->query('DELETE FROM manufacturers_info WHERE manufacturers_id='.$id);
+        }
+
+        $url = $data->getWebsiteUrl();
+
+        if(!empty($url)) {
+            $languages = $this->db->query('SELECT languages_id FROM languages');
+
+            foreach ($languages as $language) {
+                $this->db->query('INSERT INTO manufacturers_info SET manufacturers_id='.$id.', languages_id='.$language['languages_id'].', manufacturers_url="'.$url.'"');
+            }
+        }
+
+        return parent::push($data, $dbObj);
+    }
 }

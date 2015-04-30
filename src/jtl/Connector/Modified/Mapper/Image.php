@@ -303,7 +303,20 @@ class Image extends BaseMapper
 
     private function generateThumbs($fileName, $oldImage = null)
     {
-        $image = imagecreatefromjpeg($this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$fileName);
+        $imgInfo = getimagesize($this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$fileName);
+
+        switch ($imgInfo[2]) {
+            case 1: 
+                $image = imagecreatefromgif($this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$fileName); 
+                break;
+            case 2: 
+                $image = imagecreatefromjpeg($this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$fileName);
+                break;
+            case 3: 
+                $image = imagecreatefrompng($this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$fileName);
+                break;            
+        }
+        
         $width = imagesx($image);
         $height = imagesy($image);
         $original_aspect = $width / $height;
@@ -328,6 +341,13 @@ class Image extends BaseMapper
 
             $thumb = imagecreatetruecolor($thumb_width, $thumb_height);
 
+            if($imgInfo[2] == 1 || $imgInfo[2] == 3){
+                imagealphablending($thumb, false);
+                imagesavealpha($thumb, true);
+                $transparent = imagecolorallocatealpha($thumb, 255, 255, 255, 127);
+                imagefilledrectangle($thumb, 0, 0, $nWidth, $nHeight, $transparent);
+            }
+
             imagecopyresampled(
                 $thumb,
                 $image,
@@ -341,7 +361,17 @@ class Image extends BaseMapper
                 $height
             );
 
-            imagejpeg($thumb, $this->connectorConfig->connector_root.'/'.$this->shopConfig['img'][$folder].$fileName, 80);
+            switch ($imgInfo[2]) {
+                case 1: 
+                    imagegif($thumb, $this->connectorConfig->connector_root.'/'.$this->shopConfig['img'][$folder].$fileName);
+                    break;
+                case 2:
+                    imagejpeg($thumb, $this->connectorConfig->connector_root.'/'.$this->shopConfig['img'][$folder].$fileName); 
+                    break;
+                case 3:
+                    imagepng($thumb, $this->connectorConfig->connector_root.'/'.$this->shopConfig['img'][$folder].$fileName);
+                    break;
+            }            
         }
     }
 }
