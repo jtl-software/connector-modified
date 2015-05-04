@@ -14,7 +14,7 @@ class ProductPriceItem extends BaseMapper
         )
     );
 
-    public function pull($data)
+    public function pull($data = null, $limit = null)
     {
         $return = [];
 
@@ -30,7 +30,7 @@ class ProductPriceItem extends BaseMapper
         return $return;
     }
 
-    public function push($data)
+    public function push($data, $dbObj = null)
     {
         $productId = $data->getProductId()->getEndpoint();
 
@@ -49,6 +49,8 @@ class ProductPriceItem extends BaseMapper
                 $this->db->insertRow($obj, 'personal_offers_by_customers_status_'.$data->getCustomerGroupId()->getEndpoint());
             }
         }
+
+        return $data;
     }
 
     protected function quantity($data)

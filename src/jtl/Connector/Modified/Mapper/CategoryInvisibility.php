@@ -6,7 +6,7 @@ use jtl\Connector\Model\Identity;
 
 class CategoryInvisibility extends \jtl\Connector\Modified\Mapper\BaseMapper
 {
-    public function pull($data)
+    public function pull($data = null, $limit = null)
     {
         $return = [];
 

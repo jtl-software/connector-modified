@@ -128,7 +128,7 @@ class BaseMapper
                 if (is_null($host) && method_exists(get_class($this), $endpoint)) {
                     $dbObj->$endpoint = $this->$endpoint($obj, $model, $parentObj);
                 } elseif ($this->type->getProperty($host)->isNavigation()) {
-                    list($preEndpoint, $preNavSetMethod, $preMapper) = explode('|', $endpoint);
+                    list($preEndpoint, $preNavSetMethod, $preMapper) = array_pad(explode('|', $endpoint), 3, null);
 
                     if ($preMapper) {
                         $preSubMapperClass = "\\jtl\\Connector\\Modified\\Mapper\\".$preEndpoint;
@@ -140,8 +140,10 @@ class BaseMapper
 
                             $values = $preSubMapper->push($obj, $dbObj);
 
-                            foreach ($values as $setObj) {
-                                $model->$preNavSetMethod($setObj);
+                            if (!is_null($values) && is_array($values)) {
+                                foreach ($values as $setObj) {
+                                    $model->$preNavSetMethod($setObj);
+                                }
                             }
                         }
                     } else {
@@ -186,13 +188,14 @@ class BaseMapper
 
                 if (isset($this->mapperConfig['where'])) {
                     $whereKey = $this->mapperConfig['where'];
-                    $whereValue = $dbObj->{$this->mapperConfig['where']};
-
+                    
                     if (is_array($whereKey)) {
                         $whereValue = [];
                         foreach ($whereKey as $key) {
                             $whereValue[] = $dbObj->{$key};
                         }
+                    } else {
+                        $whereValue = $dbObj->{$whereKey};
                     }
                 }
 
@@ -227,8 +230,10 @@ class BaseMapper
 
                     $values = $subMapper->push($obj);
 
-                    foreach ($values as $setObj) {
-                        $model->$navSetMethod($setObj);
+                    if(!is_null($values) && is_array($values)) {
+                        foreach ($values as $setObj) {
+                            $model->$navSetMethod($setObj);
+                        }
                     }
                 }
             }

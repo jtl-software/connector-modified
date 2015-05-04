@@ -52,7 +52,7 @@ class ProductPrice extends BaseMapper
         return $return;
     }
 
-    public function push($parent, $dbObj)
+    public function push($parent, $dbObj = null)
     {
         if (get_class($parent) == 'jtl\Connector\Model\Product') {
             $productId = $parent->getId();
@@ -63,7 +63,7 @@ class ProductPrice extends BaseMapper
         } else {
             $customerGrp = $parent->getCustomerGroupId()->getEndpoint();
 
-            if (!empty($customerGrp)) {
+            if (!is_null($customerGrp) && $customerGrp != '') {
                 $this->db->query('DELETE FROM personal_offers_by_customers_status_'.$customerGrp.' WHERE products_id='.$parent->getProductId()->getEndpoint());
             }
 

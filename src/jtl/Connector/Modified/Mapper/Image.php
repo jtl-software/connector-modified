@@ -345,7 +345,7 @@ class Image extends BaseMapper
                 imagealphablending($thumb, false);
                 imagesavealpha($thumb, true);
                 $transparent = imagecolorallocatealpha($thumb, 255, 255, 255, 127);
-                imagefilledrectangle($thumb, 0, 0, $nWidth, $nHeight, $transparent);
+                imagefilledrectangle($thumb, 0, 0, $thumb_width, $thumb_height, $transparent);
             }
 
             imagecopyresampled(

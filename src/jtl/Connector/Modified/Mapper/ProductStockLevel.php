@@ -6,7 +6,7 @@ use jtl\Connector\Model\ProductStockLevel as ProductStockLevelModel;
 
 class ProductStockLevel extends BaseMapper
 {
-    public function pull($data)
+    public function pull($data = null, $limit = null)
     {
         $stockLevel = new ProductStockLevelModel();
         $stockLevel->setProductId($this->identity($data['products_id']));

@@ -22,7 +22,7 @@ class Product2Category extends BaseMapper
         )
     );
 
-    public function push($parent, $dbObj)
+    public function push($parent, $dbObj = null)
     {
         $id = $parent->getId()->getEndpoint();
 

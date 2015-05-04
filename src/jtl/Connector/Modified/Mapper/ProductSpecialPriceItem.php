@@ -13,12 +13,12 @@ class ProductSpecialPriceItem extends BaseMapper
         )
     );
 
-    public function pull($data)
+    public function pull($data = null, $limit = null)
     {
         return array($this->generateModel($data));
     }
 
-    public function push($parent, $dbObj)
+    public function push($parent, $dbObj = null)
     {
         $prices = $parent->getItems();
         $dbObj->specials_new_products_price = $prices[0]->getPriceNet();

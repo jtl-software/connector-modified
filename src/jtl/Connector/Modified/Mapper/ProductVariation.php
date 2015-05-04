@@ -21,7 +21,7 @@ class ProductVariation extends BaseMapper
         )
     );
 
-    public function push($parent, $dbObj)
+    public function push($parent, $dbObj = null)
     {
         if (count($parent->getVariations()) > 0) {
             $checksum = ChecksumLinker::find($parent, 1);
