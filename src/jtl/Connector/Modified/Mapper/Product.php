@@ -83,18 +83,22 @@ class Product extends BaseMapper
         $id = $data->getId()->getEndpoint();
 
         if (!empty($id) && $id != '') {
-            $this->db->query('DELETE FROM products WHERE products_id='.$id);
-            $this->db->query('DELETE FROM products_to_categories WHERE products_id='.$id);
-            $this->db->query('DELETE FROM products_description WHERE products_id='.$id);
-            $this->db->query('DELETE FROM products_images WHERE products_id='.$id);
-            $this->db->query('DELETE FROM products_attributes WHERE products_id='.$id);
-            $this->db->query('DELETE FROM products_xsell WHERE products_id='.$id.' OR xsell_id='.$id);
+            try {
+                $this->db->query('DELETE FROM products WHERE products_id='.$id);
+                $this->db->query('DELETE FROM products_to_categories WHERE products_id='.$id);
+                $this->db->query('DELETE FROM products_description WHERE products_id='.$id);
+                $this->db->query('DELETE FROM products_images WHERE products_id='.$id);
+                $this->db->query('DELETE FROM products_attributes WHERE products_id='.$id);
+                $this->db->query('DELETE FROM products_xsell WHERE products_id='.$id.' OR xsell_id='.$id);
 
-            foreach ($this->getCustomerGroups() as $group) {
-                $this->db->query('DELETE FROM personal_offers_by_customers_status_'.$group['customers_status_id'].' WHERE products_id='.$id);
+                foreach ($this->getCustomerGroups() as $group) {
+                    $this->db->query('DELETE FROM personal_offers_by_customers_status_'.$group['customers_status_id'].' WHERE products_id='.$id);
+                }
+
+                $this->db->query('DELETE FROM jtl_connector_link WHERE type=64 && endpointId="'.$id.'"');
             }
-
-            $this->db->query('DELETE FROM jtl_connector_link WHERE type=64 && endpointId="'.$id.'"');
+            catch (\Exception $e) {                
+            }
         }
         return $data;
     }

@@ -27,10 +27,14 @@ class Manufacturer extends BaseMapper
         $id = $data->getId()->getEndpoint();
 
         if (!empty($id) && $id != '') {
-            $this->db->query('DELETE FROM manufacturers WHERE manufacturers_id='.$id);
-            $this->db->query('DELETE FROM manufacturers_info WHERE manufacturers_id='.$id);
+            try {
+                $this->db->query('DELETE FROM manufacturers WHERE manufacturers_id='.$id);
+                $this->db->query('DELETE FROM manufacturers_info WHERE manufacturers_id='.$id);
 
-            $this->db->query('DELETE FROM jtl_connector_link WHERE type=32 && endpointId="'.$id.'"');
+                $this->db->query('DELETE FROM jtl_connector_link WHERE type=32 && endpointId="'.$id.'"');
+            }
+            catch (\Exception $e) {                
+            }
         }
 
         return $data;

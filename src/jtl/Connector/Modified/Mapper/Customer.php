@@ -128,11 +128,15 @@ class Customer extends BaseMapper
 
     public function delete($data)
     {
-        $this->db->query('DELETE FROM customers WHERE customers_id='.$data->getId()->getEndpoint());
-        $this->db->query('DELETE FROM address_book WHERE customers_id='.$data->getId()->getEndpoint());
-        $this->db->query('DELETE FROM customers_info WHERE customers_info_id='.$data->getId()->getEndpoint());
-		
-		$this->db->query('DELETE FROM jtl_connector_link WHERE type=2 && endpointId='.$data->getId()->getEndpoint());
+        try {
+            $this->db->query('DELETE FROM customers WHERE customers_id='.$data->getId()->getEndpoint());
+            $this->db->query('DELETE FROM address_book WHERE customers_id='.$data->getId()->getEndpoint());
+            $this->db->query('DELETE FROM customers_info WHERE customers_info_id='.$data->getId()->getEndpoint());
+    		
+    		$this->db->query('DELETE FROM jtl_connector_link WHERE type=2 && endpointId='.$data->getId()->getEndpoint());
+        }
+        catch(\Exception $e) {            
+        }
 
         return $data;
     }
