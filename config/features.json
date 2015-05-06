@@ -56,7 +56,7 @@
             "delete": false
         },
         "Currency": {
-            "push": false,
+            "push": true,
             "pull": true,
             "delete": false
         },
@@ -71,8 +71,8 @@
             "delete": false
         },
         "MeasurementUnit": {
-            "push": false,
-            "pull": false,
+            "push": true,
+            "pull": true,
             "delete": false
         },
         "ProductType": {
@@ -92,7 +92,7 @@
         },
         "Unit": {
             "push": false,
-            "pull": true,
+            "pull": false,
             "delete": false
         },
         "Warehouse": {

@@ -24,8 +24,9 @@ class Product extends BaseMapper
             "productWeight" => "products_weight",
             "manufacturerId" => null,
             "manufacturerNumber" => "products_manufacturers_model",
-            "basePriceUnitId" => null,
+            "unitId" => null,
             "basePriceDivisor" => "products_vpe_value",
+            "considerBasePrice" => null,
             "isActive" => "products_status",
             "isTopProduct" => "products_startpage",
             "considerStock" => null,
@@ -51,8 +52,9 @@ class Product extends BaseMapper
             "products_weight" => "productWeight",
             "manufacturers_id" => "manufacturerId",
             "products_manufacturers_model" => "manufacturerNumber",
-            "products_vpe" => "basePriceUnitId",
+            "products_vpe" => "unitId",
             "products_vpe_value" => "basePriceDivisor",
+            "products_vpe_status" => null,
             "products_status" => "isActive",
             "products_startpage" => "isTopProduct",
             "products_tax_class_id" => null,
@@ -104,6 +106,16 @@ class Product extends BaseMapper
         return $data;
     }
 
+    protected function considerBasePrice($data)
+    {
+        return $data['products_vpe_status'] == 1 ? true : false;
+    }
+
+    protected function products_vpe_status($data)
+    {
+        return $data->getConsiderBasePrice() == true ? 1 : 0;
+    }
+
     protected function products_image($data)
     {
         $id = $data->getId()->getEndpoint();
@@ -125,7 +137,7 @@ class Product extends BaseMapper
         return $this->replaceZero($data['manufacturers_id']);
     }
 
-    protected function basePriceUnitId($data)
+    protected function unitId($data)
     {
         return $this->replaceZero($data['products_vpe']);
     }

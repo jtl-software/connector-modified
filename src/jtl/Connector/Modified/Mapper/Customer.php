@@ -20,7 +20,7 @@ class Customer extends BaseMapper
             "id" => "customers_id",
             "customerGroupId" => "customers_status",
             "customerNumber" => "customers_cid",
-            "salutation" => "customers_gender",
+            "salutation" => null,
             "birthday" => "customers_dob",
             "firstName" => "customers_firstname",
             "lastName" => "customers_lastname",
@@ -42,7 +42,7 @@ class Customer extends BaseMapper
             "customers_id" => "id",
             "customers_status" => "customerGroupId",
             "customers_cid" => "customerNumber",
-            "customers_gender" => "salutation",
+            "customers_gender" => null,
             "customers_firstname" => "firstName",
             "customers_lastname" => "lastName",
             "customers_dob" => "birthday",
@@ -55,6 +55,24 @@ class Customer extends BaseMapper
             "customers_password" => null
         )
     );
+    
+    protected function salutation($data)
+    {
+        if ($data['customers_gender'] == 'm') {
+            return 'Herr';
+        } elseif ($data['customers_gender'] == 'w') {
+            return 'Frau';
+        }
+    }
+
+    protected function customers_gender($data)
+    {
+        if ($data->getSalutation() == 'Herr') {
+            return 'm';
+        } elseif ($data->getSalutation() == 'Frau') {
+            return 'w';
+        }
+    }
 
     protected function languageISO($data)
     {

@@ -106,7 +106,7 @@ class Image extends BaseMapper
                         $oldImage = $this->db->query('SELECT products_image FROM products WHERE products_id = '.$data->getForeignKey()->getEndpoint());
                         $oldImage = $oldImage[0]['products_image'];
 
-                        if (isset($oldImage)) {
+                        if (!empty($oldImage)) {
                             @unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$oldImage);
                         }
 
@@ -132,8 +132,10 @@ class Image extends BaseMapper
                         $oldImage = null;
                         $imgObj = new \stdClass();
 
-                        $oldImage = $this->db->query('SELECT image_name FROM products_images WHERE products_id = '.$data->getForeignKey()->getEndpoint().' && image_nr='.($data->getSort() - 1));
-                        $oldImage = $oldImage[0]['image_name'];
+                        $oldImageQuery = $this->db->query('SELECT image_name FROM products_images WHERE products_id = '.$data->getForeignKey()->getEndpoint().' && image_nr='.($data->getSort() - 1));
+                        if (count($oldImageQuery) > 0) {
+                            $oldImage = $oldImageQuery[0]['image_name'];
+                        }
 
                         if (!empty($oldImage)) {
                             @unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$oldImage);
@@ -227,10 +229,12 @@ class Image extends BaseMapper
                         $this->db->updateRow($productsObj, 'products', 'products_id', $data->getForeignKey()->getEndpoint());
                     } else {
                         if ($data->getId()->getEndpoint() != '') {
-                            $oldImage = $this->db->query('SELECT image_name FROM products_images WHERE image_id = "'.$data->getId()->getEndpoint().'"');
-                            $oldImage = $oldImage[0]['image_name'];
-
-                            @unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$oldImage);
+                            $oldImageQuery = $this->db->query('SELECT image_name FROM products_images WHERE image_id = "'.$data->getId()->getEndpoint().'"');
+                            
+                            if (count($oldImageQuery) > 0) {
+                                $oldImage = $oldImageQuery[0]['image_name'];
+                                @unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$oldImage);
+                            }
 
                             $this->db->query('DELETE FROM products_images WHERE image_id="'.$data->getId()->getEndpoint().'"');
                         }
@@ -322,7 +326,7 @@ class Image extends BaseMapper
         $original_aspect = $width / $height;
 
         foreach ($this->thumbConfig as $folder => $sizes) {
-            if (!is_null($oldImage)) {
+            if (!empty($oldImage)) {
                 unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img'][$folder].$oldImage);
             }
 

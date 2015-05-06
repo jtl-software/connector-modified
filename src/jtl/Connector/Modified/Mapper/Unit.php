@@ -19,4 +19,28 @@ class Unit extends BaseMapper
         	"UnitI18n|addI18n" => "i18ns",
         )
     );
+
+    public function push($data, $dbObj = null)
+    {
+        $nextId = $this->db->query('SELECT max(products_vpe_id) + 1 AS nextID FROM products_vpe');
+        $nextId = is_null($nextId[0]['nextID']) || $nextId[0]['nextID'] === 0 ? 1 : $nextId[0]['nextID'];
+
+        foreach ($data->getUnits() as $unit) {
+            $id = $unit->getId()->getEndpoint();
+
+            if (empty($id) || $id == '') {
+                $unit->getId()->setEndpoint($nextId);
+
+                foreach ($unit->getI18ns() as $i18n) {
+                    $i18n->setUnitId($unit->getId());
+                }
+
+                $nextId++;
+            } else {
+                $this->db->query('DELETE FROM products_vpe WHERE products_vpe_id='.$id);        
+            }
+        }
+
+        return parent::push($data, $dbObj);
+    }
 }
