@@ -17,7 +17,7 @@ class Product extends BaseMapper
             "id" => "products_id",
             "ean" => "products_ean",
             "stockLevel" => "ProductStockLevel|setStockLevel",
-            "sku" => "products_model",
+            "sku" => null,
             "sort" => "products_sort",
             "creationDate" => "products_date_added",
             "availableFrom" => "products_date_available",
@@ -106,6 +106,15 @@ class Product extends BaseMapper
         return $data;
     }
 
+    protected function sku($data)
+    {
+        if (!empty($data['products_model'])) {
+            return $data['products_model'];
+        } else {
+            return $data['products_id'];
+        }
+    }
+
     protected function considerBasePrice($data)
     {
         return $data['products_vpe_status'] == 1 ? true : false;
@@ -159,13 +168,18 @@ class Product extends BaseMapper
 
     protected function vat($data)
     {
-        $sql = $this->db->query('SELECT tax_rate FROM tax_rates WHERE tax_rates_id='.$this->connectorConfig->tax_rate);
+        $sql = $this->db->query('SELECT r.tax_rate FROM zones_to_geo_zones z LEFT JOIN tax_rates r ON z.geo_zone_id=r.tax_zone_id WHERE z.zone_country_id = '.$this->shopConfig['settings']['STORE_COUNTRY'].' && r.tax_class_id='.$data['products_tax_class_id']);
+
+        if (empty($sql)) {
+            $sql = $this->db->query('SELECT tax_rate FROM tax_rates WHERE tax_rates_id='.$this->connectorConfig->tax_rate);
+        }
+
         return floatval($sql[0]['tax_rate']);
     }
 
     protected function products_tax_class_id($data)
     {
-        $sql = $this->db->query('SELECT tax_class_id FROM tax_rates WHERE tax_rate='.$data->getVat());
+        $sql = $this->db->query('SELECT r.tax_class_id FROM zones_to_geo_zones z LEFT JOIN tax_rates r ON z.geo_zone_id=r.tax_zone_id WHERE z.zone_country_id = '.$this->shopConfig['settings']['STORE_COUNTRY'].' && r.tax_rate='.$data->getVat());
         
         if (empty($sql)) {
             $sql = $this->db->query('SELECT tax_class_id FROM tax_rates WHERE tax_rates_id='.$this->connectorConfig->tax_rate);

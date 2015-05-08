@@ -18,8 +18,6 @@ class CustomerOrder extends BaseMapper
             "customerId" => "customers_id",
             "creationDate" => "date_purchased",
             "note" => "comments",
-            "status" => null,
-            "paymentStatus" => null,
             "paymentModuleCode" => null,
             "currencyIso" => "currency",
             "billingAddress" => "CustomerOrderBillingAddress|setBillingAddress",
@@ -76,35 +74,45 @@ class CustomerOrder extends BaseMapper
         return parent::pull(null, $limit);
     }
 
-    protected function status($data)
-    {
-        $mappings = (array) $this->connectorConfig->mapping;
-        $combo = $mappings['status_'.$data['orders_status']];
-
-        if (!is_null($combo)) {
-            $return = explode('|', $combo);
-            if (isset($return[0])) {
-                return $return[0];
-            }
-        }
-    }
-
-    protected function paymentStatus($data)
-    {
-        $mappings = (array) $this->connectorConfig->mapping;
-        $combo = $mappings['status_'.$data['orders_status']];
-
-        if (!is_null($combo)) {
-            $return = explode('|', $combo);
-            if (isset($return[1])) {
-                return $return[1];
-            }
-        }
-    }
-
     protected function orders_status($data)
     {
-        return $this->connectorConfig->mapping->{$data->getStatus()};
+        $newStatus = null;
+
+        if ($data->getPaymentStatus() == CustomerOrder::PAYMENT_STATUS_COMPLETED) {
+            if ($data->getOrderStatus() == CustomerOrder::STATUS_CANCELLED) {
+                $newStatus = 'canceled';
+            } elseif ($data->getOrderStatus() == CustomerOrder::STATUS_COMPLETED) {
+                $newStatus = 'completed';
+            } elseif ($data->getOrderStatus() == CustomerOrder::STATUS_PARTIALLY_SHIPPED) {
+                $newStatus = 'paid';
+            } elseif ($data->getOrderStatus() == CustomerOrder::STATUS_UPDATED) {
+                $newStatus = 'paid';
+            } elseif ($data->getOrderStatus() == CustomerOrder::STATUS_NEW) {
+                $newStatus = 'paid';
+            }
+        } elseif ($data->getPaymentStatus() == CustomerOrder::PAYMENT_STATUS_UNPAID) {
+            if ($data->getOrderStatus() == CustomerOrder::STATUS_CANCELLED) {
+                $newStatus = 'canceled';
+            } elseif ($data->getOrderStatus() == CustomerOrder::STATUS_SHIPPED) {
+                $newStatus = 'shipped';
+            } elseif ($data->getOrderStatus() == CustomerOrder::STATUS_UPDATED) {
+                $newStatus = 'new';
+            } elseif ($data->getOrderStatus() == CustomerOrder::STATUS_NEW) {
+                $newStatus = 'new';
+            }
+        } elseif ($data->getPaymentStatus() == CustomerOrder::PAYMENT_STATUS_PARTIALLY) {
+            if ($data->getOrderStatus() == CustomerOrder::STATUS_CANCELLED) {
+                $newStatus = 'canceled';
+            } elseif ($data->getOrderStatus() == CustomerOrder::STATUS_SHIPPED) {
+                $newStatus = 'shipped';
+            }
+        }
+
+        if (!is_null($newStatus)) {
+            $mapping = (array) $this->connectorConfig->mapping;
+            
+            return $mapping[$newStatus];
+        }
     }
 
     protected function paymentModuleCode($data)

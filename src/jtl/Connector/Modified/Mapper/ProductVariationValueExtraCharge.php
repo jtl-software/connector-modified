@@ -6,7 +6,7 @@ use jtl\Connector\Model\ProductVariationValueExtraCharge as ProductVariationValu
 
 class ProductVariationValueExtraCharge extends BaseMapper
 {
-    public function pull($data)
+    public function pull($data = null, $limit = null)
     {
         $return = [];
 

@@ -71,8 +71,8 @@
             "delete": false
         },
         "MeasurementUnit": {
-            "push": true,
-            "pull": true,
+            "push": false,
+            "pull": false,
             "delete": false
         },
         "ProductType": {
@@ -91,8 +91,8 @@
             "delete": false
         },
         "Unit": {
-            "push": false,
-            "pull": false,
+            "push": true,
+            "pull": true,
             "delete": false
         },
         "Warehouse": {

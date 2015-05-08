@@ -7,6 +7,7 @@
         <mkdir dir="./dist/db" />
         <mkdir dir="./dist/logs" />
         <mkdir dir="./dist/install" />
+        <mkdir dir="./dist/plugins" />
 
         <copy todir="./dist/config">
             <fileset dir="./config">
@@ -28,6 +29,11 @@
         <copy todir="./dist/install">
             <fileset dir="./install">
                 <include name="index.php" />
+            </fileset>
+        </copy>
+        <copy todir="./dist/plugins">
+            <fileset dir="./plugins">
+                <include name=".htaccess" />
             </fileset>
         </copy>
 
