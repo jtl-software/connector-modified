@@ -16,7 +16,8 @@ class Currency extends BaseMapper
             "factor" => "value",
             "delimiterCent" => "decimal_point",
             "delimiterThousand" => "thousands_point",
-            "isDefault" => null
+            "isDefault" => null,
+            "iso" => "code"
         ),
         "mapPush" => array(
             "currencies_id" => "id",
@@ -26,7 +27,7 @@ class Currency extends BaseMapper
             "thousands_point" => "delimiterThousand",
             "code" => null,
             "decimal_places" => null,
-            "symbol_right" => null
+            "symbol_right" => "name"
         )
     );
 
@@ -47,10 +48,5 @@ class Currency extends BaseMapper
     protected function decimal_places($data)
     {
         return 2;
-    }
-
-    protected function symbol_right($data)
-    {
-        return $data->getIso();
     }
 }

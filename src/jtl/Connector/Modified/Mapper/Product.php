@@ -52,7 +52,7 @@ class Product extends BaseMapper
             "products_weight" => "productWeight",
             "manufacturers_id" => "manufacturerId",
             "products_manufacturers_model" => "manufacturerNumber",
-            "products_vpe" => "unitId",
+            "products_vpe" => null,
             "products_vpe_value" => "basePriceDivisor",
             "products_vpe_status" => null,
             "products_status" => "isActive",
@@ -118,6 +118,23 @@ class Product extends BaseMapper
     protected function considerBasePrice($data)
     {
         return $data['products_vpe_status'] == 1 ? true : false;
+    }
+
+    protected function products_vpe($data)
+    {
+        foreach ($data->getI18ns() as $i18n) {
+            $language_id = $this->locale2id($i18n->getLanguageISO());
+            $dbResult = $this->db->query('SELECT code FROM languages WHERE languages_id='.$language_id);
+
+            if ($dbResult[0]['code'] == $this->shopConfig['settings']['DEFAULT_LANGUAGE']) {
+                $sql = $this->db->query('SELECT products_vpe_id FROM products_vpe WHERE language_id='.$language_id.' && products_vpe_name="'.$i18n->getUnitName().'"');
+                if (count($sql) > 0) {
+                    return $sql[0]['products_vpe_id'];
+                }
+            }
+        }
+
+        return '';
     }
 
     protected function products_vpe_status($data)

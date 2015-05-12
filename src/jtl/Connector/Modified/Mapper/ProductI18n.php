@@ -21,7 +21,8 @@ class ProductI18n extends BaseMapper
             "metaDescription" => "products_meta_description",
             "metaKeywords" => "products_meta_keywords",
             "shortDescription" => "products_short_description",
-            "titleTag" => "products_meta_title"
+            "titleTag" => "products_meta_title",
+            "unitName" => null
         ),
         "mapPush" => array(
             "language_id" => null,
@@ -43,6 +44,18 @@ class ProductI18n extends BaseMapper
     protected function language_id($data)
     {
         return $this->locale2id($data->getLanguageISO());
+    }
+
+    protected function unitName($data)
+    {
+        $sql = $this->db->query('SELECT p.products_id, v.products_vpe_name
+            FROM products p
+            LEFT JOIN products_vpe v ON v.products_vpe_id = p.products_vpe
+            WHERE products_id='.$data['products_id'].' && v.language_id='.$data['language_id']);
+
+        if(count($sql) > 0) {
+            return $sql[0]['products_vpe_name'];
+        }
     }
 
     public function push($parent, $dbObj = null)

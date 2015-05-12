@@ -33,33 +33,17 @@ class StatusChange extends BaseMapper
 
     private function getStatus(StatusChangeModel $status)
     {
-        if ($status->getPaymentStatus() == CustomerOrder::PAYMENT_STATUS_COMPLETED) {
-            if ($status->getOrderStatus() == CustomerOrder::STATUS_CANCELLED) {
-                return 'canceled';
-            } elseif ($status->getOrderStatus() == CustomerOrder::STATUS_COMPLETED) {
+        if ($status->getOrderStatus() == CustomerOrder::STATUS_CANCELLED) {
+            return 'canceled';
+        } else {
+            if ($status->getPaymentStatus() == CustomerOrder::PAYMENT_STATUS_COMPLETED && $status->getOrderStatus() == CustomerOrder::STATUS_SHIPPED) {
                 return 'completed';
-            } elseif ($status->getOrderStatus() == CustomerOrder::STATUS_PARTIALLY_SHIPPED) {
-                return 'paid';
-            } elseif ($status->getOrderStatus() == CustomerOrder::STATUS_UPDATED) {
-                return 'paid';
-            } elseif ($status->getOrderStatus() == CustomerOrder::STATUS_NEW) {
-                return 'paid';
-            }
-        } elseif ($status->getPaymentStatus() == CustomerOrder::PAYMENT_STATUS_UNPAID) {
-            if ($status->getOrderStatus() == CustomerOrder::STATUS_CANCELLED) {
-                return 'canceled';
-            } elseif ($status->getOrderStatus() == CustomerOrder::STATUS_SHIPPED) {
-                return 'shipped';
-            } elseif ($status->getOrderStatus() == CustomerOrder::STATUS_UPDATED) {
-                return 'new';
-            } elseif ($status->getOrderStatus() == CustomerOrder::STATUS_NEW) {
-                return 'new';
-            }
-        } elseif ($status->getPaymentStatus() == CustomerOrder::PAYMENT_STATUS_PARTIALLY) {
-            if ($status->getOrderStatus() == CustomerOrder::STATUS_CANCELLED) {
-                return 'canceled';
-            } elseif ($status->getOrderStatus() == CustomerOrder::STATUS_SHIPPED) {
-                return 'shipped';
+            } else {
+                if ($status->getOrderStatus() == CustomerOrder::STATUS_SHIPPED) {
+                    return 'shipped';
+                } elseif ($status->getPaymentStatus() == CustomerOrder::PAYMENT_STATUS_COMPLETED) {
+                    return 'paid';
+                }
             }
         }
     }

@@ -8,13 +8,14 @@ class Status extends Module
     public static $name = '<span class="glyphicon glyphicon-random"></span> Status Zuordnung';
 
     private $modifiedStats = null;
+    private $defaultLanguage = null;
 
     private $jtlStats = array(
-        'new' => 'Neu',
-        'cancelled' => 'Abgebrochen',
+        'pending' => 'In Bearbeitung',
         'paid' => 'Bezahlt',
         'shipped' => 'Versendet',
-        'completed' => 'Abgeschlossen'
+        'completed' => 'Bezahlt &amp; Versendet',
+        'canceled' => 'Abgebrochen'
     );
 
     public function __construct($db, $config, $shopConfig)
@@ -23,17 +24,33 @@ class Status extends Module
 
         $customerOrderModel = new \ReflectionClass('\jtl\Connector\Model\CustomerOrder');
 
-        $this->modifiedStats = $this->db->query('SELECT * FROM orders_status WHERE (orders_status_id, language_id) IN (SELECT orders_status_id, MAX(language_id) FROM orders_status GROUP BY orders_status_id)');
+        $defaultLanguage = $this->db->query('SELECT l.languages_id
+            FROM languages l
+            LEFT JOIN configuration c ON c.configuration_value = l.code
+            WHERE c.configuration_key =  "DEFAULT_LANGUAGE"');
+        
+        if (count($defaultLanguage) > 0) {
+            $this->defaultLanguage = $defaultLanguage[0]['languages_id'];
+        }
+
+        $this->modifiedStats = $this->db->query('SELECT * FROM orders_status WHERE language_id='.$this->defaultLanguage);
     }
 
     public function form()
     {
-        $html = '<div class="form-group">
-                        <div class="col-sm-2">
-                            <b>Wawi Status</b>
-                        </div>
+        $default = $this->db->query('SELECT o.orders_status_name
+            FROM configuration c
+            LEFT JOIN orders_status o ON c.configuration_value = o.orders_status_id
+            WHERE c.configuration_key =  "DEFAULT_ORDERS_STATUS_ID" && o.language_id ='.$this->defaultLanguage);
+        
+        $default = count($default) > 0 ? $default[0]['orders_status_name'] : '';
+
+        $html = '<div class="alert alert-info">Für jeden Auftrags-Zustand aus der Wawi muss hier der zugehörige Shop-Zustand konfiguriert werden. Bitte beachten Sie dass jeder Zustand eindeutig sein sollte.<br/><b>Bei mehrfacher Zuordnung wird der jeweils erste Status gesetzt.</b></div>';
+        $html .= '<a class="btn btn-default btn-sm btn-block" href="'.$this->shopConfig['shop']['fullUrl'].'admin/orders_status.php">Shop-Status anlegen und verwalten</a>';
+        $html .= '<div class="form-group">
+                    <label class="col-sm-2 control-label">Neu</label>
                         <div class="col-sm-3">
-                            <b>Modified Status</b>
+                            <p class="form-control-static">'.$default.' (Standard-Status Ihres Shops)</p>
                         </div>
                 </div>';
 

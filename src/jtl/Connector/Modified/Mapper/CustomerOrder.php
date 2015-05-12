@@ -2,6 +2,7 @@
 namespace jtl\Connector\Modified\Mapper;
 
 use jtl\Connector\Modified\Mapper\BaseMapper;
+use jtl\Connector\Model\CustomerOrder as CustomerOrderModel;
 
 class CustomerOrder extends BaseMapper
 {
@@ -23,7 +24,8 @@ class CustomerOrder extends BaseMapper
             "billingAddress" => "CustomerOrderBillingAddress|setBillingAddress",
             "shippingAddress" => "CustomerOrderShippingAddress|setShippingAddress",
             "shippingMethodName" => "shipping_method",
-            "items" => "CustomerOrderItem|addItem"
+            "items" => "CustomerOrderItem|addItem",
+            "status" => null
         ),
         "mapPush" => array(
             "orders_id" => "id",
@@ -74,37 +76,64 @@ class CustomerOrder extends BaseMapper
         return parent::pull(null, $limit);
     }
 
+    protected function status($data)
+    {
+        $defaultStatus = $this->db->query('SELECT configuration_value FROM configuration WHERE configuration_key="DEFAULT_ORDERS_STATUS_ID"');
+
+        if (count($defaultStatus) > 0) {
+            $defaultStatus = $defaultStatus[0]['configuration_value'];
+
+            if ($data['orders_status'] == $defaultStatus) {
+                $newStatus = $this->connectorConfig->mapping->pending;
+
+                if (!is_null($newStatus)) {
+                    $this->db->query('UPDATE orders SET orders_status='.$newStatus.' WHERE orders_id='.$data['orders_id']);
+
+                    $orderHistory = new \stdClass();
+                    $orderHistory->orders_id = $data['orders_id'];
+                    $orderHistory->orders_status_id = $newStatus;
+                    $orderHistory->date_added = date('Y-m-d H:i:s');
+
+                    $this->db->insertRow($orderHistory, 'orders_status_history');    
+
+                    $data['orders_status'] = $newStatus;            
+                }
+            }
+        }
+       
+        $mapping = array_search($data['orders_status'], (array) $this->connectorConfig->mapping);
+
+        if ($mapping == 'canceled') {
+            return CustomerOrderModel::STATUS_CANCELLED;    
+        } elseif ($mapping == 'completed' || $mapping == 'shipped') {
+            return CustomerOrderModel::STATUS_SHIPPED;
+        }
+    }
+
+    protected function paymentStatus($data)
+    {
+        $mapping = array_search($data['orders_status'], (array) $this->connectorConfig->mapping);
+        
+        if ($mapping == 'completed' || $mapping == 'paid') {
+            return CustomerOrderModel::PAYMENT_STATUS_COMPLETED;
+        }
+    }
+
     protected function orders_status($data)
     {
         $newStatus = null;
 
-        if ($data->getPaymentStatus() == CustomerOrder::PAYMENT_STATUS_COMPLETED) {
-            if ($data->getOrderStatus() == CustomerOrder::STATUS_CANCELLED) {
-                $newStatus = 'canceled';
-            } elseif ($data->getOrderStatus() == CustomerOrder::STATUS_COMPLETED) {
+        if ($data->getOrderStatus() == CustomerOrderModel::STATUS_CANCELLED) {
+            $newStatus = 'canceled';
+        } else {
+            if ($data->getPaymentStatus() == CustomerOrderModel::PAYMENT_STATUS_COMPLETED && $data->getOrderStatus() == CustomerOrderModel::STATUS_SHIPPED) {
                 $newStatus = 'completed';
-            } elseif ($data->getOrderStatus() == CustomerOrder::STATUS_PARTIALLY_SHIPPED) {
-                $newStatus = 'paid';
-            } elseif ($data->getOrderStatus() == CustomerOrder::STATUS_UPDATED) {
-                $newStatus = 'paid';
-            } elseif ($data->getOrderStatus() == CustomerOrder::STATUS_NEW) {
-                $newStatus = 'paid';
-            }
-        } elseif ($data->getPaymentStatus() == CustomerOrder::PAYMENT_STATUS_UNPAID) {
-            if ($data->getOrderStatus() == CustomerOrder::STATUS_CANCELLED) {
-                $newStatus = 'canceled';
-            } elseif ($data->getOrderStatus() == CustomerOrder::STATUS_SHIPPED) {
-                $newStatus = 'shipped';
-            } elseif ($data->getOrderStatus() == CustomerOrder::STATUS_UPDATED) {
-                $newStatus = 'new';
-            } elseif ($data->getOrderStatus() == CustomerOrder::STATUS_NEW) {
-                $newStatus = 'new';
-            }
-        } elseif ($data->getPaymentStatus() == CustomerOrder::PAYMENT_STATUS_PARTIALLY) {
-            if ($data->getOrderStatus() == CustomerOrder::STATUS_CANCELLED) {
-                $newStatus = 'canceled';
-            } elseif ($data->getOrderStatus() == CustomerOrder::STATUS_SHIPPED) {
-                $newStatus = 'shipped';
+            } else {
+                if ($data->getOrderStatus() == CustomerOrderModel::STATUS_SHIPPED) {
+                    $newStatus = 'shipped';
+                } elseif ($data->getPaymentStatus() == CustomerOrderModel::PAYMENT_STATUS_COMPLETED) {
+                    $newStatus = 'paid';
+                }
             }
         }
 

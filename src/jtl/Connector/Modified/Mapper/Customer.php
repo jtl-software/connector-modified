@@ -59,24 +59,26 @@ class Customer extends BaseMapper
     protected function salutation($data)
     {
         if ($data['customers_gender'] == 'm') {
-            return 'Herr';
+            return 'm';
         } elseif ($data['customers_gender'] == 'w') {
-            return 'Frau';
+            return 'w';
         }
     }
 
     protected function customers_gender($data)
     {
-        if ($data->getSalutation() == 'Herr') {
+        if ($data->getSalutation() == 'm') {
             return 'm';
-        } elseif ($data->getSalutation() == 'Frau') {
+        } else {
             return 'w';
         }
     }
 
     protected function languageISO($data)
     {
-        return $this->fullLocale(strtolower($data['countries_iso_code_2']));
+        if (!empty($data['countries_iso_code_2'])) {
+            return $this->fullLocale(strtolower($data['countries_iso_code_2']));
+        }
     }
 
     protected function countryIso($data)
@@ -91,29 +93,37 @@ class Customer extends BaseMapper
 
     protected function customers_password($data)
     {
-        if ($data->getId()->getEndpoint() !== 0) {
-            $password = $this->db->query('SELECT customers_password FROM customers WHERE customers_id = '.$data->getId()->getEndpoint());
+        $id = $data->getId()->getEndpoint();
+
+        if (!empty($id)) {
+            $password = $this->db->query('SELECT customers_password FROM customers WHERE customers_id = '.$id);
             $password = $password[0]['customers_password'];
         }
 
-        return isset($password) ? $password : null;
+        return isset($password) ? $password : md5(rand());
     }
 
     public function push($data, $dbObj = null)
     {
-        if ($data->getId()->getEndpoint() !== 0) {
-            $this->db->query('DELETE FROM address_book WHERE customers_id='.$data->getId()->getEndpoint());
-            $this->db->query('DELETE FROM customers_info WHERE customers_info_id='.$data->getId()->getEndpoint());
+        $id = $data->getId()->getEndpoint();
+        
+        if (!is_null($id)) {
+            $this->db->query('DELETE FROM address_book WHERE customers_id='.$id);
+            $this->db->query('DELETE FROM customers_info WHERE customers_info_id='.$id);
         }
 
         $return = parent::push($data, $dbObj);
 
-        $iso = strtoupper(Language::map($data->getCountryIso()));
-        $countryResult = $this->db->query('SELECT countries_id FROM countries WHERE countries_iso_code_2="'.$iso.'"');
+        $dataIso = $data->getCountryIso();
+
+        if (!empty($dataIso)) {
+            $iso = strtoupper(Language::map($dataIso));
+            $countryResult = $this->db->query('SELECT countries_id FROM countries WHERE countries_iso_code_2="'.$iso.'"');
+        }
 
         $entry = new \stdClass();
         $entry->customers_id = $data->getId()->getEndpoint();
-        $entry->entry_gender = $data->getSalutation();
+        $entry->entry_gender = $data->getSalutation() == 'Herr' ? 'm' : 'f';
         $entry->entry_company = $data->getCompany();
         $entry->entry_firstname = $data->getFirstName();
         $entry->entry_lastname = $data->getLastName();
@@ -122,8 +132,7 @@ class Customer extends BaseMapper
         $entry->entry_postcode = $data->getZipCode();
         $entry->entry_city = $data->getCity();
         $entry->entry_state = $data->getState();
-        $entry->address_class = 'primary';
-        $entry->entry_country_id = ($countryResult) ? $countryResult[0]['countries_id'] : '81'; // if country not found set to default xtc ID for germany
+        $entry->entry_country_id = ($countryResult) ? $countryResult[0]['countries_id'] : '81';
 
         $address = $this->db->insertRow($entry, 'address_book');
 
@@ -140,7 +149,7 @@ class Customer extends BaseMapper
         $infoObj = new \stdClass();
         $infoObj->customers_info_id = $insertResult->getKey();
         $this->db->insertRow($infoObj, 'customers_info');
-
+      
         return $return;
     }
 
