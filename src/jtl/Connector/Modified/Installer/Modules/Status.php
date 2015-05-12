@@ -15,7 +15,7 @@ class Status extends Module
         'paid' => 'Bezahlt',
         'shipped' => 'Versendet',
         'completed' => 'Bezahlt &amp; Versendet',
-        'canceled' => 'Abgebrochen'
+        'canceled' => 'Storniert'
     );
 
     public function __construct($db, $config, $shopConfig)
@@ -77,8 +77,12 @@ class Status extends Module
 
     public function save()
     {
-        $this->config->mapping = $_REQUEST['status'];
+        if (count(array_unique($_REQUEST['status'])) < count($_REQUEST['status'])) {
+            return 'Bitte legen Sie für jeden Status eine eindeutige Shop-Zuweisung fest. Wenn ihr Shop derzeit nicht über genügend Status verfügt, legen Sie bitte die notwendigen zusätzlich an.';
+        } else {
+            $this->config->mapping = $_REQUEST['status'];
 
-        return true;
+            return true; 
+        }
     }
 }

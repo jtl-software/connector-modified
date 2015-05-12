@@ -87,7 +87,6 @@ class Installer
 		        		<ul>';
 
                     foreach ($moduleErrors as $error) {
-                        var_dump($moduleErrors);
                         echo '<li>'.$error.'</li>';
                     }
 
