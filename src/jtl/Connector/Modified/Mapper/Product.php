@@ -65,7 +65,8 @@ class Product extends BaseMapper
             "ProductVariation|addVariation" => "variations",
             "ProductInvisibility|addInvisibility|true" => "invisibilities",
             "ProductCrossSelling|addCrossSelling" => "crossSellings",
-            "products_image" => null
+            "products_image" => null,
+            "products_shippingtime" => null
         )
     );
 
@@ -123,13 +124,52 @@ class Product extends BaseMapper
     protected function products_vpe($data)
     {
         foreach ($data->getI18ns() as $i18n) {
-            $language_id = $this->locale2id($i18n->getLanguageISO());
-            $dbResult = $this->db->query('SELECT code FROM languages WHERE languages_id='.$language_id);
+            $name = $i18n->getUnitName();
 
-            if ($dbResult[0]['code'] == $this->shopConfig['settings']['DEFAULT_LANGUAGE']) {
-                $sql = $this->db->query('SELECT products_vpe_id FROM products_vpe WHERE language_id='.$language_id.' && products_vpe_name="'.$i18n->getUnitName().'"');
-                if (count($sql) > 0) {
-                    return $sql[0]['products_vpe_id'];
+            if (!empty($name)) {
+                $language_id = $this->locale2id($i18n->getLanguageISO());
+                $dbResult = $this->db->query('SELECT code FROM languages WHERE languages_id='.$language_id);
+
+                if ($dbResult[0]['code'] == $this->shopConfig['settings']['DEFAULT_LANGUAGE']) {
+                    $sql = $this->db->query('SELECT products_vpe_id FROM products_vpe WHERE language_id='.$language_id.' && products_vpe_name="'.$name.'"');
+                    if (count($sql) > 0) {
+                        return $sql[0]['products_vpe_id'];
+                    }
+                }
+            }
+        }
+
+        return '';
+    }
+
+    protected function products_shippingtime($data)
+    {
+        foreach ($data->getI18ns() as $i18n) {
+            $name = $i18n->getDeliveryStatus();
+
+            if (!empty($name)) {
+                $language_id = $this->locale2id($i18n->getLanguageISO());
+                $dbResult = $this->db->query('SELECT code FROM languages WHERE languages_id='.$language_id);
+
+                if ($dbResult[0]['code'] == $this->shopConfig['settings']['DEFAULT_LANGUAGE']) {
+                    $sql = $this->db->query('SELECT shipping_status_id FROM shipping_status WHERE language_id='.$language_id.' && shipping_status_name="'.$name.'"');
+                    if (count($sql) > 0) {
+                        return $sql[0]['shipping_status_id'];
+                    } else {
+                        $nextId = $this->db->query('SELECT max(shipping_status_id) + 1 AS nextID FROM shipping_status');
+                        $id = is_null($nextId[0]['nextID']) || $nextId[0]['nextID'] === 0 ? 1 : $nextId[0]['nextID'];
+
+                        foreach ($data->getI18ns() as $i18n) {
+                            $status = new \stdClass();
+                            $status->shipping_status_id = $id;
+                            $status->language_id = $this->locale2id($i18n->getLanguageISO());
+                            $status->shipping_status_name = $i18n->getDeliveryStatus();
+
+                            $this->db->deleteInsertRow($status, 'shipping_status', array('shipping_status_id', 'langauge_id'), array($status->shipping_status_id, $status->language_id));
+                        }
+
+                        return $id;
+                    }
                 }
             }
         }

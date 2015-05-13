@@ -9,7 +9,7 @@ class TaxRate extends Module
 
     public function form()
     {
-        $rates = $this->db->query('SELECT r.tax_rates_id,r.tax_rate,r.tax_class_id,r.tax_description,c.tax_class_title FROM tax_rates r LEFT JOIN tax_class c ON r.tax_class_id=c.tax_class_id');
+        $rates = $this->db->query('SELECT r.tax_rates_id,r.tax_rate,r.tax_class_id,r.tax_description,c.tax_class_title FROM tax_rates r LEFT JOIN tax_class c ON r.tax_class_id=c.tax_class_id WHERE r.tax_rate > 0');
 
         foreach ($rates as $taxRate) {
             $selected = $taxRate['tax_rates_id'] == $this->config->tax_rate ? ' selected="selected"' : '';
@@ -21,7 +21,7 @@ class TaxRate extends Module
                 <div class="col-xs-6">
                     <select class="form-control" name="tax_rate" id="tax_rate">'.$options.'</select>
                     <span id="helpBlock" class="help-block">
-                        Bitte wählen Sie die Steuer-Rate die als Standard verwedent werden soll.
+                        Bitte wählen Sie die Steuer-Rate die als Standard verwendet werden soll.
                     </span>
                 </div>
         </div>';

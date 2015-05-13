@@ -45,7 +45,7 @@ class Status extends Module
         
         $default = count($default) > 0 ? $default[0]['orders_status_name'] : '';
 
-        $html = '<div class="alert alert-info">Für jeden Auftrags-Zustand aus der Wawi muss hier der zugehörige Shop-Zustand konfiguriert werden. Bitte beachten Sie dass jeder Zustand eindeutig sein sollte.<br/><b>Bei mehrfacher Zuordnung wird der jeweils erste Status gesetzt.</b></div>';
+        $html = '<div class="alert alert-info">Für jeden Auftrags-Zustand aus der Wawi muss hier der zugehörige Shop-Zustand konfiguriert werden. <b>Bitte beachten Sie dass jeder Zustand eindeutig sein muss.</b></div>';
         $html .= '<a class="btn btn-default btn-sm btn-block" href="'.$this->shopConfig['shop']['fullUrl'].'admin/orders_status.php">Shop-Status anlegen und verwalten</a>';
         $html .= '<div class="form-group">
                     <label class="col-sm-2 control-label">Neu</label>
