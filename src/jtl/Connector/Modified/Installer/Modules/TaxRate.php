@@ -21,7 +21,7 @@ class TaxRate extends Module
                 <div class="col-xs-6">
                     <select class="form-control" name="tax_rate" id="tax_rate">'.$options.'</select>
                     <span id="helpBlock" class="help-block">
-                        Bitte wählen Sie die Steuer-Rate die als Standard verwendet werden soll.
+                        Bitte wählen Sie die Steuer-Rate die verwendet werden soll, wenn es Abweichungen zur Wawi geben sollte und der Satz nicht eindeutig zugeordnet werden kann.
                     </span>
                 </div>
         </div>';
