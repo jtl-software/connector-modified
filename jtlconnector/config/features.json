@@ -1,0 +1,127 @@
+{
+    "entities": {
+        "Product": {
+            "push": true,
+            "pull": true,
+            "delete": true
+        },
+        "Category": {
+            "push": true,
+            "pull": true,
+            "delete": true
+        },
+        "Customer": {
+            "push": true,
+            "pull": true,
+            "delete": true
+        },
+        "CustomerOrder": {
+            "push": false,
+            "pull": true,
+            "delete": false
+        },
+        "DeliveryNote": {
+            "push": false,
+            "pull": false,
+            "delete": false
+        },
+        "Image": {
+            "push": true,
+            "pull": true,
+            "delete": true
+        },
+        "Manufacturer": {
+            "push": true,
+            "pull": true,
+            "delete": true
+        },
+        "Specific": {
+            "push": false,
+            "pull": false,
+            "delete": false
+        },
+        "ConfigGroup": {
+            "push": false,
+            "pull": false,
+            "delete": false
+        },
+        "ConfigItem": {
+            "push": false,
+            "pull": false,
+            "delete": false
+        },
+        "CrossSellingGroup": {
+            "push": false,
+            "pull": false,
+            "delete": false
+        },
+        "Currency": {
+            "push": true,
+            "pull": true,
+            "delete": false
+        },
+        "CustomerGroup": {
+            "push": false,
+            "pull": true,
+            "delete": false
+        },
+        "Language": {
+            "push": false,
+            "pull": true,
+            "delete": false
+        },
+        "MeasurementUnit": {
+            "push": false,
+            "pull": false,
+            "delete": false
+        },
+        "ProductType": {
+            "push": false,
+            "pull": false,
+            "delete": false
+        },
+        "ShippingClass": {
+            "push": false,
+            "pull": false,
+            "delete": false
+        },
+        "TaxRate": {
+            "push": false,
+            "pull": true,
+            "delete": false
+        },
+        "Unit": {
+            "push": true,
+            "pull": true,
+            "delete": false
+        },
+        "Warehouse": {
+            "push": false,
+            "pull": false,
+            "delete": false
+        },
+        "StatusChange" : {
+            "pull" : false,
+            "push" : true,
+            "delete" : false
+        }
+    },
+    "flags": {
+        "var_combination_child_first": false,
+        "product_images_supported": true,
+        "category_images_supported": true,
+        "manufacturer_images_supported": false,
+        "specific_images_supported": false,
+        "specific_value_images_supported": false,
+        "config_group_images_supported": false,
+        "product_variation_value_images_supported": false,
+        "can_reactivate_customer_order" : false,
+        "can_update_customer_order" : false,
+        "customer_order_partially_payable": false,
+        "variation_products_supported": true,
+        "variation_combinations_supported": false,
+        "set_articles_supported": false,
+        "needs_finish_call" : false,
+        "free_field_supported" : false
+    }
+}
