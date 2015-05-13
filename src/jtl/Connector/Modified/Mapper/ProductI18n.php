@@ -22,7 +22,8 @@ class ProductI18n extends BaseMapper
             "metaKeywords" => "products_meta_keywords",
             "shortDescription" => "products_short_description",
             "titleTag" => "products_meta_title",
-            "unitName" => null
+            "unitName" => null,
+            "deliveryStatus" => null
         ),
         "mapPush" => array(
             "language_id" => null,
@@ -35,6 +36,18 @@ class ProductI18n extends BaseMapper
             "products_meta_title" => "titleTag"
         )
     );
+    
+    protected function deliveryStatus($data)
+    {
+        $query = $this->db->query('SELECT s.shipping_status_name
+            FROM shipping_status s
+            LEFT JOIN products p ON p.products_shippingtime = s.shipping_status_id
+            WHERE p.products_id ='.$data['products_id'].' && s.language_id ='.$data['language_id']);
+
+        if(count($query) > 0) {
+            return $query[0]['shipping_status_name'];
+        }
+    }
 
     protected function languageISO($data)
     {
