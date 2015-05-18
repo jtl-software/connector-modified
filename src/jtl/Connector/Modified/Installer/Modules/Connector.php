@@ -27,6 +27,15 @@ class Connector extends Module
                 </div>
             </div>
             <div class="form-group">
+                <label class="control-label col-xs-2">Connector URL</label>
+                <div class="col-xs-10">
+                    <input type="text" class="form-control" name="config[auth_token]" value="'.$this->shopConfig['shop']['fullUrl'].'jtlconnector/" readonly/>
+                    <span id="helpBlock" class="help-block">
+                        Dies ist die URL die in Ihrer Wawi zum einrichten des Connectors verwendet werden muss.
+                    </span>
+                </div>
+            </div>
+            <div class="form-group">
                 <label class="control-label col-xs-2">Auth Token</label>
                 <div class="col-xs-10">
                     <input type="text" class="form-control" name="config[auth_token]" value="'.$this->config->auth_token.'" readonly/>
