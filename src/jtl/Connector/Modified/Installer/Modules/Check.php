@@ -23,6 +23,12 @@ class Check extends Module
             'ok' => 'GDLib Extension ist verfügbar',
             'fault' => 'GDLib extension ist nicht verfügbar',
         ),
+        'sqlite' => array(
+            'title' => 'SQLite',
+            'info' => 'Die PHP SQLite Extension wird für Session-Daten des Connectors benötigt.',
+            'ok' => 'SQLite Extension ist verfügbar',
+            'fault' => 'SQLite extension ist nicht verfügbar',
+        ),
         'configFile' => array(
             'title' => 'Connector Config Datei',
             'info' => 'Das config Verzeichnis oder die datei "%s" müssen beschreibar sein.',
@@ -106,6 +112,11 @@ class Check extends Module
     private function gdlib()
     {
         return array((extension_loaded('gd') && function_exists('gd_info')));
+    }
+
+    private function sqlite()
+    {
+        return array((extension_loaded('sqlite3')));
     }
 
     private function configFile()
