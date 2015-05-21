@@ -51,11 +51,11 @@ class Image extends BaseMapper
         $defaultQuery = 'SELECT CONCAT("pID_",p.products_id) image_id, p.products_image image_name, p.products_id foreignKey, 0 image_nr, "product" type
             FROM products p
             LEFT JOIN jtl_connector_link l ON CONCAT("pID_",p.products_id) = l.endpointId AND l.type = 16
-            WHERE l.hostId IS NULL && p.products_image IS NOT NULL';
+            WHERE l.hostId IS NULL && p.products_image IS NOT NULL && p.products_image != ""';
         $categoriesQuery = 'SELECT CONCAT("cID_",p.categories_id) image_id, p.categories_image as image_name, p.categories_id foreignKey, "category" type, 0 image_nr
             FROM categories p
             LEFT JOIN jtl_connector_link l ON CONCAT("cID_",p.categories_id) = l.endpointId AND l.type = 16
-            WHERE l.hostId IS NULL && p.categories_image IS NOT NULL';
+            WHERE l.hostId IS NULL && p.categories_image IS NOT NULL && p.categories_image != ""';
 
         $dbResult = $this->db->query($query);
         $dbResultDefault = $this->db->query($defaultQuery);

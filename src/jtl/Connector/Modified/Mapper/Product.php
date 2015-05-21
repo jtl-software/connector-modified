@@ -39,6 +39,7 @@ class Product extends BaseMapper
             "variations" => "ProductVariation|addVariation",
             "invisibilities" => "ProductInvisibility|addInvisibility",
             "crossSellings" => "ProductCrossSelling|addCrossSelling",
+            "attributes" => "ProductAttr|addAttribute",
             "vat" => null
         ),
         "mapPush" => array(
@@ -65,6 +66,7 @@ class Product extends BaseMapper
             "ProductVariation|addVariation" => "variations",
             "ProductInvisibility|addInvisibility|true" => "invisibilities",
             "ProductCrossSelling|addCrossSelling" => "crossSellings",
+            "ProductAttr|addAttribute|true" => "attributes",
             "products_image" => null,
             "products_shippingtime" => null
         )
