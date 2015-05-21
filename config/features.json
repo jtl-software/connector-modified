@@ -6,13 +6,13 @@
             "delete": true
         },
         "CategoryAttr": {
-            "pull": false,
-            "push": false,
+            "pull": true,
+            "push": true,
             "delete": false
         },
         "CategoryAttrI18n": {
-            "pull": false,
-            "push": false,
+            "pull": true,
+            "push": true,
             "delete": false
         },
         "CategoryCustomerGroup": {
@@ -236,13 +236,13 @@
             "delete": true
         },
         "ProductAttr": {
-            "pull": false,
-            "push": false,
+            "pull": true,
+            "push": true,
             "delete": false
         },
         "ProductAttrI18n": {
-            "pull": false,
-            "push": false,
+            "pull": true,
+            "push": true,
             "delete": false
         },
         "ProductConfigGroup": {
