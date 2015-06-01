@@ -225,6 +225,11 @@
             "push": false,
             "delete": false
         },
+        "Payment": {
+            "pull": true,
+            "push": false,
+            "delete": false
+        },
         "Product": {
             "pull": true,
             "push": true,

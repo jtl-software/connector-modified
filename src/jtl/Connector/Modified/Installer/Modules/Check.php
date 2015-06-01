@@ -59,6 +59,12 @@ class Check extends Module
             'ok' => 'Tabelle wurde erstellt',
             'fault' => 'Fehler beim erstellen',
         ),
+        'paymentTable' => array(
+            'title' => 'Zahlungs-Tabelle',
+            'info' => 'Die Zahlungs-Tabelle muss in der Shop-Datenbank verfügbar sein.',
+            'ok' => 'Tabelle wurde erstellt',
+            'fault' => 'Fehler beim erstellen',
+        ),
         'additionalImages' => array(
             'title' => 'Zusätzliche Produkt-Bilder',
             'info' => 'Um diese Funktion zu nutzen müssen zusätzliche Produkt-Bilder in der <a href="%sadmin/configuration.php?gID=4">modified Konfiguration</a> eingestellt werden.',
@@ -176,6 +182,33 @@ class Check extends Module
                     type tinyint unsigned NOT NULL,
                     checksum varchar(255) NOT NULL,
                     PRIMARY KEY (endpoint_id)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+            ";
+
+            try {
+                $this->db->query($sql);
+
+                return array(true);
+            } catch (\Exception $e) {
+                return array(false);
+            }
+        }
+
+        return array(true);
+    }
+
+    private function paymentTable()
+    {
+        if (count($this->db->query("SHOW TABLES LIKE 'jtl_connector_payment'")) == 0) {
+            $sql = "
+                CREATE TABLE IF NOT EXISTS jtl_connector_payment (
+                    id int(11) unsigned NOT NULL,
+                    customerOrderId int(11) NOT NULL,
+                    billingInfo varchar(255) NULL,
+                    creationDate datetime NOT NULL,
+                    totalSum double NOT NULL,
+                    transactionId varchar(255) NULL,
+                    PRIMARY KEY (id)
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
             ";
 
