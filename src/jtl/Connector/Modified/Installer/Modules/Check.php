@@ -208,6 +208,7 @@ class Check extends Module
                     creationDate datetime NOT NULL,
                     totalSum double NOT NULL,
                     transactionId varchar(255) NULL,
+                    paymentModuleCode varchar(64) NULL,
                     PRIMARY KEY (id)
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
             ";

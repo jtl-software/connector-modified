@@ -16,7 +16,8 @@ class Payment extends \jtl\Connector\Modified\Mapper\BaseMapper
             "billingInfo" => "billingInfo",
             "creationDate" => "creationDate",
             "totalSum" => "totalSum",
-            "transactionId" => "transactionId"
+            "transactionId" => "transactionId",
+            "paymentModuleCode" => "paymentModuleCode"
         )
     );
 }
