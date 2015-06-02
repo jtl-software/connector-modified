@@ -78,7 +78,7 @@ class Connector extends Controller
         include $config->connector_root.'/admin/includes/version.php';
 
         $connector = new ConnectorIdentification();
-        $connector->setEndpointVersion('1.0.1');
+        $connector->setEndpointVersion(CONNECTOR_VERSION);
         $connector->setPlatformName('Modified Shop');
         $connector->setPlatformVersion(PROJECT_VERSION);
 

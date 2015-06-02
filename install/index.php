@@ -20,23 +20,24 @@
     </style>
   </head>
   <body>
+    <?php
+        include('../index.php');
+
+        use \jtl\Connector\Modified\Installer\Installer;
+    ?>
     <div class="container">
         <br>
         <br>
         <div class="panel panel-primary">
             <div class="panel-heading">
                 <h3 class="panel-title">
-                    <span class="glyphicon glyphicon-transfer"></span> JTL-Connector Konfiguration für den Modified Shop
+                    <span class="glyphicon glyphicon-transfer"></span> JTL-Connector Konfiguration für den Modified Shop<span class="pull-right label label-info">v<?php echo CONNECTOR_VERSION; ?></span>
                 </h3>
             </div>
             <div class="panel-body">
                 <form class="form-horizontal" role="form" method="post">
-                    <?php
-                        include('../index.php');
-
-                        use \jtl\Connector\Modified\Installer\Installer;
-
-                        $installer = new Installer();
+                    <?php                       
+                        new Installer();
                     ?>
                 </form>
             </div>

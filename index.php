@@ -5,6 +5,7 @@ use \jtl\Connector\Application\Application;
 use \jtl\Connector\Modified\Modified;
 
 defined('CONNECTOR_DIR') || define("CONNECTOR_DIR", __DIR__);
+define("CONNECTOR_VERSION", "1.0.2");
 
 try {
     if (!strpos($_SERVER['REQUEST_URI'], 'install')) {
