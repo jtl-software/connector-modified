@@ -72,7 +72,7 @@ class Check extends Module
             'fault' => 'Zusätzliche Bilder deaktiviert',
         ),
         'groups' => array(
-            'title' => 'Kundengruppen-Sichtbarkeiten und Staffel-Preise',
+            'title' => 'Kundengruppen-Sichtbarkeiten',
             'info' => 'Das Zusatz-Modul "Kundengruppencheck" muss in der <a href="%sadmin/configuration.php?gID=17">modified Konfiguration</a> eingestellt sein.',
             'ok' => 'Modul aktiviert',
             'fault' => 'Modul deaktiviert',

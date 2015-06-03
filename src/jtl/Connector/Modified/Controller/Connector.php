@@ -74,13 +74,13 @@ class Connector extends Controller
         $session = new SessionHelper("modified");
         $config = $session->connectorConfig;
 
-        define('_VALID_XTC', true);
-        include $config->connector_root.'/admin/includes/version.php';
+        //define('_VALID_XTC', true);
+        //include $config->connector_root.'/admin/includes/version.php';
 
         $connector = new ConnectorIdentification();
         $connector->setEndpointVersion(CONNECTOR_VERSION);
         $connector->setPlatformName('Modified Shop');
-        $connector->setPlatformVersion(PROJECT_VERSION);
+        $connector->setPlatformVersion(SHOP_VERSION);
 
         $action->setResult($connector);
 
