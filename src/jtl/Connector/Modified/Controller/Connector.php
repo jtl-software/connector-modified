@@ -79,7 +79,7 @@ class Connector extends Controller
 
         $connector = new ConnectorIdentification();
         $connector->setEndpointVersion(CONNECTOR_VERSION);
-        $connector->setPlatformName('Modified Shop');
+        $connector->setPlatformName('modified eCommerce');
         $connector->setPlatformVersion(SHOP_VERSION);
 
         $action->setResult($connector);
