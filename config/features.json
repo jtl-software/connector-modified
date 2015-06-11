@@ -30,6 +30,11 @@
             "push": true,
             "delete": true
         },
+        "Checksum": {
+            "pull": false,
+            "push": false,
+            "delete": false
+        },
         "ConfigGroup": {
             "pull": false,
             "push": false,
@@ -55,15 +60,25 @@
             "push": false,
             "delete": false
         },
+        "CrossSelling": {
+            "pull": true,
+            "push": true,
+            "delete": true
+        },
         "CrossSellingGroup": {
-            "pull": false,
-            "push": false,
+            "pull": true,
+            "push": true,
             "delete": false
         },
         "CrossSellingGroupI18n": {
-            "pull": false,
-            "push": false,
+            "pull": true,
+            "push": true,
             "delete": false
+        },
+        "CrossSellingItem": {
+            "pull": true,
+            "push": true,
+            "delete": true
         },
         "Currency": {
             "pull": true,
@@ -254,11 +269,6 @@
             "pull": false,
             "push": false,
             "delete": false
-        },
-        "ProductCrossSelling": {
-            "pull": true,
-            "push": true,
-            "delete": true
         },
         "ProductFileDownload": {
             "pull": false,

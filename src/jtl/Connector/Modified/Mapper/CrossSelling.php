@@ -41,4 +41,19 @@ class CrossSelling extends BaseMapper
 
         return $data;
     }
+
+    public function delete($data)
+    {
+        $id = $data->getProductId()->getEndpoint();
+
+        if (!empty($id) && $id != '') {
+            try {
+                $this->db->query('DELETE FROM products_xsell WHERE products_id='.$id);                
+            }
+            catch(\Exception $e) {            
+            }
+        }
+
+        return $data;
+    }
 }

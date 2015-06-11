@@ -11,11 +11,13 @@ class GlobalData extends \jtl\Connector\Modified\Mapper\BaseMapper
             "customerGroups" => "CustomerGroup|addCustomerGroup",
             "taxRates" => "TaxRate|addTaxRate",
             "currencies" => "Currency|addCurrency",
-            "units" => "Unit|addUnit"
+            "units" => "Unit|addUnit",
+            "crossSellingGroups" => "CrossSellingGroup|addCrossSellingGroup"
         ),
         "mapPush" => array(
             "Currency|addCurrency" => "currencies",
-            "Unit|addUnit" => "units"
+            "Unit|addUnit" => "units",
+            "CrossSellingGroup|addCrossSellingGroup" => "crossSellingGroups"
         )
     );
 
