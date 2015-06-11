@@ -80,6 +80,9 @@ class Installer
                         echo '<div class="alert alert-danger">Fehler beim Schreiben der config.json Datei.</div>';
                     } else {
                         echo '<div class="alert alert-success">Connector Konfiguration wurde gespeichert.</div>';
+                        echo '<div class="alert alert-danger"><b>ACHTUNG:</b><br/>
+                            Bitte sorgen Sie nach erfolgreicher Installation des Connectors unbedingt dafür, dass dieser Installer 
+                            sowie die Datei config.json im Verzeichnis config nicht öffentlich les- und ausführbar sind!</div>';
                     }
                 } else {
                     echo '<div class="alert alert-danger">Folgende Fehler traten auf:

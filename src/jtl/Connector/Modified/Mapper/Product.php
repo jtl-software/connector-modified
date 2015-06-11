@@ -38,7 +38,6 @@ class Product extends BaseMapper
             "specialPrices" => "ProductSpecialPrice|addSpecialPrice",
             "variations" => "ProductVariation|addVariation",
             "invisibilities" => "ProductInvisibility|addInvisibility",
-            "crossSellings" => "ProductCrossSelling|addCrossSelling",
             "attributes" => "ProductAttr|addAttribute",
             "vat" => null
         ),
@@ -65,7 +64,6 @@ class Product extends BaseMapper
             "ProductSpecialPrice|addSpecialPrice" => "specialPrices",
             "ProductVariation|addVariation" => "variations",
             "ProductInvisibility|addInvisibility|true" => "invisibilities",
-            "ProductCrossSelling|addCrossSelling" => "crossSellings",
             "ProductAttr|addAttribute|true" => "attributes",
             "products_image" => null,
             "products_shippingtime" => null

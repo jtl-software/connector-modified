@@ -25,6 +25,7 @@ class Connector extends Controller
             'Image',
             'Product',
             'Manufacturer',
+            'CrossSelling'
         );
 
         foreach ($mainControllers as $controller) {
