@@ -75,13 +75,11 @@ class Connector extends Controller
         $session = new SessionHelper("modified");
         $config = $session->connectorConfig;
 
-        //define('_VALID_XTC', true);
-        //include $config->connector_root.'/admin/includes/version.php';
-
         $connector = new ConnectorIdentification();
         $connector->setEndpointVersion(CONNECTOR_VERSION);
         $connector->setPlatformName('modified eCommerce');
         $connector->setPlatformVersion(SHOP_VERSION);
+        $connector->setProtocolVersion(Application()->getProtocolVersion());
 
         $action->setResult($connector);
 

@@ -17,7 +17,7 @@ class Product extends BaseMapper
             "id" => "products_id",
             "ean" => "products_ean",
             "stockLevel" => "ProductStockLevel|setStockLevel",
-            "sku" => null,
+            "sku" => "products_model",
             "sort" => "products_sort",
             "creationDate" => "products_date_added",
             "availableFrom" => "products_date_available",
@@ -105,15 +105,6 @@ class Product extends BaseMapper
             }
         }
         return $data;
-    }
-
-    protected function sku($data)
-    {
-        if (!empty($data['products_model'])) {
-            return $data['products_model'];
-        } else {
-            return $data['products_id'];
-        }
     }
 
     protected function considerBasePrice($data)
