@@ -218,14 +218,13 @@ class CustomerOrder extends BaseMapper
         $shipping->setType('shipping');
         $shipping->setName($data['shipping_method']);
         $shipping->setCustomerOrderId($this->identity($data['orders_id']));
-        $shipping->settype('shipping');
         $shipping->setId($this->identity($data['shipping_class']));
         $shipping->setQuantity(1);
         $shipping->setVat(0);
 
         $sum = 0;
 
-        $totalData = $this->db->query('SELECT class,value FROM orders_total WHERE orders_id='.$data['orders_id']);
+        $totalData = $this->db->query('SELECT class,value,title FROM orders_total WHERE orders_id='.$data['orders_id']);
 
         foreach ($totalData as $total) {
             if ($total['class'] == 'ot_total') {
@@ -236,6 +235,18 @@ class CustomerOrder extends BaseMapper
             }
             if ($total['class'] == 'ot_shipping') {
                 $shipping->setPrice(floatval($total['value']));
+            }
+            if ($total['class'] == 'ot_payment') {
+                $discount = new \jtl\Connector\Model\CustomerOrderItem();
+                $discount->setType('discount');
+                $discount->setName($total['title']);
+                $discount->setCustomerOrderId($this->identity($data['orders_id']));
+                $discount->setId($this->identity($total['orders_total_id']));
+                $discount->setQuantity(1);
+                $discount->setVat(0);
+                $discount->setPrice(floatval($total['value']));
+
+                $model->addItem($discount);
             }
         }
 

@@ -71,6 +71,7 @@ class PrimaryKeyMapper implements IPrimaryKeyMapper
 
     public function gc()
     {
+        /*
         $this->db->query('DELETE jtl_connector_link FROM jtl_connector_link LEFT JOIN categories ON categories_id = endpointId WHERE type=1 && categories_id IS NULL');
         $this->db->query('DELETE jtl_connector_link FROM jtl_connector_link LEFT JOIN customers ON customers_id = endpointId WHERE type=2 && customers_id IS NULL');
         $this->db->query('DELETE jtl_connector_link FROM jtl_connector_link LEFT JOIN orders ON orders_id = endpointId WHERE type=4 && orders_id IS NULL');
@@ -79,7 +80,7 @@ class PrimaryKeyMapper implements IPrimaryKeyMapper
         $this->db->query('DELETE jtl_connector_link FROM jtl_connector_link LEFT JOIN products_images ON image_id = endpointId WHERE type=16 && image_id IS NULL');
         $this->db->query('DELETE jtl_connector_link FROM jtl_connector_link LEFT JOIN manufacturers ON manufacturers_id = endpointId WHERE type=32 && manufacturers_id IS NULL');
         $this->db->query('DELETE jtl_connector_link FROM jtl_connector_link LEFT JOIN products ON products_id = endpointId WHERE type=64 && products_id IS NULL');
-        
+        */
         return true;
     }
 }
