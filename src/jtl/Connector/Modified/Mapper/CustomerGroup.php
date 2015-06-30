@@ -9,11 +9,16 @@ class CustomerGroup extends BaseMapper
         "table" => "customers_status",
         "query" => "SELECT * FROM customers_status GROUP BY customers_status_id",
         "identity" => "getId",
+        "getMethod" => "getCustomerGroups",
         "mapPull" => array(
             "id" => "customers_status_id",
             "discount" => "customers_status_discount",
+            "applyNetPrice" => "customers_status_add_tax_ot",
             "isDefault" => null,
             "i18ns" => "CustomerGroupI18n|addI18n"
+        ),
+        "mapPush" => array(
+            "CustomerGroupI18n|addI18n" => "i18ns"
         )
     );
 

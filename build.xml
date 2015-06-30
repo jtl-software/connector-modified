@@ -77,6 +77,14 @@
         </pharpackage>
         <move file="./dist/index.phar" tofile="./dist/index.php" />
         <delete dir="./build" />
+        <input propertyname="version" promptChar=":">Connector Version</input>
+        <phingcall target="zip">
+            <property name="version" value="${version}" />
+        </phingcall>
+    </target>
+
+    <target name="zip">
+        <zip destfile="./dist/jtl_connector_modified_${version}.zip" basedir="./dist" prefix="jtlconnector/"/>
     </target>
 
     <target name="clean">

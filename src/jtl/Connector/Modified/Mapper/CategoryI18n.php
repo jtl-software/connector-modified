@@ -15,13 +15,19 @@ class CategoryI18n extends \jtl\Connector\Modified\Mapper\BaseMapper
             "languageISO" => null,
             "categoryId" => "categories_id",
             "name" => "categories_name",
-            "description" => "categories_description"
+            "description" => "categories_description",
+            "metaDescription" => "categories_meta_description",
+            "metaKeywords" => "categories_meta_keywords",
+            "titleTag" => "categories_meta_title"
         ),
         "mapPush" => array(
             "language_id" => null,
             "categories_id" => null,
             "categories_name" => "name",
-            "categories_description" => "description"
+            "categories_description" => "description",
+            "categories_meta_description" => "metaDescription",
+            "categories_meta_keywords" => "metaKeywords",
+            "categories_meta_title" => "titleTag"
         )
     );
 
