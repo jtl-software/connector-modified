@@ -14,13 +14,23 @@ class Manufacturer extends BaseMapper
         "identity" => "getId",
         "mapPull" => array(
             "id" => "manufacturers_id",
-            "name" => "manufacturers_name"
+            "name" => "manufacturers_name",
+            "websiteUrl" => null
         ),
         "mapPush" => array(
             "manufacturers_id" => "id",
             "manufacturers_name" => "name"
         )
     );
+
+    protected function websiteUrl($data)
+    {
+        $result = $this->db->query('SELECT m.manufacturers_url, l.languages_id FROM languages l LEFT JOIN manufacturers_info m ON m.languages_id=l.languages_id WHERE m.manufacturers_id='.$data['manufacturers_id'].' && l.code="'.$this->shopConfig['settings']['DEFAULT_LANGUAGE'].'"');
+        
+        if (count($result) > 0) {
+            return $result[0]['manufacturers_url'];
+        }
+    }
 
     public function delete($data)
     {
@@ -47,17 +57,21 @@ class Manufacturer extends BaseMapper
         if (!empty($id) && $id != '') {
             $this->db->query('DELETE FROM manufacturers_info WHERE manufacturers_id='.$id);
         }
-        /*
+        
         $url = $data->getWebsiteUrl();
 
-        if(!empty($url)) {
+        $return = parent::push($data, $dbObj);
+
+        $newId = $return->getId()->getEndpoint();
+
+        if(!empty($url) && !empty($newId)) {
             $languages = $this->db->query('SELECT languages_id FROM languages');
 
             foreach ($languages as $language) {
-                $this->db->query('INSERT INTO manufacturers_info SET manufacturers_id='.$id.', languages_id='.$language['languages_id'].', manufacturers_url="'.$url.'"');
+                $this->db->query('INSERT INTO manufacturers_info SET manufacturers_id='.$newId.', languages_id='.$language['languages_id'].', manufacturers_url="'.$url.'"');
             }
         }
-        */
-        return parent::push($data, $dbObj);
+
+        return $return;
     }
 }
