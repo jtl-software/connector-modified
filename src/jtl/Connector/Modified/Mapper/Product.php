@@ -205,13 +205,14 @@ class Product extends BaseMapper
 
     protected function considerStock($data)
     {
-        return $this->shopConfig['settings']['STOCK_CHECK'];
+        return true;
     }
 
     protected function considerVariationStock($data)
     {
-        //return $this->shopConfig['settings']['ATTRIBUTE_STOCK_CHECK'];
-        return false;
+        $check = $this->db->query('SELECT products_id FROM products_attributes WHERE products_id='.$data['products_id']);
+        
+        return count($check) > 0 ? true : false;
     }
 
     protected function permitNegativeStock($data)
