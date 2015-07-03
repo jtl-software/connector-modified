@@ -103,6 +103,24 @@ class Image extends BaseMapper
 
                 case ImageRelationType::TYPE_PRODUCT:
                     if ($data->getSort() == 1) {
+                        $imgId = $data->getId()->getEndpoint();
+
+                        if (!empty($imgId)) {
+                            $prevImgQuery = $this->db->query('SELECT image_name FROM products_images WHERE image_id = '.$imgId);
+                            if (count($prevImgQuery) > 0) {
+                                $prevImage = $prevImgQuery[0]['image_name'];
+                            }
+
+                            if (!empty($prevImage)) {
+                                @unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$prevImage);
+                                foreach ($this->thumbConfig as $folder => $sizes) {
+                                    unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img'][$folder].$prevImage);                                    
+                                }
+                            }
+
+                            $this->db->query('DELETE FROM products_images WHERE image_id='.$imgId);
+                        }
+
                         $oldImage = $this->db->query('SELECT products_image FROM products WHERE products_id = '.$data->getForeignKey()->getEndpoint());
                         $oldImage = $oldImage[0]['products_image'];
 
@@ -131,6 +149,24 @@ class Image extends BaseMapper
                     } else {
                         $oldImage = null;
                         $imgObj = new \stdClass();
+
+                        $imgId = $data->getId()->getEndpoint();
+
+                        if (!empty($imgId)) {
+                            $prevImgQuery = $this->db->query('SELECT image_name FROM products_images WHERE image_id = '.$imgId);
+                            if (count($prevImgQuery) > 0) {
+                                $prevImage = $prevImgQuery[0]['image_name'];
+                            }
+
+                            if (!empty($prevImage)) {
+                                @unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$prevImage);
+                                foreach ($this->thumbConfig as $folder => $sizes) {
+                                    unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img'][$folder].$prevImage);                                    
+                                }
+                            }
+
+                            $this->db->query('DELETE FROM products_images WHERE image_id='.$imgId);
+                        }
 
                         $oldImageQuery = $this->db->query('SELECT image_name FROM products_images WHERE products_id = '.$data->getForeignKey()->getEndpoint().' && image_nr='.($data->getSort() - 1));
                         if (count($oldImageQuery) > 0) {

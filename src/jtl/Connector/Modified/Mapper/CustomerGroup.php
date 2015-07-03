@@ -7,7 +7,7 @@ class CustomerGroup extends BaseMapper
 {
     protected $mapperConfig = array(
         "table" => "customers_status",
-        "query" => "SELECT * FROM customers_status GROUP BY customers_status_id",
+        "query" => "SELECT * FROM customers_status WHERE customers_status_id != 0 GROUP BY customers_status_id",
         "identity" => "getId",
         "getMethod" => "getCustomerGroups",
         "mapPull" => array(
