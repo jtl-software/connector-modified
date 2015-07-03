@@ -27,13 +27,12 @@ class CategoryAttr extends BaseMapper
         $dbObj->categories_status = 1;
 
         foreach ($data->getAttributes() as $attr) {
-            if ($attr->getId()->getEndpoint() == 1) {
-                foreach ($attr->getI18ns() as $i18n) {
-                    if ($i18n->getName() == 'Aktiv' && $i18n->getValue() == '0') {
-                        $dbObj->categories_status = 0;
-                    }                    
-                }                
-            }
+            foreach ($attr->getI18ns() as $i18n) {
+                if ($i18n->getName() == 'Aktiv' && $i18n->getValue() == '0') {
+                    $dbObj->categories_status = 0;
+                    break;
+                }                    
+            }            
         }
 
         return $data->getAttributes();

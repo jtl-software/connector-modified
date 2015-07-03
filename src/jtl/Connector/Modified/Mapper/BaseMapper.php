@@ -202,7 +202,16 @@ class BaseMapper
                 $checkEmpty = get_object_vars($dbObj);
 
                 if (!empty($checkEmpty)) {
-                    $insertResult = $this->db->deleteInsertRow($dbObj, $this->mapperConfig['table'], $whereKey, $whereValue);
+                    if (isset($this->mapperConfig['identity'])) {
+                        $currentId = $obj->{$this->mapperConfig['identity']}()->getEndpoint();
+                    }                    
+
+                    if (!empty($currentId)) {
+                        $insertResult = $this->db->updateRow($dbObj, $this->mapperConfig['table'], $whereKey, $whereValue);
+                        $insertResult->setKey($currentId);
+                    } else {                    
+                        $insertResult = $this->db->deleteInsertRow($dbObj, $this->mapperConfig['table'], $whereKey, $whereValue);
+                    }
 
                     if (isset($this->mapperConfig['identity'])) {
                         $obj->{$this->mapperConfig['identity']}()->setEndpoint($insertResult->getKey());
