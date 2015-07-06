@@ -51,6 +51,7 @@
                 <include name="src/" />
                 <include name="vendor/" />
                 <include name="index.php" />
+                <include name="version" />
             </fileset>
         </copy>
     </target>

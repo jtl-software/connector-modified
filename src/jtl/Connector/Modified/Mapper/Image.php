@@ -56,12 +56,17 @@ class Image extends BaseMapper
             FROM categories p
             LEFT JOIN jtl_connector_link l ON CONCAT("cID_",p.categories_id) = l.endpointId AND l.type = 16
             WHERE l.hostId IS NULL && p.categories_image IS NOT NULL && p.categories_image != ""';
+        $manufacturersQuery = 'SELECT CONCAT("mID_",m.manufacturers_id) image_id, m.manufacturers_image as image_name, m.manufacturers_id foreignKey, "manufacturer" type, 0 image_nr
+            FROM manufacturers m
+            LEFT JOIN jtl_connector_link l ON CONCAT("mID_",m.manufacturers_id) = l.endpointId AND l.type = 16
+            WHERE l.hostId IS NULL && m.manufacturers_image IS NOT NULL && m.manufacturers_image != ""';
 
         $dbResult = $this->db->query($query);
         $dbResultDefault = $this->db->query($defaultQuery);
         $dbResultCategories = $this->db->query($categoriesQuery);
+        $dbResultManufacturers = $this->db->query($manufacturersQuery);
 
-        $dbResult = array_merge($dbResult, $dbResultDefault, $dbResultCategories);
+        $dbResult = array_merge($dbResult, $dbResultDefault, $dbResultCategories, $dbResultManufacturers);
 
         $current = array_slice($dbResult, 0, $limit);
 
@@ -98,6 +103,29 @@ class Image extends BaseMapper
                     $this->db->updateRow($categoryObj, 'categories', 'categories_id', $data->getForeignKey()->getEndpoint());
 
                     $data->getId()->setEndpoint('cID_'.$data->getForeignKey()->getEndpoint());
+
+                    break;
+
+                case ImageRelationType::TYPE_MANUFACTURER:
+                    $oldImage = $this->db->query('SELECT manufacturers_image FROM manufacturers WHERE manufacturers_id = '.$data->getForeignKey()->getEndpoint());
+                    $oldImage = $oldImage[0]['manufacturers_image'];
+
+                    if (isset($oldImage)) {
+                        @unlink($this->connectorConfig->connector_root.'/images/manufacturers/'.$oldImage);
+                    }
+
+                    $imgFileName = substr($data->getFilename(), strrpos($data->getFilename(), '/') + 1);
+
+                    if (!rename($data->getFilename(), $this->connectorConfig->connector_root.'/images/manufacturers/'.$imgFileName)) {
+                        throw new \Exception('Cannot move uploaded image file');
+                    }
+
+                    $manufacturersObj = new \stdClass();
+                    $manufacturersObj->manufacturers_image = $imgFileName;
+
+                    $this->db->updateRow($manufacturersObj, 'manufacturers', 'manufacturers_id', $data->getForeignKey()->getEndpoint());
+
+                    $data->getId()->setEndpoint('mID_'.$data->getForeignKey()->getEndpoint());
 
                     break;
 
@@ -228,6 +256,21 @@ class Image extends BaseMapper
 
                     break;
 
+                case ImageRelationType::TYPE_MANUFACTURER:
+                    $oldImage = $this->db->query('SELECT manufacturers_image FROM manufacturers WHERE manufacturers_id = '.$data->getForeignKey()->getEndpoint());
+                    $oldImage = $oldImage[0]['manufacturers_image'];
+
+                    if (isset($oldImage)) {
+                        @unlink($this->connectorConfig->connector_root.'/images/manufacturers/'.$oldImage);
+                    }
+
+                    $manufacturersObj = new \stdClass();
+                    $manufacturersObj->categories_image = null;
+
+                    $this->db->updateRow($manufacturersObj, 'manufacturers', 'manufacturers_id', $data->getForeignKey()->getEndpoint());
+
+                    break;
+
                 case ImageRelationType::TYPE_PRODUCT:
                     if ($data->getSort() == 0) {
                         $oldImage = $this->db->query('SELECT products_image FROM products WHERE products_id = '.$data->getForeignKey()->getEndpoint());
@@ -319,6 +362,17 @@ class Image extends BaseMapper
             WHERE l.hostId IS NULL
         ");
 
+        $manufacturersQuery = $this->db->query("
+            SELECT m.*
+            FROM (
+                SELECT CONCAT('mID_',m.manufacturers_id) as imgId
+                FROM manufacturers m
+                WHERE m.manufacturers_image IS NOT NULL && m.manufacturers_image != ''
+            ) m
+            LEFT JOIN jtl_connector_link l ON m.imgId = l.endpointId AND l.type = 16
+            WHERE l.hostId IS NULL
+        ");
+
         $imageQuery = $this->db->query("
             SELECT i.* FROM products_images i
             LEFT JOIN jtl_connector_link l ON i.image_id = l.endpointId AND l.type = 16
@@ -327,6 +381,7 @@ class Image extends BaseMapper
 
         $totalImages += count($productQuery);
         $totalImages += count($categoryQuery);
+        $totalImages += count($manufacturersQuery);
         $totalImages += count($imageQuery);
 
         return $totalImages;
@@ -336,6 +391,8 @@ class Image extends BaseMapper
     {
         if ($data['type'] == ImageRelationType::TYPE_CATEGORY) {
             return $this->shopConfig['shop']['fullUrl'].'images/categories/'.$data['image_name'];
+        } elseif ($data['type'] == ImageRelationType::TYPE_MANUFACTURER) {
+            return $this->shopConfig['shop']['fullUrl'].'images/manufacturers/'.$data['image_name'];
         } else {
             return $this->shopConfig['shop']['fullUrl'].$this->shopConfig['img']['original'].$data['image_name'];
         }
