@@ -111,7 +111,7 @@ class Image extends BaseMapper
                     $oldImage = $oldImage[0]['manufacturers_image'];
 
                     if (isset($oldImage)) {
-                        @unlink($this->connectorConfig->connector_root.'/images/manufacturers/'.$oldImage);
+                        @unlink($this->connectorConfig->connector_root.'/images/'.$oldImage);
                     }
 
                     $imgFileName = substr($data->getFilename(), strrpos($data->getFilename(), '/') + 1);
@@ -121,7 +121,7 @@ class Image extends BaseMapper
                     }
 
                     $manufacturersObj = new \stdClass();
-                    $manufacturersObj->manufacturers_image = $imgFileName;
+                    $manufacturersObj->manufacturers_image = 'manufacturers/'.$imgFileName;
 
                     $this->db->updateRow($manufacturersObj, 'manufacturers', 'manufacturers_id', $data->getForeignKey()->getEndpoint());
 
@@ -261,7 +261,7 @@ class Image extends BaseMapper
                     $oldImage = $oldImage[0]['manufacturers_image'];
 
                     if (isset($oldImage)) {
-                        @unlink($this->connectorConfig->connector_root.'/images/manufacturers/'.$oldImage);
+                        @unlink($this->connectorConfig->connector_root.'/images/'.$oldImage);
                     }
 
                     $manufacturersObj = new \stdClass();
@@ -392,7 +392,7 @@ class Image extends BaseMapper
         if ($data['type'] == ImageRelationType::TYPE_CATEGORY) {
             return $this->shopConfig['shop']['fullUrl'].'images/categories/'.$data['image_name'];
         } elseif ($data['type'] == ImageRelationType::TYPE_MANUFACTURER) {
-            return $this->shopConfig['shop']['fullUrl'].'images/manufacturers/'.$data['image_name'];
+            return $this->shopConfig['shop']['fullUrl'].'images/'.$data['image_name'];
         } else {
             return $this->shopConfig['shop']['fullUrl'].$this->shopConfig['img']['original'].$data['image_name'];
         }
