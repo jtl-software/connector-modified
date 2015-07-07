@@ -12,7 +12,7 @@ class Customer extends BaseMapper
             LEFT JOIN address_book a ON c.customers_default_address_id = a.address_book_id
             LEFT JOIN countries co ON co.countries_id = a.entry_country_id
             LEFT JOIN jtl_connector_link l ON c.customers_id = l.endpointId AND l.type = 2
-            WHERE l.hostId IS NULL
+            WHERE l.hostId IS NULL && c.customers_status != 0
             ORDER BY c.customers_date_added",
         "where" => "customers_id",
         "identity" => "getId",
@@ -60,7 +60,7 @@ class Customer extends BaseMapper
     {
         if ($data['customers_gender'] == 'm') {
             return 'm';
-        } elseif ($data['customers_gender'] == 'w') {
+        } elseif ($data['customers_gender'] == 'f') {
             return 'w';
         }
     }
@@ -70,7 +70,7 @@ class Customer extends BaseMapper
         if ($data->getSalutation() == 'm') {
             return 'm';
         } else {
-            return 'w';
+            return 'f';
         }
     }
 
@@ -117,8 +117,7 @@ class Customer extends BaseMapper
         $dataIso = $data->getCountryIso();
 
         if (!empty($dataIso)) {
-            $iso = strtoupper(Language::map($dataIso));
-            $countryResult = $this->db->query('SELECT countries_id FROM countries WHERE countries_iso_code_2="'.$iso.'"');
+            $countryResult = $this->db->query('SELECT countries_id FROM countries WHERE countries_iso_code_2="'.$dataIso.'"');
         }
 
         $entry = new \stdClass();
