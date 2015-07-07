@@ -458,7 +458,7 @@
         "config_group_images_supported": false,
         "customer_order_partially_payable": false,
         "free_field_supported": false,
-        "manufacturer_images_supported": false,
+        "manufacturer_images_supported": true,
         "needs_finish_call": false,
         "product_images_supported": true,
         "product_variation_value_images_supported": false,
