@@ -84,7 +84,7 @@ class Image extends BaseMapper
         if (get_class($data) === 'jtl\Connector\Model\Image') {
             switch ($data->getRelationType()) {
                 case ImageRelationType::TYPE_CATEGORY:
-                    $oldImage = $this->db->query('SELECT categories_image FROM categories WHERE categories_id = '.$data->getForeignKey()->getEndpoint());
+                    $oldImage = $this->db->query('SELECT categories_image FROM categories WHERE categories_id = "'.$data->getForeignKey()->getEndpoint().'"');
                     $oldImage = $oldImage[0]['categories_image'];
 
                     if (isset($oldImage)) {
@@ -107,7 +107,7 @@ class Image extends BaseMapper
                     break;
 
                 case ImageRelationType::TYPE_MANUFACTURER:
-                    $oldImage = $this->db->query('SELECT manufacturers_image FROM manufacturers WHERE manufacturers_id = '.$data->getForeignKey()->getEndpoint());
+                    $oldImage = $this->db->query('SELECT manufacturers_image FROM manufacturers WHERE manufacturers_id = "'.$data->getForeignKey()->getEndpoint().'"');
                     $oldImage = $oldImage[0]['manufacturers_image'];
 
                     if (isset($oldImage)) {
@@ -134,7 +134,7 @@ class Image extends BaseMapper
                         $imgId = $data->getId()->getEndpoint();
 
                         if (!empty($imgId)) {
-                            $prevImgQuery = $this->db->query('SELECT image_name FROM products_images WHERE image_id = '.$imgId);
+                            $prevImgQuery = $this->db->query('SELECT image_name FROM products_images WHERE image_id = "'.$imgId.'"');
                             if (count($prevImgQuery) > 0) {
                                 $prevImage = $prevImgQuery[0]['image_name'];
                             }
@@ -146,10 +146,10 @@ class Image extends BaseMapper
                                 }
                             }
 
-                            $this->db->query('DELETE FROM products_images WHERE image_id='.$imgId);
+                            $this->db->query('DELETE FROM products_images WHERE image_id="'.$imgId.'"');
                         }
 
-                        $oldImage = $this->db->query('SELECT products_image FROM products WHERE products_id = '.$data->getForeignKey()->getEndpoint());
+                        $oldImage = $this->db->query('SELECT products_image FROM products WHERE products_id = "'.$data->getForeignKey()->getEndpoint().'"');
                         $oldImage = $oldImage[0]['products_image'];
 
                         if (!empty($oldImage)) {
@@ -181,7 +181,7 @@ class Image extends BaseMapper
                         $imgId = $data->getId()->getEndpoint();
 
                         if (!empty($imgId)) {
-                            $prevImgQuery = $this->db->query('SELECT image_name FROM products_images WHERE image_id = '.$imgId);
+                            $prevImgQuery = $this->db->query('SELECT image_name FROM products_images WHERE image_id = "'.$imgId.'"');
                             if (count($prevImgQuery) > 0) {
                                 $prevImage = $prevImgQuery[0]['image_name'];
                             }
@@ -193,10 +193,10 @@ class Image extends BaseMapper
                                 }
                             }
 
-                            $this->db->query('DELETE FROM products_images WHERE image_id='.$imgId);
+                            $this->db->query('DELETE FROM products_images WHERE image_id="'.$imgId.'"');
                         }
 
-                        $oldImageQuery = $this->db->query('SELECT image_name FROM products_images WHERE products_id = '.$data->getForeignKey()->getEndpoint().' && image_nr='.($data->getSort() - 1));
+                        $oldImageQuery = $this->db->query('SELECT image_name FROM products_images WHERE products_id = "'.$data->getForeignKey()->getEndpoint().'" && image_nr='.($data->getSort() - 1));
                         if (count($oldImageQuery) > 0) {
                             $oldImage = $oldImageQuery[0]['image_name'];
                         }
@@ -242,7 +242,7 @@ class Image extends BaseMapper
         if (get_class($data) === 'jtl\Connector\Model\Image') {
             switch ($data->getRelationType()) {
                 case ImageRelationType::TYPE_CATEGORY:
-                    $oldImage = $this->db->query('SELECT categories_image FROM categories WHERE categories_id = '.$data->getForeignKey()->getEndpoint());
+                    $oldImage = $this->db->query('SELECT categories_image FROM categories WHERE categories_id = "'.$data->getForeignKey()->getEndpoint().'"');
                     $oldImage = $oldImage[0]['categories_image'];
 
                     if (isset($oldImage)) {
@@ -257,7 +257,7 @@ class Image extends BaseMapper
                     break;
 
                 case ImageRelationType::TYPE_MANUFACTURER:
-                    $oldImage = $this->db->query('SELECT manufacturers_image FROM manufacturers WHERE manufacturers_id = '.$data->getForeignKey()->getEndpoint());
+                    $oldImage = $this->db->query('SELECT manufacturers_image FROM manufacturers WHERE manufacturers_id = "'.$data->getForeignKey()->getEndpoint().'"');
                     $oldImage = $oldImage[0]['manufacturers_image'];
 
                     if (isset($oldImage)) {
@@ -273,15 +273,15 @@ class Image extends BaseMapper
 
                 case ImageRelationType::TYPE_PRODUCT:
                     if ($data->getSort() == 0) {
-                        $oldImage = $this->db->query('SELECT products_image FROM products WHERE products_id = '.$data->getForeignKey()->getEndpoint());
+                        $oldImage = $this->db->query('SELECT products_image FROM products WHERE products_id = "'.$data->getForeignKey()->getEndpoint().'"');
                         $oldImage = $oldImage[0]['products_image'];
 
                         if (isset($oldImage)) {
                             @unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$oldImage);
-                            $this->db->query('UPDATE products SET products_image="" WHERE products_id='.$data->getForeignKey()->getEndpoint());
+                            $this->db->query('UPDATE products SET products_image="" WHERE products_id="'.$data->getForeignKey()->getEndpoint().'"');
                         }
 
-                        $additionalImages = $this->db->query('SELECT image_name FROM products_images WHERE products_id='.$data->getForeignKey()->getEndpoint());
+                        $additionalImages = $this->db->query('SELECT image_name FROM products_images WHERE products_id="'.$data->getForeignKey()->getEndpoint().'"');
 
                         foreach ($additionalImages as $image) {
                             if (!empty($image['image_name'])) {
@@ -293,9 +293,9 @@ class Image extends BaseMapper
                             }
                         }
 
-                        $this->db->query('DELETE FROM products_images WHERE products_id='.$data->getForeignKey()->getEndpoint());
+                        $this->db->query('DELETE FROM products_images WHERE products_id="'.$data->getForeignKey()->getEndpoint().'"');
                     } elseif ($data->getSort() == 1) {
-                        $oldImage = $this->db->query('SELECT products_image FROM products WHERE products_id = '.$data->getForeignKey()->getEndpoint());
+                        $oldImage = $this->db->query('SELECT products_image FROM products WHERE products_id = "'.$data->getForeignKey()->getEndpoint().'"');
                         $oldImage = $oldImage[0]['products_image'];
 
                         if (isset($oldImage)) {
@@ -426,18 +426,27 @@ class Image extends BaseMapper
             $thumb_width = $sizes[0];
             $thumb_height = $sizes[1];
 
-            $thumb_aspect = $thumb_width / $thumb_height;
-
-            if ($original_aspect >= $thumb_aspect) {
-                $new_height = $thumb_height;
-                $new_width = $width / ($height / $thumb_height);
+            $new_width = $thumb_width;
+            $new_height = round($new_width*($height/$width));
+            $new_x = 0;
+            $new_y = round(($thumb_height-$new_height)/2);
+            
+            if ($this->connectorConfig->thumbs === 'fill') {
+                $next = $new_height < $thumb_height;
             } else {
-                $new_width = $thumb_width;
-                $new_height = $height / ($width / $thumb_width);
+                $next = $new_height > $thumb_height;
+            }
+         
+            if ($next) {
+                $new_height = $thumb_height;
+                $new_width = round($new_height*($width/$height));
+                $new_x = round(($thumb_width - $new_width)/2);
+                $new_y = 0;
             }
 
             $thumb = imagecreatetruecolor($thumb_width, $thumb_height);
-
+            imagefill($thumb, 0, 0, imagecolorallocate($thumb, 255, 255, 255));
+            
             if($imgInfo[2] == 1 || $imgInfo[2] == 3){
                 imagealphablending($thumb, false);
                 imagesavealpha($thumb, true);
@@ -448,8 +457,8 @@ class Image extends BaseMapper
             imagecopyresampled(
                 $thumb,
                 $image,
-                0 - ($new_width - $thumb_width) / 2,
-                0 - ($new_height - $thumb_height) / 2,
+                $new_x,
+                $new_y,
                 0,
                 0,
                 $new_width,

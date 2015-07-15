@@ -9,8 +9,9 @@ class Installer
     private $modules = array(
         'check' => 'Check',
         'connector' => 'Connector',
-        'tax_rate' => 'TaxRate',
-        'status' => 'Status'
+        'status' => 'Status',
+        'thumbs' => 'ThumbMode',
+        'tax_rate' => 'TaxRate'        
     );
 
     private $connectorConfig = null;
