@@ -122,7 +122,7 @@ class Customer extends BaseMapper
 
         $entry = new \stdClass();
         $entry->customers_id = $data->getId()->getEndpoint();
-        $entry->entry_gender = $data->getSalutation() == 'Herr' ? 'm' : 'f';
+        $entry->entry_gender = $data->getSalutation() == 'm' ? 'm' : 'f';
         $entry->entry_company = $data->getCompany();
         $entry->entry_firstname = $data->getFirstName();
         $entry->entry_lastname = $data->getLastName();

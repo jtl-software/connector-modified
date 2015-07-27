@@ -20,7 +20,7 @@ class CustomerGroupI18n extends BaseMapper
     {
         $id = $data->getId()->getEndpoint();
 
-        if (empty($id) && $id != 0) {
+        if (empty($id) && $id !== 0) {
             $nextId = $this->db->query('SELECT max(customers_status_id) + 1 AS nextID FROM customers_status');
             $id = is_null($nextId[0]['nextID']) || $nextId[0]['nextID'] === 0 ? 1 : $nextId[0]['nextID'];
         } else {
@@ -41,6 +41,14 @@ class CustomerGroupI18n extends BaseMapper
             $grp->customers_status_graduated_prices = 1;
             $grp->customers_status_add_tax_ot = $data->getApplyNetPrice() === true ? 1 : 0;
             $grp->customers_status_show_price_tax = $data->getApplyNetPrice() === true ? 0 : 1;
+
+            foreach($data->getAttributes() as $attr) {
+                if ($attr->getKey() == 'Mindestbestellwert') {
+                    $grp->customers_status_min_order = $attr->getValue();
+                } elseif ($attr->getKey() == 'Hoechstbestellwert') {
+                    $grp->customers_status_max_order = $attr->getValue();
+                }
+            }
 
             $this->db->insertRow($grp, 'customers_status');
         }

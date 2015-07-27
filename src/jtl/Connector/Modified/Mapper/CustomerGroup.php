@@ -15,7 +15,8 @@ class CustomerGroup extends BaseMapper
             "discount" => "customers_status_discount",
             "applyNetPrice" => "customers_status_add_tax_ot",
             "isDefault" => null,
-            "i18ns" => "CustomerGroupI18n|addI18n"
+            "i18ns" => "CustomerGroupI18n|addI18n",
+            "attributes" => "CustomerGroupAttr|addAttribute"
         ),
         "mapPush" => array(
             "CustomerGroupI18n|addI18n" => "i18ns"

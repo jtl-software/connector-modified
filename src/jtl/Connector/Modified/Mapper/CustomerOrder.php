@@ -25,7 +25,8 @@ class CustomerOrder extends BaseMapper
             "shippingAddress" => "CustomerOrderShippingAddress|setShippingAddress",
             "shippingMethodName" => "shipping_method",
             "items" => "CustomerOrderItem|addItem",
-            "status" => null
+            "status" => null,
+            "paymentStatus" => null
         ),
         "mapPush" => array(
             "orders_id" => "id",
@@ -216,7 +217,6 @@ class CustomerOrder extends BaseMapper
     {
         $shipping = new \jtl\Connector\Model\CustomerOrderItem();
         $shipping->setType('shipping');
-        $shipping->setName($data['shipping_method']);
         $shipping->setCustomerOrderId($this->identity($data['orders_id']));
         $shipping->setId($this->identity($data['shipping_class']));
         $shipping->setQuantity(1);
@@ -235,6 +235,7 @@ class CustomerOrder extends BaseMapper
             }
             if ($total['class'] == 'ot_shipping') {
                 $shipping->setPrice(floatval($total['value']));
+                $shipping->setName($total['title']);
             }
             if ($total['class'] == 'ot_payment') {
                 $discount = new \jtl\Connector\Model\CustomerOrderItem();
