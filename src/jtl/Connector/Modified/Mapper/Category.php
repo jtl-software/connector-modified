@@ -52,6 +52,13 @@ class Category extends \jtl\Connector\Modified\Mapper\BaseMapper
             return $a['level'] - $b['level'];
         });
 
+        $pulledQuery = $this->db->query('SELECT endpointId FROM jtl_connector_link WHERE type=1');
+        $pulled = array();
+
+        foreach ($pulledQuery as $pCat) {
+            $pulled[] = $pCat['endpointId'];
+        }
+
         $resultCount = 0;
 
         foreach ($this->tree as $category) {
@@ -59,9 +66,11 @@ class Category extends \jtl\Connector\Modified\Mapper\BaseMapper
                 break;
             }
 
-            $result[] = $this->generateModel($category);
+            if (in_array($category['categories_id'], $pulled) === false) {
+                $result[] = $this->generateModel($category);
 
-            $resultCount++;
+                $resultCount++;
+            }
         }
 
         return $result;
@@ -89,19 +98,14 @@ class Category extends \jtl\Connector\Modified\Mapper\BaseMapper
 
     private function getChildren($ids = null, $level = 0, $limit)
     {
-        if (count($this->tree) >= $limit) {
-            return;
-        }
-
         if (is_null($ids)) {
             $sql = 'c.parent_id=0';
         } else {
             $sql = 'c.parent_id IN ('.implode(',', $ids).')';
         }
 
-        $children = $this->db->query('SELECT c.* FROM categories c 
-            LEFT JOIN jtl_connector_link l ON c.categories_id = l.endpointId AND l.type = 1
-            WHERE l.hostId IS NULL && '.$sql);
+        $children = $this->db->query('SELECT c.* FROM categories c
+            WHERE '.$sql);
 
         if (count($children) > 0) {
             $ids = array();

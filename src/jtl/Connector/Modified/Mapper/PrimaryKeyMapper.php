@@ -25,7 +25,7 @@ class PrimaryKeyMapper implements IPrimaryKeyMapper
         return $hostId;
     }
 
-    public function getEndpointId($hostId, $type)
+    public function getEndpointId($hostId, $type, $relationType = null)
     {
         $dbResult = $this->db->query('SELECT endpointId FROM jtl_connector_link WHERE hostId = '.$hostId.' AND type = '.$type);
 
