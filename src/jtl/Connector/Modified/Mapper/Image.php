@@ -88,12 +88,12 @@ class Image extends BaseMapper
                     $oldImage = $oldImage[0]['categories_image'];
 
                     if (isset($oldImage)) {
-                        @unlink($this->connectorConfig->connector_root.'/images/categories/'.$oldImage);
+                        @unlink($this->shopConfig['shop']['path'].'images/categories/'.$oldImage);
                     }
 
                     $imgFileName = substr($data->getFilename(), strrpos($data->getFilename(), '/') + 1);
 
-                    if (!rename($data->getFilename(), $this->connectorConfig->connector_root.'/images/categories/'.$imgFileName)) {
+                    if (!rename($data->getFilename(), $this->shopConfig['shop']['path'].'images/categories/'.$imgFileName)) {
                         throw new \Exception('Cannot move uploaded image file');
                     }
 
@@ -111,12 +111,12 @@ class Image extends BaseMapper
                     $oldImage = $oldImage[0]['manufacturers_image'];
 
                     if (isset($oldImage)) {
-                        @unlink($this->connectorConfig->connector_root.'/images/'.$oldImage);
+                        @unlink($this->shopConfig['shop']['path'].'images/'.$oldImage);
                     }
 
                     $imgFileName = substr($data->getFilename(), strrpos($data->getFilename(), '/') + 1);
 
-                    if (!rename($data->getFilename(), $this->connectorConfig->connector_root.'/images/manufacturers/'.$imgFileName)) {
+                    if (!rename($data->getFilename(), $this->shopConfig['shop']['path'].'images/manufacturers/'.$imgFileName)) {
                         throw new \Exception('Cannot move uploaded image file');
                     }
 
@@ -140,9 +140,9 @@ class Image extends BaseMapper
                             }
 
                             if (!empty($prevImage)) {
-                                @unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$prevImage);
+                                @unlink($this->shopConfig['shop']['path'].$this->shopConfig['img']['original'].$prevImage);
                                 foreach ($this->thumbConfig as $folder => $sizes) {
-                                    unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img'][$folder].$prevImage);                                    
+                                    unlink($this->shopConfig['shop']['path'].$this->shopConfig['img'][$folder].$prevImage);
                                 }
                             }
 
@@ -153,12 +153,12 @@ class Image extends BaseMapper
                         $oldImage = $oldImage[0]['products_image'];
 
                         if (!empty($oldImage)) {
-                            @unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$oldImage);
+                            @unlink($this->shopConfig['shop']['path'].$this->shopConfig['img']['original'].$oldImage);
                         }
 
                         $imgFileName = substr($data->getFilename(), strrpos($data->getFilename(), '/') + 1);
 
-                        if (!rename($data->getFilename(), $this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$imgFileName)) {
+                        if (!rename($data->getFilename(), $this->shopConfig['shop']['path'].$this->shopConfig['img']['original'].$imgFileName)) {
                             throw new \Exception('Cannot move uploaded image file');
                         }
 
@@ -187,9 +187,9 @@ class Image extends BaseMapper
                             }
 
                             if (!empty($prevImage)) {
-                                @unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$prevImage);
+                                @unlink($this->shopConfig['shop']['path'].$this->shopConfig['img']['original'].$prevImage);
                                 foreach ($this->thumbConfig as $folder => $sizes) {
-                                    unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img'][$folder].$prevImage);                                    
+                                    unlink($this->shopConfig['shop']['path'].$this->shopConfig['img'][$folder].$prevImage);
                                 }
                             }
 
@@ -202,14 +202,14 @@ class Image extends BaseMapper
                         }
 
                         if (!empty($oldImage)) {
-                            @unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$oldImage);
+                            @unlink($this->shopConfig['shop']['path'].$this->shopConfig['img']['original'].$oldImage);
                         }
 
                         $imgObj->image_id = $data->getId()->getEndpoint();
 
                         $imgFileName = substr($data->getFilename(), strrpos($data->getFilename(), '/') + 1);
 
-                        if (!rename($data->getFilename(), $this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$imgFileName)) {
+                        if (!rename($data->getFilename(), $this->shopConfig['shop']['path'].$this->shopConfig['img']['original'].$imgFileName)) {
                             throw new \Exception('Cannot move uploaded image file');
                         }
 
@@ -246,7 +246,7 @@ class Image extends BaseMapper
                     $oldImage = $oldImage[0]['categories_image'];
 
                     if (isset($oldImage)) {
-                        @unlink($this->connectorConfig->connector_root.'/images/categories/'.$oldImage);
+                        @unlink($this->shopConfig['shop']['path'].'images/categories/'.$oldImage);
                     }
 
                     $categoryObj = new \stdClass();
@@ -261,7 +261,7 @@ class Image extends BaseMapper
                     $oldImage = $oldImage[0]['manufacturers_image'];
 
                     if (isset($oldImage)) {
-                        @unlink($this->connectorConfig->connector_root.'/images/'.$oldImage);
+                        @unlink($this->shopConfig['shop']['path'].'images/'.$oldImage);
                     }
 
                     $manufacturersObj = new \stdClass();
@@ -277,7 +277,7 @@ class Image extends BaseMapper
                         $oldImage = $oldImage[0]['products_image'];
 
                         if (isset($oldImage)) {
-                            @unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$oldImage);
+                            @unlink($this->shopConfig['shop']['path'].$this->shopConfig['img']['original'].$oldImage);
                             $this->db->query('UPDATE products SET products_image="" WHERE products_id="'.$data->getForeignKey()->getEndpoint().'"');
                         }
 
@@ -285,10 +285,10 @@ class Image extends BaseMapper
 
                         foreach ($additionalImages as $image) {
                             if (!empty($image['image_name'])) {
-                                @unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$image['image_name']);
+                                @unlink($this->shopConfig['shop']['path'].$this->shopConfig['img']['original'].$image['image_name']);
 
                                 foreach ($this->thumbConfig as $folder => $sizes) {
-                                    @unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img'][$folder].$image['image_name']);
+                                    @unlink($this->shopConfig['shop']['path'].$this->shopConfig['img'][$folder].$image['image_name']);
                                 }
                             }
                         }
@@ -299,7 +299,7 @@ class Image extends BaseMapper
                         $oldImage = $oldImage[0]['products_image'];
 
                         if (isset($oldImage)) {
-                            @unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$oldImage);
+                            @unlink($this->shopConfig['shop']['path'].$this->shopConfig['img']['original'].$oldImage);
                         }
 
                         $productsObj = new \stdClass();
@@ -312,7 +312,7 @@ class Image extends BaseMapper
                             
                             if (count($oldImageQuery) > 0) {
                                 $oldImage = $oldImageQuery[0]['image_name'];
-                                @unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$oldImage);
+                                @unlink($this->shopConfig['shop']['path'].$this->shopConfig['img']['original'].$oldImage);
                             }
 
                             $this->db->query('DELETE FROM products_images WHERE image_id="'.$data->getId()->getEndpoint().'"');
@@ -324,7 +324,7 @@ class Image extends BaseMapper
 
             foreach ($this->thumbConfig as $folder => $sizes) {
                 if (!is_null($oldImage)) {
-                    unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img'][$folder].$oldImage);
+                    unlink($this->shopConfig['shop']['path'].$this->shopConfig['img'][$folder].$oldImage);
                 }
             }
 
@@ -400,17 +400,17 @@ class Image extends BaseMapper
 
     private function generateThumbs($fileName, $oldImage = null)
     {
-        $imgInfo = getimagesize($this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$fileName);
+        $imgInfo = getimagesize($this->shopConfig['shop']['path'].$this->shopConfig['img']['original'].$fileName);
 
         switch ($imgInfo[2]) {
             case 1: 
-                $image = imagecreatefromgif($this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$fileName); 
+                $image = imagecreatefromgif($this->shopConfig['shop']['path'].$this->shopConfig['img']['original'].$fileName);
                 break;
             case 2: 
-                $image = imagecreatefromjpeg($this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$fileName);
+                $image = imagecreatefromjpeg($this->shopConfig['shop']['path'].$this->shopConfig['img']['original'].$fileName);
                 break;
             case 3: 
-                $image = imagecreatefrompng($this->connectorConfig->connector_root.'/'.$this->shopConfig['img']['original'].$fileName);
+                $image = imagecreatefrompng($this->shopConfig['shop']['path'].$this->shopConfig['img']['original'].$fileName);
                 break;            
         }
         
@@ -420,7 +420,7 @@ class Image extends BaseMapper
 
         foreach ($this->thumbConfig as $folder => $sizes) {
             if (!empty($oldImage)) {
-                unlink($this->connectorConfig->connector_root.'/'.$this->shopConfig['img'][$folder].$oldImage);
+                unlink($this->shopConfig['shop']['path'].$this->shopConfig['img'][$folder].$oldImage);
             }
 
             $thumb_width = $sizes[0];
@@ -469,13 +469,13 @@ class Image extends BaseMapper
 
             switch ($imgInfo[2]) {
                 case 1: 
-                    imagegif($thumb, $this->connectorConfig->connector_root.'/'.$this->shopConfig['img'][$folder].$fileName);
+                    imagegif($thumb, $this->shopConfig['shop']['path'].$this->shopConfig['img'][$folder].$fileName);
                     break;
                 case 2:
-                    imagejpeg($thumb, $this->connectorConfig->connector_root.'/'.$this->shopConfig['img'][$folder].$fileName); 
+                    imagejpeg($thumb, $this->shopConfig['shop']['path'].$this->shopConfig['img'][$folder].$fileName);
                     break;
                 case 3:
-                    imagepng($thumb, $this->connectorConfig->connector_root.'/'.$this->shopConfig['img'][$folder].$fileName);
+                    imagepng($thumb, $this->shopConfig['shop']['path'].$this->shopConfig['img'][$folder].$fileName);
                     break;
             }            
         }
