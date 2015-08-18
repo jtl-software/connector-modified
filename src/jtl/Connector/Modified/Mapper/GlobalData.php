@@ -12,7 +12,8 @@ class GlobalData extends \jtl\Connector\Modified\Mapper\BaseMapper
             "taxRates" => "TaxRate|addTaxRate",
             "currencies" => "Currency|addCurrency",
             "units" => "Unit|addUnit",
-            "crossSellingGroups" => "CrossSellingGroup|addCrossSellingGroup"
+            "crossSellingGroups" => "CrossSellingGroup|addCrossSellingGroup",
+            "shippingMethods" => "ShippingMethod|addShippingMethod"
         ),
         "mapPush" => array(
             "Currency|addCurrency" => "currencies",
