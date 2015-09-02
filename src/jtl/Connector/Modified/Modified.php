@@ -30,10 +30,6 @@ class Modified extends BaseConnector
 
         $session = new SessionHelper("modified");
 
-        set_error_handler(array($this,'errorHandler'), E_ALL);
-        set_exception_handler(array($this,'exceptionHandler'));
-        register_shutdown_function(array($this,'shutdownHandler'));
-
         if (!isset($session->shopConfig)) {
             $session->shopConfig = $this->readConfigFile();
         }
@@ -154,18 +150,7 @@ class Modified extends BaseConnector
 
         $result = array();
 
-        if ($requestpacket->getMethod() == 'image.push') {
-            $action = new Action();
-
-            $result = $this->controller->{$this->action}($requestpacket->getParams());
-
-            $action->setHandled(true)
-                ->setResult($result->getResult())
-                ->setError($result->getError());
-
-            return $action;
-
-        } elseif ($this->action === Method::ACTION_PUSH || $this->action === Method::ACTION_DELETE) {
+        if ($this->action === Method::ACTION_PUSH || $this->action === Method::ACTION_DELETE) {
             if (!is_array($requestpacket->getParams())) {
                 throw new \Exception('data is not an array');
             }
@@ -186,71 +171,6 @@ class Modified extends BaseConnector
             return $action;
         } else {
             return $this->controller->{$this->action}($requestpacket->getParams());
-        }
-    }
-
-    public function errorHandler($errno, $errstr, $errfile, $errline, $errcontext)
-    {
-        $types = array(
-            E_ERROR => array(Logger::ERROR, 'E_ERROR'),
-            E_PARSE => array(Logger::WARNING, 'E_PARSE'),
-            E_CORE_ERROR => array(Logger::ERROR, 'E_CORE_ERROR'),
-            E_CORE_WARNING => array(Logger::WARNING, 'E_CORE_WARNING'),
-            E_CORE_ERROR => array(Logger::ERROR, 'E_COMPILE_ERROR'),
-            E_CORE_WARNING => array(Logger::WARNING, 'E_COMPILE_WARNING'),
-            E_USER_ERROR => array(Logger::ERROR, 'E_USER_ERROR'),
-            E_RECOVERABLE_ERROR => array(Logger::ERROR, 'E_RECOVERABLE_ERROR'),
-            E_DEPRECATED => array(Logger::INFO, 'E_DEPRECATED'),
-            E_USER_DEPRECATED => array(Logger::INFO, 'E_USER_DEPRECATED')
-        );
-
-        if (isset($types[$errno])) {
-            $err = "(" . $types[$errno][1] . ") File ({$errfile}, {$errline}): {$errstr}";
-            Logger::write($err, $types[$errno][0], 'global');
-        }
-    }
-
-    public function exceptionHandler(\Exception $exception)
-    {
-        $trace = $exception->getTrace();
-        if (isset($trace[0]['args'][0])) {
-            $requestpacket = $trace[0]['args'][0];
-        }
-
-        $error = new Error();
-        $error->setCode($exception->getCode())
-            ->setData("Exception: " . substr(strrchr(get_class($exception), "\\"), 1) . " - File: {$exception->getFile()} - Line: {$exception->getLine()}")
-            ->setMessage($exception->getMessage());
-
-        $responsepacket = new ResponsePacket();
-        $responsepacket->setError($error)
-            ->setJtlrpc("2.0");
-
-        if (isset($requestpacket) && $requestpacket !== null && is_object($requestpacket) && get_class($requestpacket) == "jtl\\Connector\\Core\\Rpc\\RequestPacket") {
-            $responsepacket->setId($requestpacket->getId());
-        }
-
-        Response::send($responsepacket);
-    }
-
-    public function shutdownHandler()
-    {
-        if (($err = error_get_last())) {
-            if ($err['type'] != 2 && $err['type'] != 8) {
-                ob_clean();
-
-                $error = new Error();
-                $error->setCode($err['type'])
-                    ->setData('Shutdown! File: ' . $err['file'] . ' - Line: ' . $err['line'])
-                    ->setMessage($err['message']);
-
-                $responsepacket = new ResponsePacket();
-                $responsepacket->setError($error)
-                    ->setId('unknown')
-                    ->setJtlrpc("2.0");
-
-                Response::send($responsepacket);
-            }
         }
     }
 }
