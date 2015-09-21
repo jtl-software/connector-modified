@@ -48,8 +48,6 @@ class Modified extends BaseConnector
             ));
         }
 
-        //$db->setNames();
-
         if (!isset($session->shopConfig['settings'])) {
             $session->shopConfig += $this->readConfigDb($db);
         }
