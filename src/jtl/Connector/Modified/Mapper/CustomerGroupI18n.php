@@ -1,8 +1,6 @@
 <?php
 namespace jtl\Connector\Modified\Mapper;
 
-use jtl\Connector\Modified\Mapper\BaseMapper;
-
 class CustomerGroupI18n extends BaseMapper
 {
     protected $mapperConfig = array(

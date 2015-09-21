@@ -1,8 +1,6 @@
 <?php
 namespace jtl\Connector\Modified\Mapper;
 
-use \jtl\Connector\Model\GlobalData as GlobalDataModel;
-
 class GlobalData extends \jtl\Connector\Modified\Mapper\BaseMapper
 {
     protected $mapperConfig = array(

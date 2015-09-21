@@ -1,12 +1,8 @@
 <?php
 namespace jtl\Connector\Modified\Mapper;
 
-use \jtl\Connector\Modified\Mapper\BaseMapper;
-
 class ProductVariationValue extends BaseMapper
 {
-    private $productId;
-
     protected $mapperConfig = array(
         "table" => "products_attributes",
         "query" => 'SELECT * FROM products_attributes WHERE products_id=[[products_id]] && options_id=[[options_id]]',

@@ -1,9 +1,7 @@
 <?php
 namespace jtl\Connector\Modified\Mapper;
 
-use \jtl\Connector\Modified\Mapper\BaseMapper;
 use \jtl\Connector\Linker\ChecksumLinker;
-use \jtl\Connector\Core\Logger\Logger;
 
 class ProductVariation extends BaseMapper
 {

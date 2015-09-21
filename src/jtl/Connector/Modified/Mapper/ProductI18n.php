@@ -1,8 +1,6 @@
 <?php
 namespace jtl\Connector\Modified\Mapper;
 
-use jtl\Connector\Modified\Mapper\BaseMapper;
-
 class ProductI18n extends BaseMapper
 {
     protected $mapperConfig = array(
