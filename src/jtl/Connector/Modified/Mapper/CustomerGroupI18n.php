@@ -66,6 +66,6 @@ class CustomerGroupI18n extends BaseMapper
 
     protected function name($data)
     {
-        return html_entity_decode($data['customers_status_name']);
+        return utf8_encode($data['customers_status_name']);
     }
 }

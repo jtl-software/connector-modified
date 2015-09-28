@@ -1,5 +1,8 @@
 1.1
 ------
+- [af71e41]
+  added changelog
+
 - [fedd103]
   cleaned up uses
 

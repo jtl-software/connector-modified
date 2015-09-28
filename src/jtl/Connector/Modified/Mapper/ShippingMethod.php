@@ -11,7 +11,7 @@ class ShippingMethod extends BaseMapper
         "getMethod" => "getShippingMethods"
     );
 
-    public function pull($data, $limit = null)
+    public function pull($data = null, $limit = null)
     {
         $moduleStr = $this->db->query('SELECT configuration_value FROM configuration WHERE configuration_key ="MODULE_SHIPPING_INSTALLED"');
 
@@ -21,20 +21,22 @@ class ShippingMethod extends BaseMapper
                 $return = array();
 
                 foreach ($modules as $moduleFile) {
-                    $modName = str_replace('.php', '', $moduleFile);
-                    include_once($this->shopConfig['shop']['path'] . 'lang/german/modules/shipping/' . $modName . '.php');
+                    if (!empty($moduleFile)) {
+                        $modName = str_replace('.php', '', $moduleFile);
+                        include_once($this->shopConfig['shop']['path'] . 'lang/german/modules/shipping/' . $modName . '.php');
 
-                    if (defined('MODULE_SHIPPING_' . strtoupper($modName) . '_TEXT_TITLE')) {
-                        $modTitle = constant('MODULE_SHIPPING_'.strtoupper($modName).'_TEXT_TITLE');
-                    } else {
-                        $modTitle = $modName;
+                        if (defined('MODULE_SHIPPING_' . strtoupper($modName) . '_TEXT_TITLE')) {
+                            $modTitle = constant('MODULE_SHIPPING_' . strtoupper($modName) . '_TEXT_TITLE');
+                        } else {
+                            $modTitle = $modName;
+                        }
+
+                        $model = new ShippingMethodModel();
+                        $model->setName($modTitle);
+                        $model->setId(new Identity($modName));
+
+                        $return[] = $model;
                     }
-
-                    $model = new ShippingMethodModel();
-                    $model->setName($modTitle);
-                    $model->setId(new Identity($modName));
-
-                    $return[] = $model;
                 }
 
                 return $return;

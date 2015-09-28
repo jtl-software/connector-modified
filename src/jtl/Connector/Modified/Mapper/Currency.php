@@ -29,7 +29,7 @@ class Currency extends BaseMapper
         )
     );
 
-    public function push($data, $parent)
+    public function push($data, $parent = null)
     {
         foreach ($data->getCurrencies() as $currency) {
             $check = $this->db->query('SELECT currencies_id FROM currencies WHERE code="'.$currency->getIso().'"');

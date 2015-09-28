@@ -5,7 +5,7 @@ use \jtl\Connector\Model\CustomerGroupAttr as CustomerGroupAttrModel;
 
 class CustomerGroupAttr extends BaseMapper
 {
-    public function pull($data)
+    public function pull($data = null, $limit = null)
     {
         $attrs = array();
 

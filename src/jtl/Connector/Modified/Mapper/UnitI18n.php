@@ -10,7 +10,7 @@ class UnitI18n extends BaseMapper
         "mapPull" => array(
             "unitId" => "products_vpe_id",
             "languageISO" => null,
-            "name" => "products_vpe_name"
+            "name" => null
         ),
         "mapPush" => array(
             "products_vpe_id" => "unitId",
@@ -67,5 +67,10 @@ class UnitI18n extends BaseMapper
     protected function language_id($data)
     {
         return $this->locale2id($data->getLanguageISO());
+    }
+
+    protected function name($data)
+    {
+        return utf8_encode($data['products_vpe_name']);
     }
 }
