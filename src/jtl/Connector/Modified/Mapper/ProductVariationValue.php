@@ -12,6 +12,7 @@ class ProductVariationValue extends BaseMapper
             "productVariationId" => "options_id",
             "extraWeight" => null,
             "sku" => "attributes_model",
+            "ean" => "attributes_ean",
             "sort" => "sortorder",
             "stockLevel" => "attributes_stock",
             "i18ns" => "ProductVariationValueI18n|addI18n",

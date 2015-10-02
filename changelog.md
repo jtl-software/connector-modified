@@ -1,8 +1,15 @@
-1.1
+1.2
 ------
+- [da50cdd]
+  fixed some propery encodings
+  avoid errors with empty shipping modules
+  fixed method definitions
+
 - [af71e41]
   added changelog
 
+1.1
+------
 - [fedd103]
   cleaned up uses
 

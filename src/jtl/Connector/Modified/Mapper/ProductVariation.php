@@ -105,7 +105,8 @@ class ProductVariation extends BaseMapper
                         $pVarObj->options_values_weight = abs($value->getExtraWeight());
                         $pVarObj->weight_prefix = $value->getExtraWeight() < 0 ? '-' : '+';
                         $pVarObj->sortorder = $value->getSort();
-                        $pVarObj->attributes_ean = $value->getSku();
+                        $pVarObj->attributes_model = $value->getSku();
+                        $pVarObj->attributes_ean = $value->getEan();
 
                         $totalStock += $pVarObj->attributes_stock;
 
