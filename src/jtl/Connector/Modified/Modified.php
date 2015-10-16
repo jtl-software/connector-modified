@@ -11,9 +11,6 @@ use \jtl\Connector\Core\Rpc\Error as Error;
 use \jtl\Connector\Core\Http\Response;
 use \jtl\Connector\Core\Rpc\Method;
 use \jtl\Connector\Modified\Mapper\PrimaryKeyMapper;
-use \jtl\Connector\Core\Config\Config;
-use \jtl\Connector\Core\Config\Loader\Json as ConfigJson;
-use \jtl\Connector\Core\Config\Loader\System as ConfigSystem;
 use \jtl\Connector\Result\Action;
 use \jtl\Connector\Modified\Auth\TokenLoader;
 use \jtl\Connector\Modified\Checksum\ChecksumLoader;
@@ -26,8 +23,6 @@ class Modified extends BaseConnector
 
     public function initialize()
     {
-        $this->initConnectorConfig();
-
         $session = new SessionHelper("modified");
 
         if (!isset($session->shopConfig)) {
@@ -48,6 +43,9 @@ class Modified extends BaseConnector
             ));
         }
 
+        //$db->setNames();
+        //$db->setCharset();
+
         if (!isset($session->shopConfig['settings'])) {
             $session->shopConfig += $this->readConfigDb($db);
         }
@@ -55,35 +53,6 @@ class Modified extends BaseConnector
         $this->setPrimaryKeyMapper(new PrimaryKeyMapper());
         $this->setTokenLoader(new TokenLoader());
         $this->setChecksumLoader(new ChecksumLoader());
-    }
-
-    protected function initConnectorConfig()
-    {
-        $config = null;
-
-        if (isset($_SESSION['config'])) {
-            $config = $_SESSION['config'];
-        }
-
-        if (empty($config)) {
-            if (!is_null($this->config)) {
-                $config = $this->getConfig();
-            }
-
-            if (empty($config)) {
-                $json = new ConfigJson(CONNECTOR_DIR . '/config/config.json');
-                $config = new Config(array(
-                    $json,
-                    new ConfigSystem()
-                ));
-            }
-        }
-
-        if (!isset($_SESSION['config'])) {
-            $_SESSION['config'] = $config;
-        }
-
-        $this->setConfig($config);
     }
 
     private function readConfigFile()

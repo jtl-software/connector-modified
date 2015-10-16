@@ -70,4 +70,10 @@ class CustomerOrderBillingAddress extends BaseMapper
     {
         return $data->getFirstName().' '.$data->getLastName();
     }
+    /*
+    protected function street($data)
+    {
+        return utf8_encode($data['billing_street_address']);
+    }
+    */
 }

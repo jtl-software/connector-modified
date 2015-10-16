@@ -46,7 +46,7 @@ class CrossSelling extends BaseMapper
 
         if (!empty($id) && $id != '') {
             try {
-                $this->db->query('DELETE FROM products_xsell WHERE products_id='.$id);                
+                $this->db->query('DELETE FROM products_xsell WHERE products_id="'.$id.'"');
             }
             catch(\Exception $e) {            
             }

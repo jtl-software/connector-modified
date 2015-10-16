@@ -1,3 +1,10 @@
+1.3
+------
+- [1ed639f]
+  added variation value ean
+  fixed encoding
+  raised connector version
+
 1.2
 ------
 - [da50cdd]

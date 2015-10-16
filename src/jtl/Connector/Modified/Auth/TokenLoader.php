@@ -7,6 +7,6 @@ class TokenLoader implements ITokenLoader
 {
     public function load()
     {
-        return Application()->getConnector()->getConfig()->read('auth_token');
+        return Application()->getConfig()->read('auth_token');
     }
 }
