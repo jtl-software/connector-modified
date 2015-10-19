@@ -1,3 +1,12 @@
+1.4
+------
+- [be37823]
+  updated version
+
+- [4b7f6fd]
+  updated tokenloader
+  fixed invalid queries
+
 1.3
 ------
 - [1ed639f]
