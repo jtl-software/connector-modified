@@ -1,5 +1,8 @@
 1.4
 ------
+- [196a19d]
+  updated changelog
+
 - [be37823]
   updated version
 
