@@ -1,5 +1,8 @@
 1.4
 ------
+- [a4bbee4]
+  added utf8 encode option for hacked shops/themes
+
 - [196a19d]
   updated changelog
 
