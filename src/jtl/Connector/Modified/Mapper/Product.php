@@ -108,6 +108,18 @@ class Product extends BaseMapper
         return $data;
     }
 
+    public function statistic()
+    {
+        $objs = $this->db->query("
+          SELECT count(p.products_id) as count
+          FROM products p
+          LEFT JOIN jtl_connector_link l ON p.products_id = l.endpointId AND l.type = 64
+          WHERE l.hostId IS NULL LIMIT 1
+        ", array("return" => "object"));
+
+        return $objs !== null ? intval($objs[0]->count) : 0;
+    }
+
     protected function considerBasePrice($data)
     {
         return $data['products_vpe_status'] == 1 ? true : false;

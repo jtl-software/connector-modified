@@ -1,6 +1,8 @@
 <?php
 namespace jtl\Connector\Modified\Mapper;
 
+use jtl\Connector\Core\Utilities\Country;
+
 class CustomerOrderBillingAddress extends BaseMapper
 {
     protected $mapperConfig = array(
@@ -16,7 +18,7 @@ class CustomerOrderBillingAddress extends BaseMapper
             "zipCode" => "billing_postcode",
             "city" => "billing_city",
             "state" => "billing_state",
-            "countryIso" => "billing_country_iso_code_2",
+            "countryIso" => null,
             "eMail" => "customers_email_address",
             "phone" => "customers_telephone",
 			"vatNumber" => "customers_vat_id"
@@ -45,6 +47,11 @@ class CustomerOrderBillingAddress extends BaseMapper
 			"customers_vat_id" => "vatNumber"
         )
     );
+
+    protected function countryIso($data)
+    {
+        return Country::map(strtolower($data['billing_country_iso_code_2']));
+    }
 
     public function pull($data = null, $limit = null)
     {
