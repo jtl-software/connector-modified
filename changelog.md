@@ -1,5 +1,8 @@
 1.4
 ------
+- [db4ac83]
+  fixed iso mappings
+
 - [b25773e]
   added crossselling id
 

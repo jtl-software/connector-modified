@@ -238,7 +238,7 @@ class CustomerOrder extends BaseMapper
             }
             if ($total['class'] == 'ot_payment') {
                 $discount = new \jtl\Connector\Model\CustomerOrderItem();
-                $discount->setType('discount');
+                $discount->setType('product');
                 $discount->setName($total['title']);
                 $discount->setCustomerOrderId($this->identity($data['orders_id']));
                 $discount->setId($this->identity($total['orders_total_id']));
