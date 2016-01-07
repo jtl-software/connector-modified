@@ -8,7 +8,9 @@ class ProductAttr extends BaseMapper
 {
     private $additions = array(
         'products_status' => 'Aktiv',
-        'products_fsk18' => 'FSK 18'
+        'products_fsk18' => 'FSK 18',
+        'product_template' => 'Produkt Vorlage',
+        'options_template' => 'Optionen Vorlage'
     );
 
     public function pull($data = null, $limit = null) {

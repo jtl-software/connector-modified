@@ -1,5 +1,8 @@
 1.4
 ------
+- [bf909de]
+  fixed additional costs/discounts for orders
+
 - [db4ac83]
   fixed iso mappings
 
