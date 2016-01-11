@@ -1,5 +1,8 @@
-1.4
+1.5
 ------
+- [e6e26da]
+  added product templates
+
 - [bf909de]
   fixed additional costs/discounts for orders
 
@@ -18,6 +21,8 @@
 - [be37823]
   updated version
 
+1.4
+------
 - [4b7f6fd]
   updated tokenloader
   fixed invalid queries

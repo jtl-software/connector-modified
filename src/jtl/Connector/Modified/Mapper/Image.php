@@ -43,19 +43,19 @@ class Image extends BaseMapper
     {
         $result = [];
 
-        $query = 'SELECT p.*, p.products_id foreignKey, "product" type
+        $query = 'SELECT p.image_id, p.products_id foreignKey, "product" type, (p.image_nr + 1) image_nr
             FROM products_images p
             LEFT JOIN jtl_connector_link l ON p.image_id = l.endpointId AND l.type = 16
             WHERE l.hostId IS NULL';
-        $defaultQuery = 'SELECT CONCAT("pID_",p.products_id) image_id, p.products_image image_name, p.products_id foreignKey, 0 image_nr, "product" type
+        $defaultQuery = 'SELECT CONCAT("pID_",p.products_id) image_id, p.products_image image_name, p.products_id foreignKey, 1 image_nr, "product" type
             FROM products p
             LEFT JOIN jtl_connector_link l ON CONCAT("pID_",p.products_id) = l.endpointId AND l.type = 16
             WHERE l.hostId IS NULL && p.products_image IS NOT NULL && p.products_image != ""';
-        $categoriesQuery = 'SELECT CONCAT("cID_",p.categories_id) image_id, p.categories_image as image_name, p.categories_id foreignKey, "category" type, 0 image_nr
+        $categoriesQuery = 'SELECT CONCAT("cID_",p.categories_id) image_id, p.categories_image as image_name, p.categories_id foreignKey, "category" type, 1 image_nr
             FROM categories p
             LEFT JOIN jtl_connector_link l ON CONCAT("cID_",p.categories_id) = l.endpointId AND l.type = 16
             WHERE l.hostId IS NULL && p.categories_image IS NOT NULL && p.categories_image != ""';
-        $manufacturersQuery = 'SELECT CONCAT("mID_",m.manufacturers_id) image_id, m.manufacturers_image as image_name, m.manufacturers_id foreignKey, "manufacturer" type, 0 image_nr
+        $manufacturersQuery = 'SELECT CONCAT("mID_",m.manufacturers_id) image_id, m.manufacturers_image as image_name, m.manufacturers_id foreignKey, "manufacturer" type, 1 image_nr
             FROM manufacturers m
             LEFT JOIN jtl_connector_link l ON CONCAT("mID_",m.manufacturers_id) = l.endpointId AND l.type = 16
             WHERE l.hostId IS NULL && m.manufacturers_image IS NOT NULL && m.manufacturers_image != ""';
