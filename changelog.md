@@ -1,5 +1,8 @@
 1.5
 ------
+- [3fee431]
+  fixed image pull sort
+
 - [e6e26da]
   added product templates
 

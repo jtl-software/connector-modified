@@ -43,7 +43,7 @@ class Image extends BaseMapper
     {
         $result = [];
 
-        $query = 'SELECT p.image_id, p.products_id foreignKey, "product" type, (p.image_nr + 1) image_nr
+        $query = 'SELECT p.image_id, p.image_name, p.products_id foreignKey, "product" type, (p.image_nr + 1) image_nr
             FROM products_images p
             LEFT JOIN jtl_connector_link l ON p.image_id = l.endpointId AND l.type = 16
             WHERE l.hostId IS NULL';
