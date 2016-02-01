@@ -18,7 +18,7 @@ class CustomerOrder extends BaseMapper
             "customerId" => "customers_id",
             "creationDate" => "date_purchased",
             "note" => "comments",
-            "paymentModuleCode" => null,
+            "paymentModuleCode" => "payment_method",
             "currencyIso" => "currency",
             "billingAddress" => "CustomerOrderBillingAddress|setBillingAddress",
             "shippingAddress" => "CustomerOrderShippingAddress|setShippingAddress",

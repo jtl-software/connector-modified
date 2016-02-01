@@ -158,11 +158,13 @@ class Check extends Module
                     hostId int(10) NOT NULL,
                     type int(10)
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-                ALTER TABLE jtl_connector_link ADD INDEX(endpointId), ADD INDEX(hostId), ADD INDEX(type);
             ";
+
+            $sql2 = "ALTER TABLE jtl_connector_link ADD INDEX(endpointId), ADD INDEX(hostId), ADD INDEX(type);";
 
             try {
                 $this->db->query($sql);
+                $this->db->query($sql2);
 
                 return array(true);
             } catch (\Exception $e) {

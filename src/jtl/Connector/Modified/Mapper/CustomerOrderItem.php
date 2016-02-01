@@ -101,7 +101,11 @@ class CustomerOrderItem extends BaseMapper
 
     protected function price($data)
     {
-        return ($data['products_price']/(100+$data['products_tax'])) * 100;
+        if ($data['allow_tax'] == "0") {
+            return $data['products_price'];
+        } else {
+            return ($data['products_price'] / (100 + $data['products_tax'])) * 100;
+        }
     }
 
     protected function products_price($data)

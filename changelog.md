@@ -1,5 +1,11 @@
 1.5
 ------
+- [1e3b8f6]
+  add link table index checks
+
+- [f7b43db]
+  image bugfix
+
 - [3fee431]
   fixed image pull sort
 
