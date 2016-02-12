@@ -227,16 +227,41 @@ class CustomerOrder extends BaseMapper
 
         foreach ($totalData as $total) {
             if ($total['class'] == 'ot_total') {
-                $sum += floatval($total['value']);
+                //$sum += floatval($total['value']);
+                $model->setTotalSum(floatval($total['value']));
             }
             if ($total['class'] == 'ot_tax') {
-                $sum -= floatval($total['value']);
+                //$sum -= floatval($total['value']);
             }
             if ($total['class'] == 'ot_shipping') {
-                $shipping->setPrice(floatval($total['value']));
+                $vat = 0;
+                $price = floatval($total['value']);
+
+                list($shippingModule, $shippingName) = explode('_', $data['shipping_class']);
+
+                $moduleTaxClass = $this->db->query('SELECT configuration_value FROM configuration WHERE configuration_key ="MODULE_SHIPPING_'.strtoupper($shippingModule).'_TAX_CLASS"');
+                if (count($moduleTaxClass) > 0) {
+                    if (!empty($moduleTaxClass[0]['configuration_value']) && !empty($data['delivery_country_iso_code_2'])) {
+                        $rateResult = $this->db->query('SELECT r.tax_rate FROM countries c
+                          LEFT JOIN zones_to_geo_zones z ON z.zone_country_id = c.countries_id
+                          LEFT JOIN tax_rates r ON r.tax_zone_id = z.geo_zone_id
+                          WHERE c.countries_iso_code_2 = "'.$data['delivery_country_iso_code_2'].'" && r.tax_class_id='.$moduleTaxClass[0]['configuration_value']);
+
+                        if (count($rateResult) > 0 && isset($rateResult[0]['tax_rate'])) {
+                            $vat = floatval($rateResult[0]['tax_rate']);
+
+                            if ($vat > 0) {
+                                $price = ($price / (1 + ($vat / 100)));
+                            }
+                        }
+                    }
+                }
+
+                $shipping->setPrice($price);
+                $shipping->setVat($vat);
                 $shipping->setName($total['title']);
             }
-            if ($total['class'] == 'ot_payment') {
+            if ($total['class'] == 'ot_payment' || $total['class'] == 'ot_discount') {
                 $discount = new \jtl\Connector\Model\CustomerOrderItem();
                 $discount->setType('product');
                 $discount->setName($total['title']);
@@ -246,11 +271,25 @@ class CustomerOrder extends BaseMapper
                 $discount->setVat(0);
                 $discount->setPrice(floatval($total['value']));
 
+                //$sum += floatval($total['value']);
+
                 $model->addItem($discount);
+            }
+            if ($total['class'] == 'ot_coupon') {
+                $coupon = new \jtl\Connector\Model\CustomerOrderItem();
+                $coupon->setType('product');
+                $coupon->setName($total['title']);
+                $coupon->setCustomerOrderId($this->identity($data['orders_id']));
+                $coupon->setId($this->identity($total['orders_total_id']));
+                $coupon->setQuantity(1);
+                $coupon->setVat(0);
+                $coupon->setPrice(floatval($total['value']));
+
+                $model->addItem($coupon);
             }
         }
 
-        $model->setTotalSum($sum);
+        //$model->setTotalSum($sum);
         $model->addItem($shipping);
     }
 }

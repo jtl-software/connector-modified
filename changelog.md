@@ -1,5 +1,10 @@
 1.5
 ------
+- [bbc2163]
+  fixed mapping table creation
+  fixed payment method name
+  fixed order item price calculation
+
 - [1e3b8f6]
   add link table index checks
 
