@@ -260,6 +260,8 @@ class CustomerOrder extends BaseMapper
                 $shipping->setPrice($price);
                 $shipping->setVat($vat);
                 $shipping->setName($total['title']);
+
+                $model->setShippingMethodName($total['title']);
             }
             if ($total['class'] == 'ot_payment' || $total['class'] == 'ot_discount') {
                 $discount = new \jtl\Connector\Model\CustomerOrderItem();

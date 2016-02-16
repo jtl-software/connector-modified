@@ -1,5 +1,8 @@
 1.5
 ------
+- [59b4bb0]
+  added delivery tax rate
+
 - [bbc2163]
   fixed mapping table creation
   fixed payment method name
