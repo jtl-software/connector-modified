@@ -14,7 +14,7 @@ class CustomerOrderItem extends BaseMapper
             "productId" => "products_id",
             "customerOrderId" => "orders_id",
             "quantity" => "products_quantity",
-            "name" => null,
+            "name" => "products_name",
             "price" => null,
             "vat" => "products_tax",
             "sku" => "products_model",
@@ -133,10 +133,5 @@ class CustomerOrderItem extends BaseMapper
     protected function type($data)
     {
         return 'product';
-    }
-
-    protected function name($data)
-    {
-        return utf8_encode($data['products_name']);
     }
 }

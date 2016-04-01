@@ -18,7 +18,7 @@ class CustomerOrder extends BaseMapper
             "customerId" => "customers_id",
             "creationDate" => "date_purchased",
             "note" => "comments",
-            "paymentModuleCode" => "payment_method",
+            "paymentModuleCode" => null,
             "currencyIso" => "currency",
             "billingAddress" => "CustomerOrderBillingAddress|setBillingAddress",
             "shippingAddress" => "CustomerOrderShippingAddress|setShippingAddress",
@@ -146,7 +146,11 @@ class CustomerOrder extends BaseMapper
 
     protected function paymentModuleCode($data)
     {
-        return $this->paymentMapping[$data['payment_method']];
+        if (key_exists($data['payment_method'], $this->paymentMapping)) {
+            return $this->paymentMapping[$data['payment_method']];
+        }
+
+        return $data['payment_method'];
     }
 
     protected function payment_method($data)
@@ -250,9 +254,11 @@ class CustomerOrder extends BaseMapper
                         if (count($rateResult) > 0 && isset($rateResult[0]['tax_rate'])) {
                             $vat = floatval($rateResult[0]['tax_rate']);
 
+			    /*
                             if ($vat > 0) {
                                 $price = ($price / (1 + ($vat / 100)));
                             }
+                            */
                         }
                     }
                 }

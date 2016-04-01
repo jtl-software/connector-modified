@@ -1,5 +1,8 @@
 1.5
 ------
+- [8cd1558]
+  workaround for shipping name
+
 - [59b4bb0]
   added delivery tax rate
 
