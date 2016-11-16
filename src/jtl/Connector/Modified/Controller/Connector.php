@@ -76,6 +76,8 @@ class Connector extends Controller
         $session = new SessionHelper("modified");
         $config = $session->connectorConfig;
 
+        include($config->platform_root.'/admin/includes/version.php');
+
         $returnMegaBytes = function($value) {
             $value = trim($value);
             $unit = strtolower($value[strlen($value) - 1]);
@@ -96,7 +98,13 @@ class Connector extends Controller
         $connector = new ConnectorIdentification();
         $connector->setEndpointVersion(CONNECTOR_VERSION);
         $connector->setPlatformName('modified eCommerce');
-        $connector->setPlatformVersion(SHOP_VERSION);
+
+        if (defined('PROJECT_MAJOR_VERSION')) {
+            $connector->setPlatformVersion(PROJECT_MAJOR_VERSION.'.'.PROJECT_MINOR_VERSION);
+        } else {
+            $connector->setPlatformVersion('1.0.6');
+        }
+
         $connector->setProtocolVersion(Application()->getProtocolVersion());
         $connector->setServerInfo($serverInfo);
 
