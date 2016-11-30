@@ -76,6 +76,8 @@ class Connector extends Controller
         $session = new SessionHelper("modified");
         $config = $session->connectorConfig;
 
+        define('_VALID_XTC', true);
+
         include($config->platform_root.'/admin/includes/version.php');
 
         $returnMegaBytes = function($value) {
