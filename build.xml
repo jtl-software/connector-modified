@@ -8,6 +8,7 @@
         <mkdir dir="./dist/logs" />
         <mkdir dir="./dist/install" />
         <mkdir dir="./dist/plugins" />
+        <mkdir dir="./dist/tmp" />
 
         <copy todir="./dist/config">
             <fileset dir="./config">
@@ -36,11 +37,17 @@
                 <include name=".htaccess" />
             </fileset>
         </copy>
+        <copy todir="./dist/tmp">
+            <fileset dir="./tmp">
+                <include name=".htaccess" />
+            </fileset>
+        </copy>
 
         <chmod file="./dist/config" mode="0777" />
         <chmod file="./dist/db" mode="0777" />
         <chmod file="./dist/db/connector.s3db" mode="0777" />
         <chmod file="./dist/logs" mode="0777" />
+        <chmod file="./dist/tmp" mode="0777" />
 
         <delete dir="./build" />
         <mkdir dir="./build" />
