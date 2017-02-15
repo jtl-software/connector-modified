@@ -5,4 +5,5 @@ logs/**
 build/**
 dist/**
 db/connector.s3db
+db/version
 .idea/**

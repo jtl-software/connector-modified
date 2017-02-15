@@ -6,8 +6,8 @@ class Category extends \jtl\Connector\Modified\Mapper\BaseMapper
     protected $mapperConfig = array(
         "table" => "categories",
         "query" => "SELECT c.* FROM categories c
-            LEFT JOIN jtl_connector_link l ON c.categories_id = l.endpointId AND l.type = 1
-            WHERE l.hostId IS NULL",
+            LEFT JOIN jtl_connector_link_category l ON c.categories_id = l.endpoint_id
+            WHERE l.host_id IS NULL",
         "where" => "categories_id",
         "identity" => "getId",
         "mapPull" => array(
@@ -58,11 +58,11 @@ class Category extends \jtl\Connector\Modified\Mapper\BaseMapper
             return $a['level'] - $b['level'];
         });
 
-        $pulledQuery = $this->db->query('SELECT endpointId FROM jtl_connector_link WHERE type=1');
+        $pulledQuery = $this->db->query('SELECT endpoint_id FROM jtl_connector_link_category WHERE type=1');
         $pulled = array();
 
         foreach ($pulledQuery as $pCat) {
-            $pulled[] = $pCat['endpointId'];
+            $pulled[] = $pCat['endpoint_id'];
         }
 
         $resultCount = 0;
@@ -139,7 +139,7 @@ class Category extends \jtl\Connector\Modified\Mapper\BaseMapper
                 $this->db->query('DELETE FROM categories_description WHERE categories_id='.$data->getId()->getEndpoint());
                 $this->db->query('DELETE FROM products_to_categories WHERE categories_id='.$data->getId()->getEndpoint());
 
-                $this->db->query('DELETE FROM jtl_connector_link WHERE type=1 && endpointId="'.$data->getId()->getEndpoint().'"');
+                $this->db->query('DELETE FROM jtl_connector_link_category WHERE endpoint_id="'.$data->getId()->getEndpoint().'"');
             }
             catch(\Exception $e) {            
             }

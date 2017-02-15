@@ -151,43 +151,39 @@ class Check extends Module
 
     private function connectorTable()
     {
-        if (count($this->db->query("SHOW TABLES LIKE 'jtl_connector_link'")) == 0) {
-            $sql = "
-                CREATE TABLE IF NOT EXISTS jtl_connector_link (
-                    endpointId varchar(64) NOT NULL,
-                    hostId int(10) NOT NULL,
-                    type int(10)
-                ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-            ";
+        $types = array(
+            1 => 'category',
+            2 => 'customer',
+            4 => 'customer_order',
+            8 => 'delivery_note',
+            16 => 'image',
+            32 => 'manufacturer',
+            64 => 'product',
+            512 => 'payment',
+            1024 => 'crossselling',
+            2048 => 'crossselling_group'
+        );
 
-            $sql2 = "ALTER TABLE jtl_connector_link ADD INDEX(endpointId), ADD INDEX(hostId), ADD INDEX(type);";
+        $queryInt = 'CREATE TABLE IF NOT EXISTS %s (
+          endpoint_id INT(20) NOT NULL,
+          host_id INT(20) NOT NULL,
+          PRIMARY KEY (endpoint_id),
+          INDEX (host_id)          
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci';
 
-            try {
-                $this->db->query($sql);
-                $this->db->query($sql2);
+        $queryChar = 'CREATE TABLE IF NOT EXISTS %s (
+          endpoint_id varchar(20) NOT NULL,
+          host_id INT(20) NOT NULL,
+          PRIMARY KEY (endpoint_id),
+          INDEX (host_id)          
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci';
 
-                return array(true);
-            } catch (\Exception $e) {
-                return array(false);
+        foreach($types as $id => $name) {
+            if ($id == 16 || $id == 64) {
+                $this->db->query(sprintf($queryChar, 'jtl_connector_link_'.$name));
+            } else {
+                $this->db->query(sprintf($queryInt, 'jtl_connector_link_'.$name));
             }
-        } else {
-            if (count($this->db->query('SHOW INDEX FROM jtl_connector_link WHERE Key_name = "PRIMARY"')) > 0) {
-                $this->db->query('ALTER TABLE jtl_connector_link DROP PRIMARY KEY');
-            }
-
-            if (count($this->db->query('SHOW INDEX FROM jtl_connector_link WHERE Key_name = "endpointId"')) == 0) {
-                $this->db->query('ALTER TABLE jtl_connector_link ADD INDEX(endpointId)');
-            }
-
-            if (count($this->db->query('SHOW INDEX FROM jtl_connector_link WHERE Key_name = "hostId"')) == 0) {
-                $this->db->query('ALTER TABLE jtl_connector_link ADD INDEX(hostId)');
-            }
-
-            if (count($this->db->query('SHOW INDEX FROM jtl_connector_link WHERE Key_name = "type"')) == 0) {
-                $this->db->query('ALTER TABLE jtl_connector_link ADD INDEX(type)');
-            }
-
-            return array(true);
         }
 
         return array(true);
@@ -198,7 +194,7 @@ class Check extends Module
         if (count($this->db->query("SHOW TABLES LIKE 'jtl_connector_product_checksum'")) == 0) {
             $sql = "
                 CREATE TABLE IF NOT EXISTS jtl_connector_product_checksum (
-                    endpoint_id int(10) unsigned NOT NULL,
+                    endpoint_id int(20) unsigned NOT NULL,
                     type tinyint unsigned NOT NULL,
                     checksum varchar(255) NOT NULL,
                     PRIMARY KEY (endpoint_id)
