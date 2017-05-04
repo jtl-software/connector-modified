@@ -231,11 +231,7 @@ class CustomerOrder extends BaseMapper
 
         foreach ($totalData as $total) {
             if ($total['class'] == 'ot_total') {
-                //$sum += floatval($total['value']);
                 $model->setTotalSum(floatval($total['value']));
-            }
-            if ($total['class'] == 'ot_tax') {
-                //$sum -= floatval($total['value']);
             }
             if ($total['class'] == 'ot_shipping') {
                 $vat = 0;
@@ -253,17 +249,11 @@ class CustomerOrder extends BaseMapper
 
                         if (count($rateResult) > 0 && isset($rateResult[0]['tax_rate'])) {
                             $vat = floatval($rateResult[0]['tax_rate']);
-
-			    /*
-                            if ($vat > 0) {
-                                $price = ($price / (1 + ($vat / 100)));
-                            }
-                            */
                         }
                     }
                 }
 
-                $shipping->setPrice($price);
+                $shipping->setPriceGross($price);
                 $shipping->setVat($vat);
                 $shipping->setName($total['title']);
 
@@ -278,8 +268,6 @@ class CustomerOrder extends BaseMapper
                 $discount->setQuantity(1);
                 $discount->setVat(0);
                 $discount->setPrice(floatval($total['value']));
-
-                //$sum += floatval($total['value']);
 
                 $model->addItem($discount);
             }
@@ -297,7 +285,6 @@ class CustomerOrder extends BaseMapper
             }
         }
 
-        //$model->setTotalSum($sum);
         $model->addItem($shipping);
     }
 }

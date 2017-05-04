@@ -44,7 +44,9 @@ foreach ($existingTypes as $existingType) {
     ");
 }
 
-$db->query("RENAME TABLE jtl_connector_link TO jtl_connector_link_backup");
-$db->query("ALTER TABLE jtl_connector_product_checksum MODIFY endpoint_id VARCHAR(10)");
+if (count($existingTypes) > 0) {
+    $db->query("RENAME TABLE jtl_connector_link TO jtl_connector_link_backup");
+    $db->query("ALTER TABLE jtl_connector_product_checksum MODIFY endpoint_id VARCHAR(10)");
+}
 
 file_put_contents(CONNECTOR_DIR.'/db/version', $updateFile->getBasename('.php'));
