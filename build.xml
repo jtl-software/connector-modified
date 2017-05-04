@@ -20,6 +20,7 @@
             <fileset dir="./db">
                 <include name="connector.s3db" />
                 <include name=".htaccess" />
+                <include name="updates/*" />
             </fileset>
         </copy>
         <copy todir="./dist/logs">

@@ -6,8 +6,8 @@ class Product extends BaseMapper
     protected $mapperConfig = array(
         "table" => "products",
         "query" => "SELECT p.* FROM products p
-            LEFT JOIN jtl_connector_link l ON p.products_id = l.endpointId AND l.type = 64
-            WHERE l.hostId IS NULL",
+            LEFT JOIN jtl_connector_link_product l ON p.products_id = l.endpoint_id 
+            WHERE l.host_id IS NULL",
         "where" => "products_id",
         "identity" => "getId",
         "mapPull" => array(
@@ -100,7 +100,7 @@ class Product extends BaseMapper
                     $this->db->query('DELETE FROM personal_offers_by_customers_status_'.$group['customers_status_id'].' WHERE products_id='.$id);
                 }
 
-                $this->db->query('DELETE FROM jtl_connector_link WHERE type=64 && endpointId="'.$id.'"');
+                $this->db->query('DELETE FROM jtl_connector_link_product WHERE endpoint_id="'.$id.'"');
             }
             catch (\Exception $e) {                
             }
@@ -113,8 +113,8 @@ class Product extends BaseMapper
         $objs = $this->db->query("
           SELECT count(p.products_id) as count
           FROM products p
-          LEFT JOIN jtl_connector_link l ON p.products_id = l.endpointId AND l.type = 64
-          WHERE l.hostId IS NULL LIMIT 1
+          LEFT JOIN jtl_connector_link_product l ON p.products_id = l.endpoint_id
+          WHERE l.host_id IS NULL LIMIT 1
         ", array("return" => "object"));
 
         return $objs !== null ? intval($objs[0]->count) : 0;
