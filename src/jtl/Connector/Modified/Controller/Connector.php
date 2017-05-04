@@ -78,7 +78,12 @@ class Connector extends Controller
 
         define('_VALID_XTC', true);
 
-        include($config->platform_root.'/admin/includes/version.php');
+        foreach (new \DirectoryIterator($config->platform_root) as $shoproot) {
+            if (!$shoproot->isDot() && $shoproot->isDir() && is_file($config->platform_root.'/'.$shoproot->getFilename().'/check_update.php')) {
+                include($config->platform_root.'/'.$shoproot->getFilename().'/includes/version.php');
+                break;
+            }
+        }
 
         $returnMegaBytes = function($value) {
             $value = trim($value);
