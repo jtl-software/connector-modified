@@ -64,14 +64,16 @@ class PrimaryKeyMapper implements IPrimaryKeyMapper
         $where = '';
 
         if ($endpointId && $endpointId != '') {
-            $where .= 'endpoint_id = "'.$endpointId.'"';
+            $where = 'endpoint_id = "'.$endpointId.'"';
         }
 
         if ($hostId) {
-            $where .= ' && host_id = '.$hostId;
+            $where = 'host_id = '.$hostId;
         }
 
-        $this->db->query('DELETE FROM jtl_connector_link_'.static::$types[$type].' WHERE '.$where);
+        if (!empty($where)) {
+            $this->db->query('DELETE FROM jtl_connector_link_' . static::$types[$type] . ' WHERE ' . $where);
+        }
     }
 
     public function clear()

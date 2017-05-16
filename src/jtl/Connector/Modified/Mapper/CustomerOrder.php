@@ -71,6 +71,15 @@ class CustomerOrder extends BaseMapper
         'worldpay' => 'pm_worldpay'
     );
 
+    public function __construct()
+    {
+        parent::__construct();
+
+        if (!empty($this->connectorConfig->from_date)) {
+            $this->mapperConfig['query'] .= ' && date_purchased >= "'.$this->connectorConfig->from_date.'"';
+        }
+    }
+
     public function pull($data = null, $limit = null)
     {
         return parent::pull(null, $limit);

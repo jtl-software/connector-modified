@@ -46,6 +46,16 @@ class Connector extends Module
                         Oftmals werden in xt-basierten Shops UTF8 Hacks und Themes verwendet, welche den serienmäßigen Zustand des Systems zugunsten einer zeitgemäßeren Zeichensatz-Kodierung aushebeln. Sollte der Connector nicht funktionieren oder sollten Probleme bei der Darstellung von Umlauten und Sonderzeichen auftreten, aktivieren Sie diese Option bitte.
                     </span>
                 </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-xs-2">Datums-Grenze</label>
+                <div class="col-xs-10">
+                    <input type="date" class="form-control" name="config[from_date]" value="'.$this->config->from_date.'"/>
+                    <span id="helpBlock" class="help-block">
+                        Legen Sie hier bei Bedarf eine Datums-Grenze für Bestellungen fest. Wenn diese Einstellung gesetzt ist, werden nur Bestellungen abgeglichen die nach diesem Datum erfolgten.<br>
+                        <b>Wenn Sie diese Option verwenden, sollten Sie sicherstellen dass in Ihrer Datenbank-Tabelle "orders" ein Index auf der Spalte "date_purchased" gesetzt ist.</b>
+                    </span>
+                </div>
             </div>';
 
         return $html;
@@ -55,6 +65,7 @@ class Connector extends Module
     {
         $this->config->auth_token = $_REQUEST['config']['auth_token'];
         $this->config->utf8 = $_REQUEST['config']['utf8'];
+        $this->config->from_date = $_REQUEST['config']['from_date'];
 
         return true;
     }
