@@ -58,7 +58,7 @@ class Category extends \jtl\Connector\Modified\Mapper\BaseMapper
             return $a['level'] - $b['level'];
         });
 
-        $pulledQuery = $this->db->query('SELECT endpoint_id FROM jtl_connector_link_category WHERE type=1');
+        $pulledQuery = $this->db->query('SELECT endpoint_id FROM jtl_connector_link_category');
         $pulled = array();
 
         foreach ($pulledQuery as $pCat) {
