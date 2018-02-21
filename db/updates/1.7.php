@@ -34,19 +34,23 @@ foreach($types as $id => $name) {
     }
 }
 
-$existingTypes = $db->query('SELECT type FROM jtl_connector_link GROUP BY type');
+$check = $db->query('SHOW TABLES LIKE "jtl_connector_link"');
 
-foreach ($existingTypes as $existingType) {
-    $typeId = (int) $existingType['type'];
-    $tableName = 'jtl_connector_link_'.$types[$typeId];
-    $db->query("INSERT INTO {$tableName} (host_id, endpoint_id) 
+if (count($check) == 1) {
+    $existingTypes = $db->query('SELECT type FROM jtl_connector_link GROUP BY type');
+
+    foreach ($existingTypes as $existingType) {
+        $typeId = (int)$existingType['type'];
+        $tableName = 'jtl_connector_link_' . $types[$typeId];
+        $db->query("INSERT INTO {$tableName} (host_id, endpoint_id) 
       SELECT hostId, endpointId FROM jtl_connector_link WHERE type = {$typeId}
     ");
-}
+    }
 
-if (count($existingTypes) > 0) {
-    $db->query("RENAME TABLE jtl_connector_link TO jtl_connector_link_backup");
-    $db->query("ALTER TABLE jtl_connector_product_checksum MODIFY endpoint_id VARCHAR(10)");
+    if (count($existingTypes) > 0) {
+        $db->query("RENAME TABLE jtl_connector_link TO jtl_connector_link_backup");
+        $db->query("ALTER TABLE jtl_connector_product_checksum MODIFY endpoint_id VARCHAR(10)");
+    }
 }
 
 file_put_contents(CONNECTOR_DIR.'/db/version', $updateFile->getBasename('.php'));

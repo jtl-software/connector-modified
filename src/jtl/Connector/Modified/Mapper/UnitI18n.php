@@ -71,6 +71,6 @@ class UnitI18n extends BaseMapper
 
     protected function name($data)
     {
-        return utf8_encode($data['products_vpe_name']);
+        return $data['products_vpe_name'];
     }
 }
