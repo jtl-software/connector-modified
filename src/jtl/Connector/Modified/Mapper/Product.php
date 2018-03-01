@@ -63,7 +63,8 @@ class Product extends BaseMapper
             "ProductInvisibility|addInvisibility|true" => "invisibilities",
             "ProductAttr|addAttribute|true" => "attributes",
             "products_image" => null,
-            "products_shippingtime" => null
+            "products_shippingtime" => null,
+            "products_price" => null
         )
     );
 
@@ -214,6 +215,11 @@ class Product extends BaseMapper
         }
 
         return '';
+    }
+
+    protected function products_price($data)
+    {
+        return 999999;
     }
 
     protected function manufacturerId($data)

@@ -126,7 +126,10 @@ class BaseMapper
 
             foreach ($this->mapperConfig['mapPush'] as $endpoint => $host) {
                 if (is_null($host) && method_exists(get_class($this), $endpoint)) {
-                    $dbObj->$endpoint = $this->$endpoint($obj, $model, $parentObj);
+                    $fnValue = $this->$endpoint($obj, $model, $parentObj);
+                    if (!is_null($fnValue)) {
+                        $dbObj->$endpoint = $fnValue;
+                    }
                 } elseif ($this->type->getProperty($host)->isNavigation()) {
                     list($preEndpoint, $preNavSetMethod, $preMapper) = array_pad(explode('|', $endpoint), 3, null);
 
@@ -161,11 +164,15 @@ class BaseMapper
                         throw new \Exception("Cannot call get method '".$getMethod."' in entity '".$this->model."'");
                     }
 
-                    if (isset($value)) {
+                    if (!is_null($value)) {
                         if ($this->type->getProperty($host)->isIdentity()) {
                             $model->$setMethod($value);
 
-                            $value = $value->getEndpoint();
+                            $idVal = $value->getEndpoint();
+
+                            if (!empty($idVal)) {
+                                $value = $idVal;
+                            }
                         } else {
                             $type = $this->type->getProperty($host)->getType();
                             if ($type == "DateTime") {

@@ -27,7 +27,8 @@ class CategoryI18n extends \jtl\Connector\Modified\Mapper\BaseMapper
             "categories_description" => "description",
             "categories_meta_description" => "metaDescription",
             "categories_meta_keywords" => "metaKeywords",
-            "categories_meta_title" => "titleTag"
+            "categories_meta_title" => "titleTag",
+            "categories_heading_title" => "name"
         )
     );
 
