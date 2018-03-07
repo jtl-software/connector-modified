@@ -45,7 +45,9 @@ class Category extends \jtl\Connector\Modified\Mapper\BaseMapper
 
     protected function parent_id($data)
     {
-        return is_null($data->getParentCategoryId()->getEndpoint()) ? 0 : $data->getParentCategoryId()->getEndpoint();
+        $endpoint = $data->getParentCategoryId()->getEndpoint();
+
+        return empty($endpoint) ? 0 : $endpoint;
     }
 
     public function pull($parent = null, $limit = null)

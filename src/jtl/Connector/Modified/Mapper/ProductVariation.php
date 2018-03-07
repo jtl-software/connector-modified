@@ -55,6 +55,7 @@ class ProductVariation extends BaseMapper
                         $varObj->products_options_id = $variationId;
                         $varObj->language_id = $this->locale2id($i18n->getLanguageISO());
                         $varObj->products_options_name = $i18n->getName();
+                        $varObj->products_options_sortorder = 0;
 
                         $this->db->deleteInsertRow($varObj, 'products_options', array('products_options_id', 'language_id'), array($variationId, $varObj->language_id));
                     }
@@ -107,18 +108,21 @@ class ProductVariation extends BaseMapper
                         $pVarObj->sortorder = $value->getSort();
                         $pVarObj->attributes_model = $value->getSku();
                         $pVarObj->attributes_ean = $value->getEan();
+                        $pVarObj->attributes_vpe_id = 0;
+                        $pVarObj->attributes_vpe_value = 0;
 
                         $totalStock += $pVarObj->attributes_stock;
 
                         // get product variation price for default customer group
                         foreach ($value->getExtraCharges() as $extraCharge) {
-                            if ($extraCharge->getCustomerGroupId()->getEndpoint() == $this->shopConfig['settings']['DEFAULT_CUSTOMERS_STATUS_ID']) {
+                            if ($extraCharge->getCustomerGroupId()->getHost() === 0) {
                                 $pVarObj->price_prefix = $extraCharge->getExtraChargeNet() < 0 ? '-' : '+';
                                 $pVarObj->options_values_price = abs($extraCharge->getExtraChargeNet());
+
+                                $this->db->insertRow($pVarObj, 'products_attributes');
+                                break;
                             }
                         }
-
-                        $this->db->insertRow($pVarObj, 'products_attributes');
                     }
                 }
 
