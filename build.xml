@@ -78,8 +78,8 @@
             <metadata>
                 <element name="version" value="0.0.1" />
                 <element name="authors">
-                    <element name="Daniel Hoffmann">
-                        <element name="email" value="daniel.hoffmann@jtl-software.com" />
+                    <element name="Niklas Kokoschka">
+                        <element name="email" value="niklas.kokoschka@jtl-software.com" />
                     </element>
                 </element>
             </metadata>
