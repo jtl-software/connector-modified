@@ -25,14 +25,24 @@ class ProductAttr extends BaseMapper
 
     public function push($data, $dbObj = null) {
         $dbObj->products_status = 1;
-
+        $tableColumns = [];
+        
+        $columns = $this->db->query("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = N'products' AND TABLE_SCHEMA = '" . $this->db->name . "'");
+        foreach ($columns as $column) {
+            array_push($tableColumns, $column['COLUMN_NAME']);
+        }
+        
         foreach ($data->getAttributes() as $attr) {
-            foreach ($attr->getI18ns() as $i18n) {
+            $i18ns = $attr->getI18ns();
+            $i18n = reset($i18ns);
                 $field = array_search($i18n->getName(), $this->additions);
                 if ($field) {
                     $dbObj->$field = $i18n->getValue();
                 }
-            }
+                elseif(in_array($i18n->getName(), $tableColumns)){
+                    $fieldName = $i18n->getName();
+                    $dbObj->$fieldName = $i18n->getValue();
+                }
         }
 
         return $data->getAttributes();
