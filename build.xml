@@ -86,7 +86,7 @@
         </pharpackage>
         <move file="./dist/index.phar" tofile="./dist/index.php" />
         <delete dir="./build" />
-        <loadfile property="version" file="version"/>
+        <loadfile property="version" file="build-config.yaml"/>
         <phingcall target="zip">
             <property name="version" value="${version}" />
         </phingcall>

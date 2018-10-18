@@ -7,8 +7,6 @@ $loader->add('', CONNECTOR_DIR . '/plugins');
 $config = \Symfony\Component\Yaml\Yaml::parseFile(__DIR__ . '/build-config.yaml');
 defined('CONNECTOR_VERSION') || define('CONNECTOR_VERSION', $config['version']);
 
-
-
 use \jtl\Connector\Application\Application;
 use \jtl\Connector\Modified\Modified;
 
