@@ -59,7 +59,7 @@
                 <include name="src/" />
                 <include name="vendor/" />
                 <include name="index.php" />
-                <include name="version" />
+                <include name="build-config.yaml" />
             </fileset>
         </copy>
     </target>
@@ -76,7 +76,7 @@
                 <include name="**/**" />
             </fileset>
             <metadata>
-                <element name="version" value="0.0.1" />
+                <element name="version" value="${version}" />
                 <element name="authors">
                     <element name="Niklas Kokoschka">
                         <element name="email" value="niklas.kokoschka@jtl-software.com" />
@@ -86,7 +86,7 @@
         </pharpackage>
         <move file="./dist/index.phar" tofile="./dist/index.php" />
         <delete dir="./build" />
-        <loadfile property="version" file="version"/>
+        <loadfile property="version" file="build-config.yaml"/>
         <phingcall target="zip">
             <property name="version" value="${version}" />
         </phingcall>
