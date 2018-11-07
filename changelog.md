@@ -1,3 +1,25 @@
+2.0.2
+-----
+- [217f3276]
+  php version fix
+  
+- [7ca718aa]
+  'ot_coupon' and 'ot_discount' handling
+  
+- [8e7befd2]
+  build process fix
+  
+- [f1ed687f]
+  customer address fix
+  
+- [58a0df6a]
+  order price fix
+
+2.0.1
+-----
+- [d8225b30]
+  vpe fix
+
 1.5
 ------
 - [8cd1558]
