@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="JTL-Connector-Modified-Endpoint" default="package">
+    <property file="./build-config.yaml"/>
     <target name="build">
         <delete dir="./dist" />
         <mkdir dir="./dist" />
@@ -86,14 +87,11 @@
         </pharpackage>
         <move file="./dist/index.phar" tofile="./dist/index.php" />
         <delete dir="./build" />
-        <loadfile property="version" file="build-config.yaml"/>
-        <phingcall target="zip">
-            <property name="version" value="${version}" />
-        </phingcall>
+        <phingcall target="zip"/>
     </target>
 
     <target name="zip">
-        <zip destfile="./dist/jtl_connector_modified_${version}.zip" basedir="./dist" prefix="jtlconnector/"/>
+        <zip destfile="./dist/${zipname}${version}.zip" basedir="./dist" prefix="jtlconnector/"/>
     </target>
 
     <target name="clean">
