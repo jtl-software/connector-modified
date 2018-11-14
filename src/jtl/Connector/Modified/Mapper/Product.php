@@ -4,6 +4,8 @@ namespace jtl\Connector\Modified\Mapper;
 
 class Product extends BaseMapper
 {
+    private static $idCache = array();
+    
     protected $mapperConfig = [
         "table"    => "products",
         "query"    => "SELECT p.* FROM products p
@@ -34,7 +36,7 @@ class Product extends BaseMapper
             "categories"             => "Product2Category|addCategory",
             "prices"                 => "ProductPrice|addPrice",
             "specialPrices"          => "ProductSpecialPrice|addSpecialPrice",
-            "variations"             => "ProductVariation|addVariation",
+            "variations"             => "ProductVariationCombination|addVarCombination",
             "invisibilities"         => "ProductInvisibility|addInvisibility",
             "attributes"             => "ProductAttr|addAttribute",
             "vat"                    => null,
@@ -60,7 +62,6 @@ class Product extends BaseMapper
             "Product2Category|addCategory"             => "categories",
             "ProductPrice|addPrice"                    => "prices",
             "ProductSpecialPrice|addSpecialPrice"      => "specialPrices",
-            "ProductVariation|addVariation"            => "variations",
             "ProductInvisibility|addInvisibility|true" => "invisibilities",
             "ProductAttr|addAttribute|true"            => "attributes",
             "products_image"                           => null,
@@ -71,17 +72,38 @@ class Product extends BaseMapper
     
     public function push($data, $dbObj = null)
     {
+        if (isset(static::$idCache[$data->getMasterProductId()->getHost()]['parentId'])) {
+            $data->getMasterProductId()->setEndpoint(static::$idCache[$data->getMasterProductId()->getHost()]['parentId']);
+        }
+    
+        $masterId = $data->getMasterProductId()->getEndpoint();
+        
+        if (!empty($masterId)) {
+            $this->addVarCombiAsVariation($data, $masterId);
+            $this->clearUnusedVariations();
+            return $data;
+        }
+        
         $id = $data->getId()->getEndpoint();
         
         if (!empty($id)) {
             foreach ($this->getCustomerGroups() as $group) {
-                $this->db->query('DELETE FROM personal_offers_by_customers_status_' . $group[ 'customers_status_id' ] . ' WHERE products_id=' . $id);
+                $this->db
+                    ->query(
+                        'DELETE FROM personal_offers_by_customers_status_'
+                        . $group['customers_status_id']
+                        . ' WHERE products_id=' . $id
+                    );
             }
             
             $this->db->query('DELETE FROM specials WHERE products_id=' . $id);
         }
         
-        return parent::push($data, $dbObj);
+        $savedProduct = parent::push($data, $dbObj);
+    
+        static::$idCache[$data->getId()->getHost()]['parentId'] = $savedProduct->getId()->getEndpoint();
+        
+        return $savedProduct;
     }
     
     public function delete($data)
@@ -99,7 +121,7 @@ class Product extends BaseMapper
                 $this->db->query('DELETE FROM specials WHERE products_id=' . $id);
                 
                 foreach ($this->getCustomerGroups() as $group) {
-                    $this->db->query('DELETE FROM personal_offers_by_customers_status_' . $group[ 'customers_status_id' ] . ' WHERE products_id=' . $id);
+                    $this->db->query('DELETE FROM personal_offers_by_customers_status_' . $group['customers_status_id'] . ' WHERE products_id=' . $id);
                 }
                 
                 $this->db->query('DELETE FROM jtl_connector_link_product WHERE endpoint_id="' . $id . '"');
@@ -119,12 +141,12 @@ class Product extends BaseMapper
           WHERE l.host_id IS NULL LIMIT 1
         ", ["return" => "object"]);
         
-        return $objs !== null ? intval($objs[ 0 ]->count) : 0;
+        return $objs !== null ? intval($objs[0]->count) : 0;
     }
     
     protected function considerBasePrice($data)
     {
-        return $data[ 'products_vpe_status' ] == 1 ? true : false;
+        return $data['products_vpe_status'] == 1 ? true : false;
     }
     
     protected function products_vpe($data)
@@ -136,13 +158,13 @@ class Product extends BaseMapper
                 $language_id = $this->locale2id($i18n->getLanguageISO());
                 $dbResult = $this->db->query('SELECT code FROM languages WHERE languages_id=' . $language_id);
                 
-                if ($dbResult[ 0 ][ 'code' ] == $this->shopConfig[ 'settings' ][ 'DEFAULT_LANGUAGE' ]) {
+                if ($dbResult[0]['code'] == $this->shopConfig['settings']['DEFAULT_LANGUAGE']) {
                     $sql = $this->db->query('SELECT products_vpe_id FROM products_vpe WHERE language_id=' . $language_id . ' && products_vpe_name="' . $name . '"');
                     if (count($sql) > 0) {
-                        return $sql[ 0 ][ 'products_vpe_id' ];
+                        return $sql[0]['products_vpe_id'];
                     } else {
                         $nextId = $this->db->query('SELECT max(products_vpe_id) + 1 AS nextID FROM products_vpe');
-                        $id = is_null($nextId[ 0 ][ 'nextID' ]) || $nextId[ 0 ][ 'nextID' ] === 0 ? 1 : $nextId[ 0 ][ 'nextID' ];
+                        $id = is_null($nextId[0]['nextID']) || $nextId[0]['nextID'] === 0 ? 1 : $nextId[0]['nextID'];
                         
                         foreach ($data->getI18ns() as $i18n) {
                             $status = new \stdClass();
@@ -172,13 +194,13 @@ class Product extends BaseMapper
                 $language_id = $this->locale2id($i18n->getLanguageISO());
                 $dbResult = $this->db->query('SELECT code FROM languages WHERE languages_id=' . $language_id);
                 
-                if ($dbResult[ 0 ][ 'code' ] == $this->shopConfig[ 'settings' ][ 'DEFAULT_LANGUAGE' ]) {
+                if ($dbResult[0]['code'] == $this->shopConfig['settings']['DEFAULT_LANGUAGE']) {
                     $sql = $this->db->query('SELECT shipping_status_id FROM shipping_status WHERE language_id=' . $language_id . ' && shipping_status_name="' . $name . '"');
                     if (count($sql) > 0) {
-                        return $sql[ 0 ][ 'shipping_status_id' ];
+                        return $sql[0]['shipping_status_id'];
                     } else {
                         $nextId = $this->db->query('SELECT max(shipping_status_id) + 1 AS nextID FROM shipping_status');
-                        $id = is_null($nextId[ 0 ][ 'nextID' ]) || $nextId[ 0 ][ 'nextID' ] === 0 ? 1 : $nextId[ 0 ][ 'nextID' ];
+                        $id = is_null($nextId[0]['nextID']) || $nextId[0]['nextID'] === 0 ? 1 : $nextId[0]['nextID'];
                         
                         foreach ($data->getI18ns() as $i18n) {
                             $status = new \stdClass();
@@ -211,7 +233,7 @@ class Product extends BaseMapper
         
         if (!empty($id)) {
             $img = $this->db->query('SELECT products_image FROM products WHERE products_id =' . $id);
-            $img = $img[ 0 ][ 'products_image' ];
+            $img = $img[0]['products_image'];
             
             if (isset($img)) {
                 return $img;
@@ -228,12 +250,12 @@ class Product extends BaseMapper
     
     protected function manufacturerId($data)
     {
-        return $this->replaceZero($data[ 'manufacturers_id' ]);
+        return $this->replaceZero($data['manufacturers_id']);
     }
     
     protected function unitId($data)
     {
-        return $this->replaceZero($data[ 'products_vpe' ]);
+        return $this->replaceZero($data['products_vpe']);
     }
     
     protected function considerStock($data)
@@ -243,40 +265,138 @@ class Product extends BaseMapper
     
     protected function considerVariationStock($data)
     {
-        $check = $this->db->query('SELECT products_id FROM products_attributes WHERE products_id=' . $data[ 'products_id' ]);
+        $check = $this->db->query('SELECT products_id FROM products_attributes WHERE products_id=' . $data['products_id']);
         
         return count($check) > 0 ? true : false;
     }
     
     protected function permitNegativeStock($data)
     {
-        return $this->shopConfig[ 'settings' ][ 'STOCK_ALLOW_CHECKOUT' ];
+        return $this->shopConfig['settings']['STOCK_ALLOW_CHECKOUT'];
     }
     
     protected function vat($data)
     {
-        $sql = $this->db->query('SELECT r.tax_rate FROM zones_to_geo_zones z LEFT JOIN tax_rates r ON z.geo_zone_id=r.tax_zone_id WHERE z.zone_country_id = ' . $this->shopConfig[ 'settings' ][ 'STORE_COUNTRY' ] . ' && r.tax_class_id=' . $data[ 'products_tax_class_id' ]);
+        $sql = $this->db->query('SELECT r.tax_rate FROM zones_to_geo_zones z LEFT JOIN tax_rates r ON z.geo_zone_id=r.tax_zone_id WHERE z.zone_country_id = ' . $this->shopConfig['settings']['STORE_COUNTRY'] . ' && r.tax_class_id=' . $data['products_tax_class_id']);
         
         if (empty($sql)) {
             $sql = $this->db->query('SELECT tax_rate FROM tax_rates WHERE tax_rates_id=' . $this->connectorConfig->tax_rate);
         }
         
-        return floatval($sql[ 0 ][ 'tax_rate' ]);
+        return floatval($sql[0]['tax_rate']);
     }
     
     protected function products_tax_class_id($data)
     {
-        $sql = $this->db->query('SELECT r.tax_class_id FROM zones_to_geo_zones z LEFT JOIN tax_rates r ON z.geo_zone_id=r.tax_zone_id WHERE z.zone_country_id = ' . $this->shopConfig[ 'settings' ][ 'STORE_COUNTRY' ] . ' && r.tax_rate=' . $data->getVat());
+        $sql = $this->db->query('SELECT r.tax_class_id FROM zones_to_geo_zones z LEFT JOIN tax_rates r ON z.geo_zone_id=r.tax_zone_id WHERE z.zone_country_id = ' . $this->shopConfig['settings']['STORE_COUNTRY'] . ' && r.tax_rate=' . $data->getVat());
         
         if (empty($sql)) {
             $sql = $this->db->query('SELECT tax_class_id FROM tax_rates WHERE tax_rates_id=' . $this->connectorConfig->tax_rate);
         }
         
-        return $sql[ 0 ][ 'tax_class_id' ];
+        return $sql[0]['tax_class_id'];
     }
     
     protected function products_quantity($data)
     {
         return round($data->getStockLevel()->getStockLevel());
     }
+    
+    protected function addVarCombiAsVariation($data, $masterId)
+    {
+        if (isset(static::$idCache[$data->getMasterProductId()->getHost()]['variationId'])) {
+            $variationId = static::$idCache[$data->getMasterProductId()->getHost()]['variationId'];
+        }
+        
+        if (!isset($variationId)) {
+            $id = (int)$this->db->query("SELECT products_options_id FROM products_options ORDER BY products_options_id DESC LIMIT 0,1")[0]["products_options_id"];
+            if (isset($id[0]["products_options_id"])){
+                $id = ((int)$id[0]["products_options_id"]) +1;
+            }else{
+                $id = 0;
+            }
+            $this->db->query("INSERT IGNORE INTO  products_options (products_options_id, language_id, products_options_name, products_options_sortorder) VALUES (" . $id . ", 2, 'Variation', 0)");
+            
+            static::$idCache[$data->getMasterProductId()->getHost()]['variationId'] = $id;
+        }
+        
+        $variationOptionId = (int)$this->db->query("SELECT products_options_values_id FROM products_options_values ORDER BY products_options_values_id DESC LIMIT 0,1")[0]["products_options_values_id"];
+        $variationOptionId = $variationOptionId >= 0 ? ($variationOptionId + 1) : 0 ;
+        $variationOptionName = "";
+        $i = 0;
+        foreach ($data->getVariations() as $var){
+            $variationOptionName .= $var->getValues()[0]->getI18ns()[0]->getName();
+            if ($i < count($data->getVariations()) -1 && count($data->getVariations()) > 1){
+                $variationOptionName .= " | ";
+            }
+            $i++;
+        }
+        
+        $this->db->query("INSERT IGNORE INTO products_options_values (products_options_values_id, language_id, products_options_values_name, products_options_values_sortorder) VALUES (" . $variationOptionId . ", 2, '". $variationOptionName ."',0)");
+        
+        $id = $this->db->query("SELECT products_options_id FROM products_options ORDER BY products_options_id DESC LIMIT 0,1");
+        if (isset($id[0]["products_options_id"])){
+            $id = ((int)$id[0]["products_options_id"]);
+        }
+    
+        $price = $this->db->query("SELECT products_price FROM products WHERE products_id = " . $masterId);
+        $price = (double) end($data->getPrices())->getItems()[0]->getNetPrice() - $price[0]['products_price'];
+        if ($price >= 0 ){
+            $pricePrefix = "+";
+        }else{
+            $pricePrefix = "-";
+            $price = $price * -1;
+        }
+        $model = $data->getSku();
+        $stock = $data->getStockLevel()->getStockLevel();
+        $weight = $data->getProductWeight();
+        $weightPrefix = "+";
+        $sort = $data->getSort();
+        $ean = $data->getEan();
+        $vpe = 0;
+        $this->db->query("INSERT IGNORE INTO products_attributes (products_id, options_id, options_values_id, options_values_price, price_prefix, attributes_model, attributes_stock, options_values_weight, weight_prefix, sortorder, attributes_ean, attributes_vpe_id, attributes_vpe_value) VALUES (" .
+            $masterId . ", " .
+            $id . ", " .
+            $variationOptionId . ", " .
+            (double)$price . ", '" .
+            $pricePrefix . "', '" .
+            $model . "', " .
+            $stock . ", " .
+            $weight . ", '" .
+            $weightPrefix . "', " .
+            $sort . ", '" .
+            $ean . "', ".
+            $vpe . ", ".
+            $vpe . ")");
+    }
+    
+    protected function clearUnusedVariations()
+    {
+        $this->db->query('
+            DELETE FROM products_options_values
+            WHERE products_options_values_id IN (
+                SELECT * FROM (
+                    SELECT v.products_options_values_id
+                    FROM products_options_values v
+                    LEFT JOIN products_attributes a ON v.products_options_values_id = a.options_values_id
+                    WHERE a.products_attributes_id IS NULL
+                    GROUP BY v.products_options_values_id
+                ) relations
+            )
+        ');
+        
+        $this->db->query('
+            DELETE FROM products_options
+            WHERE products_options_id IN (
+                SELECT * FROM (
+                    SELECT o.products_options_id
+                    FROM products_options o
+                    LEFT JOIN products_attributes a ON o.products_options_id = a.options_id
+                    WHERE a.products_attributes_id IS NULL
+                    GROUP BY o.products_options_id
+                ) relations
+            )
+        ');
+    }
+    
 }

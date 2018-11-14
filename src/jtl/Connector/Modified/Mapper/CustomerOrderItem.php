@@ -17,8 +17,7 @@ class CustomerOrderItem extends BaseMapper
             "name" => "products_name",
             "price" => null,
             "vat" => "products_tax",
-            "sku" => "products_model",
-            "variations" => "CustomerOrderItemVariation|addVariation",
+            "sku" => null,
             "type" => null
         ),
         "mapPush" => array(
@@ -98,7 +97,18 @@ class CustomerOrderItem extends BaseMapper
 
         return $return;
     }
-
+    
+    protected function sku($data)
+    {
+        $isVarComb = $this->db->query("SELECT attributes_model FROM orders_products_attributes WHERE orders_id = " . $data['orders_id']);
+        
+        if (isset($isVarComb[0]['attributes_model'])){
+            return $isVarComb[0]['attributes_model'];
+        } else {
+            return $data['products_model'];
+        }
+    }
+    
     protected function price($data)
     {
         if ($data['allow_tax'] == "0") {
