@@ -22,8 +22,7 @@ class ProductVariationCombinationValue extends BaseMapper
             "ean"                   => "attributes_ean",
             "sort"                  => "sortorder",
             "stockLevel"            => "attributes_stock",
-            "i18ns"                 => "ProductVariationValueI18n|addI18n",
-            "extraCharges"          => "ProductVariationValueExtraCharge|addExtraCharge"
+            "i18ns"                 => "ProductVariationCombinationValueI18n|addI18n"
         )
     
     
