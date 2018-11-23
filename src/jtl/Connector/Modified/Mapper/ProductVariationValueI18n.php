@@ -8,7 +8,7 @@
 
 namespace jtl\Connector\Modified\Mapper;
 
-class ProductVariationCombinationValueI18n extends BaseMapper
+class ProductVariationValueI18n extends BaseMapper
 {
     protected $mapperConfig = array(
         "table" => "products_options_values",
@@ -24,5 +24,11 @@ class ProductVariationCombinationValueI18n extends BaseMapper
     protected function extraWeight($data)
     {
         return $data['weight_prefix'] == '-' ? $data['options_values_weight'] * -1 : $data['options_values_weight'];
+    }
+    
+    protected function languageISO($data)
+    {
+        $test = $this->id2locale($data['language_id']);
+        return $this->id2locale($data['language_id']);
     }
 }

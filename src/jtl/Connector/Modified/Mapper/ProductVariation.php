@@ -8,20 +8,19 @@
 
 namespace jtl\Connector\Modified\Mapper;
 
-class ProductVariationI18N extends BaseMapper
+class ProductVariation extends BaseMapper
 {
     protected $mapperConfig = array (
         "table"     => "products_options",
-        "query"     => 'SELECT * FROM products_options WHERE products_options_id=[[options_id]]',
+        "query"     => 'SELECT * FROM products_attributes WHERE products_id=[[products_id]] GROUP BY options_id',
+        "where"     => "options_id",
+        "getMethod" => "getVariationCombinations",
         "mapPull"   => array (
-            "productVariationId"    => "products_options_id",
-            "name"                  => "products_options_name",
-            "languageISO"           => null
+            "id"            => "options_id",
+            "productId"    => "products_id",
+            "sort"          => "sort_order",
+            "i18ns"         => "ProductVariationI18n|addI18n",
+            "values"        => "ProductVariationValue|addValue"
         )
     );
-    
-    protected function languageISO($data)
-    {
-        return $this->id2locale($data['language_id']);
-    }
 }

@@ -8,7 +8,7 @@ use jtl\Connector\Model\ProductVarCombination;
 
 class Product extends BaseMapper
 {
-    private static $idCache = array();
+    private static $idCache = [];
     
     protected $mapperConfig = [
         "table"    => "products",
@@ -78,18 +78,16 @@ class Product extends BaseMapper
     public function pull($data = null, $limit = null)
     {
         $productResult = parent::pull($data, $limit);
-    
-        
         
         foreach ($productResult as $parent) {
             /** @var \jtl\Connector\Model\Product $parent */
-            if ($parent->getIsMasterProduct()){
+            if ($parent->getIsMasterProduct()) {
                 $data = $parent->getId()->getEndpoint();
                 $dbResult = (new ProductVariationValue())->pull($data, $limit);
-    
-                foreach ($dbResult as $varCombi){
+                
+                foreach ($dbResult as $varCombi) {
                     $attrResult = $this->db->query("SELECT * FROM products_attributes LEFT JOIN products_options_values ON options_values_id = products_options_values_id LEFT JOIN products_options  ON options_id = products_options_id WHERE products_attributes_id = " . $varCombi->getId()->getEndpoint());
-    
+                    
                     /** @var \jtl\Connector\Model\Product $model */
                     $model = clone $parent;
                     $model->setId(new Identity($attrResult[0]['products_attributes_id'], null)); //todo: Nicht null sondern HostId
@@ -114,7 +112,7 @@ class Product extends BaseMapper
                     $variation->setId(new Identity($attrResult[0]['products_options_id'], null));
                     $variation->setSort($varCombi->getSort());
                     $variation->setType("select");
-    
+                    
                     $productVariationI18n = new \jtl\Connector\Model\ProductVariationI18n();
                     $productVariationI18n->setProductVariationId(new Identity($attrResult[0]['products_options_id'], null));
                     $productVariationI18n->setLanguageISO('ger');
@@ -122,7 +120,7 @@ class Product extends BaseMapper
                     $variation->setI18ns([$productVariationI18n]);
                     
                     $value = new \jtl\Connector\Model\ProductVariationValue();
-                    $value->setExtraWeight($attrResult[0]['weight_prefix'] == "+" ? (float) $attrResult[0]['options_values_weight'] : (float) $attrResult[0]['options_values_weight'] *-1);
+                    $value->setExtraWeight($attrResult[0]['weight_prefix'] == "+" ? (float)$attrResult[0]['options_values_weight'] : (float)$attrResult[0]['options_values_weight'] * -1);
                     $value->setSort($varCombi->getSort());
                     $value->setStockLevel($varCombi->getStockLevel());
                     $value->setEan($attrResult[0]['attributes_ean']);
@@ -160,12 +158,13 @@ class Product extends BaseMapper
         if (isset(static::$idCache[$data->getMasterProductId()->getHost()]['parentId'])) {
             $data->getMasterProductId()->setEndpoint(static::$idCache[$data->getMasterProductId()->getHost()]['parentId']);
         }
-    
+        
         $masterId = $data->getMasterProductId()->getEndpoint();
         
         if (!empty($masterId)) {
             $this->addVarCombiAsVariation($data, $masterId);
             $this->clearUnusedVariations();
+            
             return $data;
         }
         
@@ -185,7 +184,7 @@ class Product extends BaseMapper
         }
         
         $savedProduct = parent::push($data, $dbObj);
-    
+        
         static::$idCache[$data->getId()->getHost()]['parentId'] = $savedProduct->getId()->getEndpoint();
         
         return $savedProduct;
@@ -202,8 +201,10 @@ class Product extends BaseMapper
                 $this->db->query('DELETE FROM products_description WHERE products_id=' . $id);
                 $this->db->query('DELETE FROM products_images WHERE products_id=' . $id);
                 $result = $this->db->query('SELECT options_values_id FROM products_attributes WHERE products_id=' . $id);
-                $valuesId = $result[0]['options_values_id'];
-                $this->db->query('DELETE FROM products_options_values WHERE products_options_values_id=' . $valuesId);
+                foreach ($result as $item) {
+                    $this->db->query('DELETE FROM products_options_values WHERE products_options_values_id=' . $item['options_values_id']);
+                    $this->db->query('DELETE FROM jtl_connector_link_products_option WHERE endpoint_id=' . $item['options_values_id']);
+                }
                 $this->db->query('DELETE FROM products_attributes WHERE products_id=' . $id);
                 $this->db->query('DELETE FROM products_xsell WHERE products_id=' . $id . ' OR xsell_id=' . $id);
                 $this->db->query('DELETE FROM specials WHERE products_id=' . $id);
@@ -228,8 +229,19 @@ class Product extends BaseMapper
           LEFT JOIN jtl_connector_link_product l ON p.products_id = l.endpoint_id
           WHERE l.host_id IS NULL LIMIT 1
         ", ["return" => "object"]);
+        $objs = $objs !== null ? intval($objs[0]->count) : 0;
         
-        return $objs !== null ? intval($objs[0]->count) : 0;
+        $combis = $this->db->query("
+          SELECT count(a.options_values) as count
+          FROM products_attributes a
+          LEFT JOIN jtl_connector_link_products_option l ON a.options_values = l.endpoint_id
+          WHERE l.host_id IS NULL LIMIT 1
+        ", ["return" => "object"]);
+        $combis = $combis !== null ? intval($combis[0]->count) : 0;
+        
+        $objs += $combis;
+        
+        return $objs;
     }
     
     protected function considerBasePrice($data)
@@ -393,6 +405,7 @@ class Product extends BaseMapper
     protected function isMasterProduct($data)
     {
         $childCount = $this->db->query("SELECT COUNT(*) FROm products_attributes WHERE products_id = " . $data['products_id']);
+        
         return (int)$childCount[0]['COUNT(*)'] > 0 ? true : false;
     }
     
@@ -404,9 +417,9 @@ class Product extends BaseMapper
         
         if (!isset($variationId)) {
             $id = (int)$this->db->query("SELECT products_options_id FROM products_options ORDER BY products_options_id DESC LIMIT 0,1")[0]["products_options_id"];
-            if (isset($id[0]["products_options_id"])){
-                $id = ((int)$id[0]["products_options_id"]) +1;
-            }else{
+            if (isset($id[0]["products_options_id"])) {
+                $id = ((int)$id[0]["products_options_id"]) + 1;
+            } else {
                 $id = 1;
             }
             $this->db->query("INSERT IGNORE INTO  products_options (products_options_id, language_id, products_options_name, products_options_sortorder) VALUES (" . $id . ", 2, 'Variation', 0)");
@@ -415,35 +428,42 @@ class Product extends BaseMapper
         }
         
         $variationOptionId = (int)$this->db->query("SELECT products_options_values_id FROM products_options_values ORDER BY products_options_values_id DESC LIMIT 0,1")[0]["products_options_values_id"];
-        $variationOptionId = $variationOptionId >= 0 ? ($variationOptionId + 1) : 1 ;
+        $variationOptionId = $variationOptionId >= 0 ? ($variationOptionId + 1) : 1;
         $variationOptionName = "";
         
         $i = 0;
-        foreach ($data->getVariations() as $var){
+        foreach ($data->getVariations() as $var) {
             $variationOptionName .= $var->getValues()[0]->getI18ns()[0]->getName();
-            if ($i < count($data->getVariations()) -1 && count($data->getVariations()) > 1){
+            if ($i < count($data->getVariations()) - 1 && count($data->getVariations()) > 1) {
                 $variationOptionName .= " | ";
             }
             $i++;
         }
         
         $languageId = parent::locale2id($data->getVariations()[0]->getI18ns()[0]->getLanguageISO());
+        $result = $this->db->query("SELECT * FROM jtl_connector_link_products_option WHERE host_id = " . $data->getId()->getHost());
         
-        $this->db->query("INSERT IGNORE INTO products_options_values (products_options_values_id, language_id, products_options_values_name, products_options_values_sortorder) VALUES (" . $variationOptionId . "," . $languageId . ", '". $variationOptionName ."',0)");
-        
+        if (count($result) > 0) {
+            $variationOptionId = $result[0]['endpoint_id'];
+            $this->db->query("UPDATE products_options_values SET language_id = " . $languageId . ", products_options_values_name = '" . $variationOptionName . "', products_options_values_sortorder = 0 WHERE products_options_values_id = " . $variationOptionId);
+        } else {
+            $this->db->query("INSERT INTO products_options_values (products_options_values_id, language_id, products_options_values_name, products_options_values_sortorder) VALUES (" . $variationOptionId . "," . $languageId . ", '" . $variationOptionName . "',0)");
+            $this->db->query("INSERT INTO jtl_connector_link_products_option (endpoint_id, host_id) VALUES (" . $variationOptionId . ", " . $data->getId()->getHost() . ")");
+        }
         $id = $this->db->query("SELECT products_options_id FROM products_options ORDER BY products_options_id DESC LIMIT 0,1");
-        if (isset($id[0]["products_options_id"])){
+        if (isset($id[0]["products_options_id"])) {
             $id = ((int)$id[0]["products_options_id"]);
         }
-    
+        
         $price = $this->db->query("SELECT products_price FROM products WHERE products_id = " . $masterId);
-        $price = (double) end($data->getPrices())->getItems()[0]->getNetPrice() - $price[0]['products_price'];
-        if ($price >= 0 ){
+        $price = (double)end($data->getPrices())->getItems()[0]->getNetPrice() - $price[0]['products_price'];
+        if ($price >= 0) {
             $pricePrefix = "+";
-        }else{
+        } else {
             $pricePrefix = "-";
             $price = $price * -1;
         }
+        
         $model = $data->getSku();
         $stock = $data->getStockLevel()->getStockLevel();
         $weight = $data->getProductWeight();
@@ -451,20 +471,27 @@ class Product extends BaseMapper
         $sort = $data->getSort();
         $ean = $data->getEan();
         $vpe = 0;
-        $this->db->query("INSERT IGNORE INTO products_attributes (products_id, options_id, options_values_id, options_values_price, price_prefix, attributes_model, attributes_stock, options_values_weight, weight_prefix, sortorder, attributes_ean, attributes_vpe_id, attributes_vpe_value) VALUES (" .
-            $masterId . ", " .
-            $id . ", " .
-            $variationOptionId . ", " .
-            (double)$price . ", '" .
-            $pricePrefix . "', '" .
-            $model . "', " .
-            $stock . ", " .
-            $weight . ", '" .
-            $weightPrefix . "', " .
-            $sort . ", '" .
-            $ean . "', ".
-            $vpe . ", ".
-            $vpe . ")");
+        
+        if (count($result) > 0) {
+            $query = sprintf("UPDATE products_attributes SET products_id = %s, options_id = %s, options_values_price = %s, price_prefix = '%s', attributes_model = '%s', attributes_stock = %s, options_values_weight = %s, weight_prefix = '%s', sortorder = '%s', attributes_ean = %s, attributes_vpe_id = %s, attributes_vpe_value = %s WHERE options_values_id = %s",
+                $masterId, $id, (double)$price, $pricePrefix, $model, $stock, $weight, $weightPrefix, $sort, empty($ean) ? 'null' : $ean, $vpe, $vpe, $variationOptionId);
+            $this->db->query($query);
+        } else {
+            $this->db->query("INSERT IGNORE INTO products_attributes (products_id, options_id, options_values_id, options_values_price, price_prefix, attributes_model, attributes_stock, options_values_weight, weight_prefix, sortorder, attributes_ean, attributes_vpe_id, attributes_vpe_value) VALUES (" .
+                $masterId . ", " .
+                $id . ", " .
+                $variationOptionId . ", " .
+                (double)$price . ", '" .
+                $pricePrefix . "', '" .
+                $model . "', " .
+                $stock . ", " .
+                $weight . ", '" .
+                $weightPrefix . "', " .
+                $sort . ", '" .
+                $ean . "', " .
+                $vpe . ", " .
+                $vpe . ")");
+        }
     }
     
     protected function clearUnusedVariations()

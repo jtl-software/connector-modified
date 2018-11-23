@@ -8,7 +8,7 @@
 
 namespace jtl\Connector\Modified\Mapper;
 
-class ProductVariationCombinationI18n extends BaseMapper
+class ProductVariationI18n extends BaseMapper
 {
     protected $mapperConfig = array (
         "table"     => "products_options",
@@ -22,6 +22,7 @@ class ProductVariationCombinationI18n extends BaseMapper
     
     protected function languageISO($data)
     {
+        $test = $this->id2locale($data['language_id']);
         return $this->id2locale($data['language_id']);
     }
 }
