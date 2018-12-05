@@ -278,6 +278,7 @@ class CustomerOrder extends BaseMapper
                 $discount->setQuantity(1);
                 $discount->setVat(0);
                 $discount->setPrice(floatval($total['value']));
+                $discount->setPriceGross(floatval($total['value']));
                 
                 $model->addItem($discount);
             }
