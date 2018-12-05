@@ -277,7 +277,6 @@ class CustomerOrder extends BaseMapper
                 $discount->setId($this->identity($total['orders_total_id']));
                 $discount->setQuantity(1);
                 $discount->setVat(0);
-                $discount->setPrice(floatval($total['value']));
                 $discount->setPriceGross(floatval($total['value']));
                 
                 $model->addItem($discount);
@@ -290,7 +289,6 @@ class CustomerOrder extends BaseMapper
                 $coupon->setId($this->identity($total['orders_total_id']));
                 $coupon->setQuantity(1);
                 $coupon->setVat(0);
-                $coupon->setPrice(floatval($total['value']));
                 $coupon->setPriceGross(floatval($total['value']));
                 
                 $model->addItem($coupon);
