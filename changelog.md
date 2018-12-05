@@ -1,18 +1,18 @@
 2.0.2
 -----
-- [217f3276]
+- [217f3276] [CO-295]
   php version fix
   
-- [7ca718aa]
+- [7ca718aa] [CO-321]
   'ot_coupon' and 'ot_discount' handling
   
-- [8e7befd2]
+- [8e7befd2] [CO-323]
   build process fix
   
-- [f1ed687f]
+- [f1ed687f] [CO-295]
   customer address fix
   
-- [58a0df6a]
+- [58a0df6a] [CO-315]
   order price fix
 
 2.0.1
