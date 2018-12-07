@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Niklas
- * Date: 14.11.2018
- * Time: 12:56
- */
 
 namespace jtl\Connector\Modified\Mapper;
 
@@ -28,7 +22,6 @@ class ProductVariationValueI18n extends BaseMapper
     
     protected function languageISO($data)
     {
-        $test = $this->id2locale($data['language_id']);
         return $this->id2locale($data['language_id']);
     }
 }
