@@ -474,7 +474,10 @@ class Product extends BaseMapper
     
             $i = 0;
             foreach ($data->getVariations() as $var) {
-                $variationOptionName .= $var->getValues()[0]->getI18ns()[$i18nId]->getName();
+                if(isset($var->getValues()[0]->getI18ns()[$i18nId])) {
+                    $variationOptionName .= $var->getValues()[0]->getI18ns()[$i18nId]->getName();
+                }
+                
                 if ($i < count($data->getVariations()) - 1 && count($data->getVariations()) > 1) {
                     $variationOptionName .= " | ";
                 }
