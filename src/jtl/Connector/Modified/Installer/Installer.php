@@ -11,7 +11,8 @@ class Installer
         'connector' => 'Connector',
         'status' => 'Status',
         'thumbs' => 'ThumbMode',
-        'tax_rate' => 'TaxRate'        
+        'tax_rate' => 'TaxRate',
+        'dev_logging' => 'DevLogging'
     );
 
     private $connectorConfig = null;
