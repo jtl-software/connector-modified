@@ -17,8 +17,8 @@ class DevLogging extends Module
             <label for="logging" class="col-xs-2 control-label">Developer Logging</label>
                 <div class="col-xs-6">
                     <select class="form-control" name="logging" id="logging">
-                        <option value="1"' . ($this->config->developer_logging !== true ? : 'selected') . '>Aktiviert</option>
-                        <option value="0"' . ($this->config->developer_logging !== false ? : 'selected') . '>Deaktiviert</option>
+                        <option value="1"' . ($this->config->developer_logging !== true ? "" : 'selected') . '>Aktiviert</option>
+                        <option value="0"' . ($this->config->developer_logging !== false ? "" : 'selected') . '>Deaktiviert</option>
                     </select>
                     <span id="helpBlock" class="help-block">
                         Durch aktivieren dieser Option werden im Fehlerfall erweiterte Logdateien geschieben welche bei Supportanfragen für eine schnellere Hilfe erforderlich sind.
@@ -31,18 +31,14 @@ class DevLogging extends Module
             ';
         
         if (count(scandir($this->config->platform_root . '/jtlconnector/logs')) > 3){
-            $html .=' <button formmethod="post" formaction="/jtlconnector/install/loggingConfig.php" name="clear" class="btn btn-default btn-sm btn-block">Clear</button>';
+            $html .= '<button formmethod="post" formaction="/jtlconnector/install/loggingConfig.php" name="clear" class="btn btn-default btn-sm btn-block">Clear</button>';
         }else{
-            $html .= '
-            <div data-toggle="tooltip" data-placement="top" title="Es wurden keine Logs gefunden!">
+            $html .= '<div data-toggle="tooltip" data-placement="top" title="Es wurden keine Logs gefunden!">
                 <button disabled class="btn btn-default btn-sm btn-block">Clear</button>
-            </div>
-            
-            ';
+            </div>';
         }
         
-        $html .='
-            </div>
+        $html .='</div>
         </div>
         <div class="form-group">
             <label for="download" class="col-xs-2 control-label">Logs herunterladen</label>
@@ -51,15 +47,12 @@ class DevLogging extends Module
         if (count(scandir($this->config->platform_root . '/jtlconnector/logs')) > 3){
             $html .='<button formmethod="post" formaction="/jtlconnector/install/loggingConfig.php" name="download" class="btn btn-default btn-sm btn-block">Download</button>';
         }else{
-            $html .= '
-            <div data-toggle="tooltip" data-placement="top" title="Es wurden keine Logs gefunden!">
+            $html .= '<div data-toggle="tooltip" data-placement="top" title="Es wurden keine Logs gefunden!">
                 <button disabled class="btn btn-default btn-sm btn-block">Download</button>
-            </div>
-            
-            ';
+            </div>';
         }
-            
-            $html .= '</div>
+        
+        $html .= '</div>
         </div>
         </div>';
         

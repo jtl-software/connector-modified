@@ -11,6 +11,7 @@ $logFolder = $projectdir . '/jtlconnector/logs/';
 $downloadFolder = $projectdir . '/jtlconnector/install/';
 
 if (isset($_REQUEST['download'])) {
+    //Reset log zip
     if (file_exists($downloadFolder . 'logs.zip')) {
         unlink($downloadFolder . 'logs.zip');
     }
@@ -18,6 +19,7 @@ if (isset($_REQUEST['download'])) {
     $zip = new \ZipArchive();
     $zip->open($downloadFolder . 'logs.zip', \ZipArchive::CREATE);
     
+    //Add logs to new zip
     foreach (scandir($logFolder) as $file) {
         if ($file !== '.' && $file !== '..' && $file !== '.htaccess') {
             $zip->addFile($logFolder . $file, $file);
@@ -25,16 +27,19 @@ if (isset($_REQUEST['download'])) {
     }
     $zip->close();
     
+    //Download zip file
     header('Content-type: application/zip');
     header('Content-Disposition: attachment; filename="logs.zip"');
     readfile($downloadFolder . 'logs.zip');
 
 } elseif (isset($_REQUEST['clear'])) {
+    //Clear all logs
     foreach (scandir($logFolder) as $file) {
         if ($file !== '.' && $file !== '..' && $file !== '.htaccess') {
             unlink($logFolder . $file);
         }
     }
     
+    //Redirect to connector page
     header('Location: /jtlconnector/install/#dev_logging');
 }
