@@ -62,11 +62,21 @@ class Manufacturer extends BaseMapper
 
         $newId = $return->getId()->getEndpoint();
 
-        if(!empty($url) && !empty($newId)) {
-            $languages = $this->db->query('SELECT languages_id FROM languages');
-
-            foreach ($languages as $language) {
-                $this->db->query('INSERT INTO manufacturers_info SET manufacturers_id='.$newId.', languages_id='.$language['languages_id'].', manufacturers_url="'.$url.'"');
+        if(!empty($newId)) {
+            /** @var \jtl\Connector\Model\ManufacturerI18n $i18n */
+            foreach ($data->getI18ns() as $i18n) {
+                if ($lang = $this->locale2id($i18n->getLanguageIso())){
+                    $this->db->query(
+                        sprintf('INSERT INTO manufacturers_info SET manufacturers_id=%s, languages_id=%s, manufacturers_description="%s",	manufacturers_meta_title="%s", manufacturers_meta_description="%s", manufacturers_meta_keywords="%s", manufacturers_url="%s"',
+                        $newId,
+                        $lang,
+                        $i18n->getDescription(),
+                        $i18n->getTitleTag(),
+                        $i18n->getMetaDescription(),
+                        $i18n->getMetaKeywords(),
+                        $url)
+                    );
+                }
             }
         }
 
