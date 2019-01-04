@@ -41,17 +41,23 @@ class CrossSellingGroup extends BaseMapper
         
         $ids = implode(",", $ids);
         
-        $this->db->query(sprintf(" DELETE FROM products_xsell WHERE products_xsell_grp_name_id NOT IN (%s)",
-            $ids
-        ));
+        if (!empty($ids))
+        {
+            $this->db->query(sprintf(" DELETE FROM products_xsell WHERE products_xsell_grp_name_id NOT IN (%s)",
+                $ids
+            ));
     
-        $this->db->query(sprintf(" DELETE FROM products_xsell_grp_name WHERE products_xsell_grp_name_id NOT IN (%s)",
-            $ids
-        ));
+            $this->db->query(sprintf(" DELETE FROM products_xsell_grp_name WHERE products_xsell_grp_name_id NOT IN (%s)",
+                $ids
+            ));
+    
+            $this->db->query(sprintf(" DELETE FROM jtl_connector_link_crossselling_group WHERE endpoint_id NOT IN (%s)",
+                $ids
+            ));
+        } else {
+            $this->db->query("DELETE j.*, p.*, g.* FROM jtl_connector_link_crossselling_group j LEFT JOIN products_xsell p ON j.endpoint_id = p.products_xsell_grp_name_id LEFT JOIN products_xsell_grp_name g ON j.endpoint_id = g.products_xsell_grp_name_id");
+        }
         
-          $this->db->query(sprintf(" DELETE FROM jtl_connector_link_crossselling_group WHERE endpoint_id NOT IN (%s)",
-            $ids
-        ));
         return $result;
     }
 }
