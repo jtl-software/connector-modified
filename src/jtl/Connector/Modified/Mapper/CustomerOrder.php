@@ -20,6 +20,7 @@ class CustomerOrder extends BaseMapper
             "creationDate" => "date_purchased",
             "note" => "comments",
             "paymentModuleCode" => null,
+            "languageISO" => null,
             "currencyIso" => "currency",
             "billingAddress" => "CustomerOrderBillingAddress|setBillingAddress",
             "shippingAddress" => "CustomerOrderShippingAddress|setShippingAddress",
@@ -118,6 +119,11 @@ class CustomerOrder extends BaseMapper
         } elseif ($mapping == 'completed' || $mapping == 'shipped') {
             return CustomerOrderModel::STATUS_SHIPPED;
         }
+    }
+    
+    protected function languageISO($data)
+    {
+        return $this->id2locale($data['languages_id']);
     }
     
     protected function paymentStatus($data)
