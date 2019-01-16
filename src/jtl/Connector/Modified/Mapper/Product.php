@@ -474,7 +474,10 @@ class Product extends BaseMapper
     
             $i = 0;
             foreach ($data->getVariations() as $var) {
-                $variationOptionName .= $var->getValues()[0]->getI18ns()[$i18nId]->getName();
+                if(isset($var->getValues()[0]->getI18ns()[$i18nId])) {
+                    $variationOptionName .= $var->getValues()[0]->getI18ns()[$i18nId]->getName();
+                }
+                
                 if ($i < count($data->getVariations()) - 1 && count($data->getVariations()) > 1) {
                     $variationOptionName .= " | ";
                 }
@@ -486,29 +489,30 @@ class Product extends BaseMapper
                     $data->getId()->getHost(), $langId
                 )
             );
-            
+    
             if (count($result) > 0) {
                 $variationOptionId = explode("_", $result[0]['endpoint_id'])[0];
-                $this->db->query(
-                    sprintf("UPDATE products_options_values SET products_options_values_name = '%s', products_options_values_sortorder = 0 WHERE products_options_values_id = %s AND language_id = %s",
-                        $variationOptionName, $variationOptionId, $langId
-                    )
-                );
-                
             } else {
-                $this->db->query(
-                    sprintf("INSERT INTO products_options_values (products_options_values_id, language_id, products_options_values_name, products_options_values_sortorder) VALUES (%s, %s, '%s', 0)",
-                        $variationOptionId, $langId, $variationOptionName
-                    )
-                );
                 $this->db->query(
                     sprintf("INSERT INTO jtl_connector_link_products_option (endpoint_id, host_id) VALUES ('%s', %s)",
                         $variationOptionId . "_" . $langId, $data->getId()->getHost()
                     )
                 );
-    
                 static::$idCache[$data->getId()->getHost()]['valuesId'] = $variationOptionId;
             }
+            
+            $variationValue = new \stdClass();
+            $variationValue->products_options_values_name = $variationOptionName;
+            $variationValue->products_options_values_id = $variationOptionId;
+            $variationValue->language_id = $langId;
+            
+            if (version_compare($this->shopConfig['db']['version'], '2.0.4', '>=')){
+                $variationValue->products_options_values_sortorder = 0;
+            }
+            
+            $this->db->deleteInsertRow($variationValue, 'products_options_values',
+                ['products_options_values_id', 'langauge_id'],
+                [$variationOptionId, $langId]);
 
             $id = $this->db->query(
                 sprintf("SELECT products_options_id FROM products_options WHERE language_id = %s ORDER BY products_options_id DESC LIMIT 0,1",
