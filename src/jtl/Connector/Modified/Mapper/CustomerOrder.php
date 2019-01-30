@@ -21,6 +21,7 @@ class CustomerOrder extends BaseMapper
             "note" => "comments",
             "paymentModuleCode" => null,
             "currencyIso" => "currency",
+            "languageISO" => null,
             "billingAddress" => "CustomerOrderBillingAddress|setBillingAddress",
             "shippingAddress" => "CustomerOrderShippingAddress|setShippingAddress",
             "shippingMethodName" => "shipping_method",
@@ -84,6 +85,11 @@ class CustomerOrder extends BaseMapper
     public function pull($data = null, $limit = null)
     {
         return parent::pull(null, $limit);
+    }
+    
+    protected function languageISO($data)
+    {
+        return $this->id2locale($data['languages_id']);
     }
     
     protected function status($data)
