@@ -47,10 +47,6 @@ class PrimaryKeyMapper implements IPrimaryKeyMapper
         if (isset(static::$types[$type])) {
             $dbResult = $this->db->query("SELECT endpoint_id FROM jtl_connector_link_".static::$types[$type]." WHERE host_id = ".$hostId);
             
-            if($type = IdentityLinker::TYPE_PRODUCT && empty($dbResult)){
-                $dbResult = $this->db->query(sprintf('SELECT endpoint_id FROM jtl_connector_link_products_option l WHERE l.host_id = %s', $hostId));
-            }
-            
             $endpoint_id = (count($dbResult) > 0) ? $dbResult[0]['endpoint_id'] : null;
     
             Logger::write(sprintf('Trying to get endpoint_id with host_id (%s) and type (%s) ... endpoint_id: (%s)', $hostId, $type, $endpoint_id), Logger::DEBUG, 'linker');

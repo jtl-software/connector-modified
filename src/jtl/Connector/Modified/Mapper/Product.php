@@ -216,26 +216,32 @@ class Product extends BaseMapper
         
         if (!empty($id) && $id != '') {
             try {
-                $this->db->query('DELETE FROM products WHERE products_id=' . $id);
-                $this->db->query('DELETE FROM products_to_categories WHERE products_id=' . $id);
-                $this->db->query('DELETE FROM products_description WHERE products_id=' . $id);
-                $this->db->query('DELETE FROM products_images WHERE products_id=' . $id);
-                $result = $this->db->query('SELECT options_values_id FROM products_attributes WHERE products_id=' . $id);
-                foreach ($result as $item) {
-                    if (isset($item['options_values_id'])) {
-                        $this->db->query('DELETE FROM products_options_values WHERE products_options_values_id=' . $item['options_values_id']);
-                        $this->db->query('DELETE FROM jtl_connector_link_products_option WHERE endpoint_id=' . $item['options_values_id']);
+                if (Product::isVarCombi($id)){
+                    $this->db->query('DELETE FROM products_attributes WHERE options_values_id=' . Product::extractOptionValueId($id));
+                    $this->db->query('DELETE FROM products_options_values WHERE products_options_values_id=' . Product::extractOptionValueId($id));
+                    $this->db->query('DELETE FROM jtl_connector_link_product WHERE endpoint_id=' . $id);
+                } else {
+                    $this->db->query('DELETE FROM products WHERE products_id=' . $id);
+                    $this->db->query('DELETE FROM products_to_categories WHERE products_id=' . $id);
+                    $this->db->query('DELETE FROM products_description WHERE products_id=' . $id);
+                    $this->db->query('DELETE FROM products_images WHERE products_id=' . $id);
+                    $result = $this->db->query('SELECT options_values_id FROM products_attributes WHERE products_id=' . $id);
+                    foreach ($result as $item) {
+                        if (isset($item['options_values_id'])) {
+                            $this->db->query('DELETE FROM products_options_values WHERE products_options_values_id=' . $item['options_values_id']);
+                            $this->db->query('DELETE FROM jtl_connector_link_product WHERE endpoint_id=' . Product::createProductEndpoint($id, $item['options_values_id']));
+                        }
                     }
+                    $this->db->query('DELETE FROM products_attributes WHERE products_id=' . $id);
+                    $this->db->query('DELETE FROM products_xsell WHERE products_id=' . $id . ' OR xsell_id=' . $id);
+                    $this->db->query('DELETE FROM specials WHERE products_id=' . $id);
+    
+                    foreach ($this->getCustomerGroups() as $group) {
+                        $this->db->query('DELETE FROM personal_offers_by_customers_status_' . $group['customers_status_id'] . ' WHERE products_id=' . $id);
+                    }
+    
+                    $this->db->query('DELETE FROM jtl_connector_link_product WHERE endpoint_id="' . $id . '"');
                 }
-                $this->db->query('DELETE FROM products_attributes WHERE products_id=' . $id);
-                $this->db->query('DELETE FROM products_xsell WHERE products_id=' . $id . ' OR xsell_id=' . $id);
-                $this->db->query('DELETE FROM specials WHERE products_id=' . $id);
-                
-                foreach ($this->getCustomerGroups() as $group) {
-                    $this->db->query('DELETE FROM personal_offers_by_customers_status_' . $group['customers_status_id'] . ' WHERE products_id=' . $id);
-                }
-                
-                $this->db->query('DELETE FROM jtl_connector_link_product WHERE endpoint_id="' . $id . '"');
             } catch (\Exception $e) {
             }
         }
@@ -261,7 +267,7 @@ class Product extends BaseMapper
         $combis = $this->db->query("
           SELECT count(a.options_values) as count
           FROM products_attributes a
-          LEFT JOIN jtl_connector_link_products_option l ON a.options_values = l.endpoint_id
+          LEFT JOIN jtl_connector_link_product l ON a.options_values = l.endpoint_id
           WHERE l.host_id IS NULL LIMIT 1
         ", ["return" => "object"]);
         
@@ -485,17 +491,17 @@ class Product extends BaseMapper
             }
     
             $result = $this->db->query(
-                sprintf("SELECT * FROM jtl_connector_link_products_option WHERE host_id = %s AND endpoint_id LIKE '%%_%s'",
-                    $data->getId()->getHost(), $langId
+                sprintf("SELECT * FROM jtl_connector_link_product WHERE host_id = %s",
+                    $data->getId()->getHost()
                 )
             );
     
             if (count($result) > 0) {
-                $variationOptionId = explode("_", $result[0]['endpoint_id'])[0];
+                $variationOptionId = Product::extractOptionValueId($result[0]['endpoint_id']);
             } else {
                 $this->db->query(
-                    sprintf("INSERT INTO jtl_connector_link_products_option (endpoint_id, host_id) VALUES ('%s', %s)",
-                        $variationOptionId . "_" . $langId, $data->getId()->getHost()
+                    sprintf("INSERT INTO jtl_connector_link_product (endpoint_id, host_id) VALUES ('%s', %s)",
+                        Product::createProductEndpoint($masterId, $variationOptionId), $data->getId()->getHost()
                     )
                 );
                 static::$idCache[$data->getId()->getHost()]['valuesId'] = $variationOptionId;
@@ -596,4 +602,26 @@ class Product extends BaseMapper
         ');
     }
     
+    public static function createProductEndpoint($parentId, $optionValueId)
+    {
+        return $parentId . "_" . $optionValueId;
+    }
+    
+    public static function extractParentId($endpoint)
+    {
+        $data = explode('_', $endpoint);
+        return $data[0];
+    }
+    
+    public static function extractOptionValueId($endpoint)
+    {
+        $data = explode('_', $endpoint);
+        return $data[1];
+    }
+    
+    public static function isVarCombi($endpoint)
+    {
+        $data = explode('_', $endpoint);
+        return isset($data[1]) ? true : false;
+    }
 }

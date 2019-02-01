@@ -36,8 +36,8 @@ class ProductPriceItem extends BaseMapper
             $obj = new \stdClass();
 
             if (is_null($data->getCustomerGroupId()->getEndpoint()) || $data->getCustomerGroupId()->getEndpoint() == '') {
-                if (strpos($productId, '_')){
-                    $productId = explode('_', $productId)[0];
+                if (Product::isVarCombi($productId)){
+                    $productId = Product::extractOptionValueId($productId);
                     $newPrice = $this->db->query(sprintf("SELECT products_price FROM products WHERE products_id = (SELECT products_id FROM products_attributes WHERE options_values_id = %s)", $productId));
     
                     $newPrice = $price->getNetPrice() - $newPrice[0]['products_price'];

@@ -20,7 +20,6 @@ class Installer
     {
         error_reporting(E_ALL ^ E_NOTICE);
         ini_set('display_errors', 1);
-
         $shopConfig = $this->readConfigFile();
         $this->connectorConfig = new Config(CONNECTOR_DIR.'/config/config.json');
 

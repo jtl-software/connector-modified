@@ -24,7 +24,7 @@ class CrossSelling extends BaseMapper
         $id = $data->getProductId()->getEndpoint();
 
         if (!empty($id)) {
-            $this->db->query('DELETE FROM products_xsell WHERE products_id='.$id);    
+            $this->db->query('DELETE FROM products_xsell WHERE products_id='.Product::extractParentId($id));
         
             foreach ($data->getItems() as $item) {
                 foreach ($item->getProductIds() as $xsellid) {
