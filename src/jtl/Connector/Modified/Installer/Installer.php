@@ -67,16 +67,20 @@ class Installer
                     exit();
                 }
             } else {
-                echo '<div class="alert alert-danger">Folgende Fehler traten auf:
+                $html = '<div class="alert alert-danger">Folgende Fehler traten auf:
 		        		<br>
 		        		<ul>';
             
                 foreach ($moduleErrors as $error) {
-                    echo '<li>'.$error.'</li>';
+                    $html .= '<li>'.$error.'</li>';
                 }
             
-                echo '</ul>
+                $html .= '</ul>
 		        		</div>';
+                
+                $_SESSION['fail'] = $html;
+                header("Location: " . $_SERVER['HTTP_REFERER']);
+                exit();
             }
         }
 
@@ -106,13 +110,17 @@ class Installer
             {
                 echo '<div class="alert alert-danger">Fehler beim Schreiben der config.json Datei.</div>';
                 unset($_SESSION['error']);
-            } elseif(isset($_SESSION['success']))
+            } elseif (isset($_SESSION['success']))
             {
                 echo '<div class="alert alert-success">Connector Konfiguration wurde gespeichert.</div>';
                 echo '<div class="alert alert-danger"><b>ACHTUNG:</b><br/>
                             Bitte sorgen Sie nach erfolgreicher Installation des Connectors unbedingt dafür, dass dieser Installer
                             sowie die Datei config.json im Verzeichnis config nicht öffentlich les- und ausführbar sind!</div>';
                 unset($_SESSION['success']);
+            }elseif (isset($_SESSION['fail']))
+            {
+                echo $_SESSION['fail'];
+                unset($_SESSION['fail']);
             }
             
             echo '</div>';
