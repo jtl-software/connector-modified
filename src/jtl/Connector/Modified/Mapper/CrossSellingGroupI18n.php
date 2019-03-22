@@ -19,29 +19,16 @@ class CrossSellingGroupI18n extends BaseMapper
 
     public function push($data, $dbObj = null)
     {
-        $id = $data->getId()->getEndpoint();
+        /** @var \jtl\Connector\Model\CrossSellingGroupI18n $i18n */
+        $i18n = $data;
+        
+        $grp = new \stdClass();
+        $grp->language_id = $this->locale2id($i18n->getLanguageISO());
+        $grp->products_xsell_grp_name_id = $i18n->getCrossSellingGroupId()->getEndpoint();
+        $grp->groupname = $i18n->getName();
+        $this->db->insertRow($grp, 'products_xsell_grp_name');
 
-        if (empty($id)) {
-            $nextId = $this->db->query('SELECT max(products_xsell_grp_name_id) + 1 AS nextID FROM products_xsell_grp_name');
-            $id = is_null($nextId[0]['nextID']) || $nextId[0]['nextID'] === 0 ? 1 : $nextId[0]['nextID'];
-        } else {
-            $this->db->query('DELETE FROM products_xsell_grp_name WHERE products_xsell_grp_name_id='.$id);
-        }
-
-        $data->getId()->setEndpoint($id);
-
-        foreach ($data->getI18ns() as $i18n) {
-            $i18n->getCrossSellingGroupId()->setEndpoint($id);
-
-            $grp = new \stdClass();
-            $grp->language_id = $this->locale2id($i18n->getLanguageISO());
-            $grp->products_xsell_grp_name_id = $id;
-            $grp->groupname = $i18n->getName();
-
-            $this->db->insertRow($grp, 'products_xsell_grp_name');
-        }
-
-        return $data->getI18ns();
+        return $i18n;
     }
 
     protected function languageISO($data)
