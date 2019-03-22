@@ -62,6 +62,7 @@ class Modified extends BaseConnector
     private function readConfigFile()
     {
         require_once(CONNECTOR_DIR.'/../includes/configure.php');
+        require_once(CONNECTOR_DIR.'/../admin/includes/version.php');
 
         return array(
             'shop' => array(
@@ -74,7 +75,8 @@ class Modified extends BaseConnector
                 'host' => DB_SERVER,
                 'name' => DB_DATABASE,
                 'user' => DB_SERVER_USERNAME,
-                'pass' => DB_SERVER_PASSWORD
+                'pass' => DB_SERVER_PASSWORD,
+                'version' => substr(DB_VERSION, 4)
             ),
             'img' => array(
                 'original' => DIR_WS_ORIGINAL_IMAGES,
