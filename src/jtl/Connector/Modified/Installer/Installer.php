@@ -21,7 +21,8 @@ class Installer
     {
         error_reporting(E_ALL ^ E_NOTICE);
         ini_set('display_errors', 1);
-
+        session_start();
+        
         $shopConfig = $this->readConfigFile();
         $this->connectorConfig = new Config(CONNECTOR_DIR.'/config/config.json');
 
@@ -44,6 +45,44 @@ class Installer
             $className = '\\jtl\\Connector\\Modified\\Installer\\Modules\\'.$module;
             $moduleInstances[$id] = new $className($db, $this->connectorConfig, $shopConfig);
         }
+    
+        if (isset($_REQUEST['save'])) {
+            foreach ($moduleInstances as $class => $instance) {
+                $moduleSave = $instance->save();
+                if ($moduleSave !== true) {
+                    $moduleErrors[] = $moduleSave;
+                }
+            }
+        }
+        
+        if (isset($_REQUEST['save'])) {
+            if (count($moduleErrors) == 0) {
+                if (!$this->connectorConfig->save()) {
+                    $_SESSION['error'] = true;
+                    header("Location: " . $_SERVER['HTTP_REFERER']);
+                    exit();
+                } else {
+                    $_SESSION['success'] = true;
+                    header("Location: " . $_SERVER['HTTP_REFERER']);
+                    exit();
+                }
+            } else {
+                $html = '<div class="alert alert-danger">Folgende Fehler traten auf:
+		        		<br>
+		        		<ul>';
+            
+                foreach ($moduleErrors as $error) {
+                    $html .= '<li>'.$error.'</li>';
+                }
+            
+                $html .= '</ul>
+		        		</div>';
+                
+                $_SESSION['fail'] = $html;
+                header("Location: " . $_SERVER['HTTP_REFERER']);
+                exit();
+            }
+        }
 
         if ($moduleInstances['check']->hasPassed()) {
             echo '<ul class="nav nav-tabs">';
@@ -62,43 +101,29 @@ class Installer
             foreach ($moduleInstances as $class => $instance) {
                 $active = $class == 'check' ? ' active' : '';
 
-                if (isset($_REQUEST['save'])) {
-                    $moduleSave = $instance->save();
-                    if ($moduleSave !== true) {
-                        $moduleErrors[] = $moduleSave;
-                    }
-                }
-
                 echo '<div class="tab-pane'.$active.'" id="'.$class.'">';
                 echo $instance->form();
                 echo '</div>';
             }
-
-            echo '</div>';
-
-            if (isset($_REQUEST['save'])) {
-                if (count($moduleErrors) == 0) {
-                    if (!$this->connectorConfig->save()) {
-                        echo '<div class="alert alert-danger">Fehler beim Schreiben der config.json Datei.</div>';
-                    } else {
-                        echo '<div class="alert alert-success">Connector Konfiguration wurde gespeichert.</div>';
-                        echo '<div class="alert alert-danger"><b>ACHTUNG:</b><br/>
-                            Bitte sorgen Sie nach erfolgreicher Installation des Connectors unbedingt dafür, dass dieser Installer 
+            
+            if (isset($_SESSION['error']))
+            {
+                echo '<div class="alert alert-danger">Fehler beim Schreiben der config.json Datei.</div>';
+                unset($_SESSION['error']);
+            } elseif (isset($_SESSION['success']))
+            {
+                echo '<div class="alert alert-success">Connector Konfiguration wurde gespeichert.</div>';
+                echo '<div class="alert alert-danger"><b>ACHTUNG:</b><br/>
+                            Bitte sorgen Sie nach erfolgreicher Installation des Connectors unbedingt dafür, dass dieser Installer
                             sowie die Datei config.json im Verzeichnis config nicht öffentlich les- und ausführbar sind!</div>';
-                    }
-                } else {
-                    echo '<div class="alert alert-danger">Folgende Fehler traten auf:
-		        		<br>
-		        		<ul>';
-
-                    foreach ($moduleErrors as $error) {
-                        echo '<li>'.$error.'</li>';
-                    }
-
-                    echo '</ul>
-		        		</div>';
-                }
+                unset($_SESSION['success']);
+            }elseif (isset($_SESSION['fail']))
+            {
+                echo $_SESSION['fail'];
+                unset($_SESSION['fail']);
             }
+            
+            echo '</div>';
 
             echo '<button type="submit" name="save" class="btn btn-primary btn-block"><span class="glyphicon glyphicon-save"></span> Connector Konfiguration speichern</button>';
         } else {

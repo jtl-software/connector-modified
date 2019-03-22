@@ -32,6 +32,7 @@
         <copy todir="./dist/install">
             <fileset dir="./install">
                 <include name="index.php" />
+                <include name="loggingConfig.php" />
             </fileset>
         </copy>
         <copy todir="./dist/plugins">
