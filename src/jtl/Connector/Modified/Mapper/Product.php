@@ -229,6 +229,7 @@ class Product extends BaseMapper
                 if (Product::isVarCombi($id)){
                     $this->db->query('DELETE FROM products_attributes WHERE options_values_id=' . Product::extractOptionValueId($id));
                     $this->db->query('DELETE FROM products_options_values WHERE products_options_values_id=' . Product::extractOptionValueId($id));
+                    $this->db->query('DELETE FROM products_options_values_to_products_options WHERE products_options_values_id=' . Product::extractOptionValueId($id));
                     $this->db->query('DELETE FROM jtl_connector_link_product WHERE endpoint_id=' . $id);
                 } else {
                     $this->db->query('DELETE FROM products WHERE products_id=' . $id);
@@ -239,6 +240,7 @@ class Product extends BaseMapper
                     foreach ($result as $item) {
                         if (isset($item['options_values_id'])) {
                             $this->db->query('DELETE FROM products_options_values WHERE products_options_values_id=' . $item['options_values_id']);
+                            $this->db->query('DELETE FROM products_options_values_to_products_options WHERE products_options_values_id=' . $item['options_values_id']);
                             $this->db->query('DELETE FROM jtl_connector_link_product WHERE endpoint_id=' . Product::createProductEndpoint($id, $item['options_values_id']));
                         }
                     }
@@ -575,6 +577,20 @@ class Product extends BaseMapper
                 $this->db->query(
                     sprintf("INSERT IGNORE INTO products_attributes (products_id, options_id, options_values_id, options_values_price, price_prefix, attributes_model, attributes_stock, options_values_weight, weight_prefix, sortorder, attributes_ean, attributes_vpe_id, attributes_vpe_value) VALUES (%s, %s, %s, %s, '%s', '%s', %s, %s, '%s', %s, %s, %s, %s)",
                         $masterId, $id, $variationOptionId, (double)$price, $pricePrefix, $sku, $stock, $weight, $weightPrefix, $sort, empty($ean) ? 'null' : $ean, $vpe, $vpe
+                    )
+                );
+            }
+    
+            $pivotTableResult = $this->db->query(
+                sprintf("SELECT * FROM products_options_values_to_products_options WHERE products_options_id = %s AND products_options_values_id = %s" ,
+                    $id, $variationOptionId
+                )
+            );
+    
+            if (count($pivotTableResult) == 0) {
+                $this->db->query(
+                    sprintf("INSERT IGNORE INTO products_options_values_to_products_options (products_options_id, products_options_values_id) VALUES (%s, %s)",
+                        $id, $variationOptionId
                     )
                 );
             }
