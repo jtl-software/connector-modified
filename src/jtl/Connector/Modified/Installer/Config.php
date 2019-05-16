@@ -1,26 +1,30 @@
 <?php
 namespace jtl\Connector\Modified\Installer;
 
+use Noodlehaus\Exception\FileNotFoundException;
+
 class Config
 {
     private $data;
 
     public function __construct($file)
     {
-        $this->data = json_decode(@file_get_contents($file));
-        if (is_null($this->data)) {
-            $this->data = new \stdClass();
+        try{
+            $this->data = \Noodlehaus\Config::load($file)->all();
+        } catch (FileNotFoundException $e) {
+            $this->data = [];
+            $this->data['use_varCombi_logic'] = true;
         }
     }
 
     public function __set($name, $value)
     {
-        $this->data->$name = $value;
+        $this->data[$name] = $value;
     }
 
     public function __get($name)
     {
-        return $this->data->$name;
+        return $this->data[$name];
     }
 
     public function save()

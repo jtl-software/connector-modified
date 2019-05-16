@@ -76,7 +76,7 @@ class Modified extends BaseConnector
                 'name' => DB_DATABASE,
                 'user' => DB_SERVER_USERNAME,
                 'pass' => DB_SERVER_PASSWORD,
-                'version' => substr(DB_VERSION, 4)
+                'version' => ltrim(DB_VERSION, 'MOD_')
             ),
             'img' => array(
                 'original' => DIR_WS_ORIGINAL_IMAGES,

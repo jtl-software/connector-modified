@@ -4,6 +4,10 @@ namespace jtl\Connector\Modified\Mapper;
 
 use jtl\Connector\Core\Logger\Logger;
 use jtl\Connector\Model\Identity;
+use jtl\Connector\Model\ProductVariationI18n;
+use jtl\Connector\Model\ProductVariation;
+use jtl\Connector\Model\ProductVariationValue;
+use jtl\Connector\Model\ProductVariationValueI18n;
 use jtl\Connector\Model\ProductVarCombination;
 
 class Product extends BaseMapper
@@ -68,6 +72,7 @@ class Product extends BaseMapper
             "ProductPrice|addPrice"                    => "prices",
             "ProductSpecialPrice|addSpecialPrice"      => "specialPrices",
             "ProductInvisibility|addInvisibility|true" => "invisibilities",
+            "ProductVariation|addVariation"            => "variations",
             "ProductAttr|addAttribute|true"            => "attributes",
             "products_image"                           => null,
             "products_shippingtime"                    => null,
@@ -92,19 +97,19 @@ class Product extends BaseMapper
                         )
                     );
     
-                    $productVariationI18ns = $this->db->query(
-                        sprintf("SELECT * FROM products_options WHERE products_options_id = %s",
-                            $varCombiAttr[0]['options_id']
-                        )
-                    );
-    
-                    $productVariationValueI18ns = $this->db->query(
-                        sprintf("SELECT * FROM products_options_values WHERE products_options_values_id = %s",
-                            $varCombiAttr[0]['options_values_id']
-                        )
-                    );
-                    
                     if (isset($varCombiAttr[0])) {
+                    
+                        $productVariationI18ns = $this->db->query(
+                            sprintf("SELECT * FROM products_options WHERE products_options_id = %s",
+                                $varCombiAttr[0]['options_id']
+                            )
+                        );
+        
+                        $productVariationValueI18ns = $this->db->query(
+                            sprintf("SELECT * FROM products_options_values WHERE products_options_values_id = %s",
+                                $varCombiAttr[0]['options_values_id']
+                            )
+                        );
                         
                         $varCombiProduct = clone $parent;
                         $varCombiProduct->setId(new Identity($varCombiAttr[0]['products_attributes_id'], $varCombiAttr[0]['host_id']));
@@ -129,14 +134,14 @@ class Product extends BaseMapper
                         }
                         $varCombiProduct->setI18ns($i18ns);
                         
-                        $variation = new \jtl\Connector\Model\ProductVariation();
+                        $variation = new ProductVariation();
                         $variation->setId(new Identity($varCombiAttr[0]['products_options_id'], null));
                         $variation->setSort($varCombi->getSort());
                         $variation->setType("select");
     
                         $variationI18ns = [];
                         foreach ($productVariationI18ns as $variationI18n) {
-                            $productVariationI18n = new \jtl\Connector\Model\ProductVariationI18n();
+                            $productVariationI18n = new ProductVariationI18n();
                             $productVariationI18n->setProductVariationId(new Identity($varCombiAttr[0]['products_options_id'], null));
                             $productVariationI18n->setLanguageISO($this->id2locale($variationI18n['language_id']));
                             $productVariationI18n->setName($variationI18n['products_options_name']);
@@ -144,7 +149,7 @@ class Product extends BaseMapper
                         }
                         $variation->setI18ns($variationI18ns);
                         
-                        $value = new \jtl\Connector\Model\ProductVariationValue();
+                        $value = new ProductVariationValue();
                         $value->setExtraWeight($varCombiAttr[0]['weight_prefix'] == "+" ? (float)$varCombiAttr[0]['options_values_weight'] : (float)$varCombiAttr[0]['options_values_weight'] * -1);
                         $value->setSort($varCombi->getSort());
                         $value->setStockLevel($varCombi->getStockLevel());
@@ -152,7 +157,7 @@ class Product extends BaseMapper
     
                         $i18ns = [];
                         foreach ($productVariationValueI18ns as $i18n) {
-                            $productI18n = new \jtl\Connector\Model\ProductVariationValueI18n();
+                            $productI18n = new ProductVariationValueI18n();
                             $productI18n->setProductVariationValueId(new Identity($varCombiAttr[0]['products_options_values_id'], null));
                             $productI18n->setLanguageISO($this->id2locale($i18n['language_id']));
                             $productI18n->setName($i18n['products_options_values_name']);
@@ -175,17 +180,22 @@ class Product extends BaseMapper
     
     public function push($data, $dbObj = null)
     {
+        $useVarKombis = $this->connectorConfig->use_varCombi_logic;
+        
         if (isset(static::$idCache[$data->getMasterProductId()->getHost()]['parentId'])) {
             $data->getMasterProductId()->setEndpoint(static::$idCache[$data->getMasterProductId()->getHost()]['parentId']);
         }
         
         $masterId = $data->getMasterProductId()->getEndpoint();
+        $hostMasterId = $data->getMasterProductId()->getHost();
+        $variations = $data->getVariations();
         
-        if (!empty($masterId)) {
+        if (!empty($masterId) && $useVarKombis) {
             $this->addVarCombiAsVariation($data, $masterId);
-            //$this->clearUnusedVariations();
             
             return $data;
+        } elseif ( ((!empty($hostMasterId) || $data->getIsMasterProduct()) && !$useVarKombis) || ($useVarKombis && !empty($variations) && !$data->getIsMasterProduct())){
+            return null;
         }
         
         $id = $data->getId()->getEndpoint();
@@ -204,7 +214,7 @@ class Product extends BaseMapper
         }
         
         $savedProduct = parent::push($data, $dbObj);
-        
+    
         static::$idCache[$data->getId()->getHost()]['parentId'] = $savedProduct->getId()->getEndpoint();
         
         return $savedProduct;
@@ -258,8 +268,8 @@ class Product extends BaseMapper
           WHERE l.host_id IS NULL LIMIT 1
         ", ["return" => "object"]);
         
-        if (isset($objs[0])) {
-            $objs = $objs !== null ? intval($objs[0]->count) : 0;
+        if (is_array($objs) && isset($objs[0])) {
+            $objs = intval($objs[0]->count);
         } else {
             Logger::write('No objects were found');
         }
@@ -271,13 +281,11 @@ class Product extends BaseMapper
           WHERE l.host_id IS NULL LIMIT 1
         ", ["return" => "object"]);
         
-        if (isset($combis[0])) {
-            $combis = $combis !== null ? intval($combis[0]->count) : 0;
+        if (is_array($combis) && isset($combis[0])) {
+            $objs += intval($combis[0]->count);
         } else {
             Logger::write('No varCobis were found');
         }
-        
-        $objs += $combis;
         
         return $objs;
     }
@@ -573,35 +581,6 @@ class Product extends BaseMapper
         }
     }
     
-    protected function clearUnusedVariations()
-    {
-        $this->db->query('
-            DELETE FROM products_options_values
-            WHERE products_options_values_id IN (
-                SELECT * FROM (
-                    SELECT v.products_options_values_id
-                    FROM products_options_values v
-                    LEFT JOIN products_attributes a ON v.products_options_values_id = a.options_values_id
-                    WHERE a.products_attributes_id IS NULL
-                    GROUP BY v.products_options_values_id
-                ) relations
-            )
-        ');
-        
-        $this->db->query('
-            DELETE FROM products_options
-            WHERE products_options_id IN (
-                SELECT * FROM (
-                    SELECT o.products_options_id
-                    FROM products_options o
-                    LEFT JOIN products_attributes a ON o.products_options_id = a.options_id
-                    WHERE a.products_attributes_id IS NULL
-                    GROUP BY o.products_options_id
-                ) relations
-            )
-        ');
-    }
-    
     public static function createProductEndpoint($parentId, $optionValueId)
     {
         return $parentId . "_" . $optionValueId;
@@ -609,19 +588,29 @@ class Product extends BaseMapper
     
     public static function extractParentId($endpoint)
     {
-        $data = explode('_', $endpoint);
-        return $data[0];
+        if (self::isVarCombi($endpoint)) {
+            $data = explode('_', (string)$endpoint);
+            return $data[0];
+        } else
+        {
+            return $endpoint;
+        }
     }
     
     public static function extractOptionValueId($endpoint)
     {
-        $data = explode('_', $endpoint);
-        return $data[1];
+        if (self::isVarCombi($endpoint)) {
+            $data = explode('_', (string)$endpoint);
+            return $data[1];
+        }
+        else {
+            throw new \Error($endpoint . ' is not a Valid VarKombi endpoint');
+        }
     }
     
     public static function isVarCombi($endpoint)
     {
-        $data = explode('_', $endpoint);
+        $data = explode('_', (string)$endpoint);
         return isset($data[1]) ? true : false;
     }
 }

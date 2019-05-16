@@ -8,13 +8,13 @@ class ProductVariationValue extends BaseMapper
         "table" => "products_attributes",
         "query" => 'SELECT * FROM products_attributes WHERE products_id=[[products_id]]',
         "getMethod" => "getValues",
-        "mapPull" => array(
+        "mapPull" => [
             "id"                    => "options_values_id",
             "productVariationId"    => "options_id",
             "ean"                   => "attributes_ean",
             "stockLevel"            => "attributes_stock",
             "i18ns"                 => "ProductVariationValueI18n|addI18n"
-        )
+        ]
     );
     
     protected function extraWeight($data)
