@@ -69,11 +69,11 @@
     <target name="package" depends="build">
         <delete file="./dist/index.php" />
         <pharpackage
-            destfile="./dist/index.phar"
-            basedir="./build"
-            compression="gzip"
-            stub="./stub.php"
-            signature="sha256">
+                destfile="./dist/index.phar"
+                basedir="./build"
+                compression="gzip"
+                stub="./stub.php"
+                signature="sha256">
             <fileset dir="./build">
                 <include name="**/**" />
             </fileset>
