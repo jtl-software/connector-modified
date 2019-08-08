@@ -180,7 +180,7 @@ class Product extends BaseMapper
     
     public function push($data, $dbObj = null)
     {
-        $useVarKombis = $this->connectorConfig->use_varCombi_logic;
+        $useVarKombis = $this->connectorConfig->use_var_combi_logic;
         
         if (isset(static::$idCache[$data->getMasterProductId()->getHost()]['parentId'])) {
             $data->getMasterProductId()->setEndpoint(static::$idCache[$data->getMasterProductId()->getHost()]['parentId']);

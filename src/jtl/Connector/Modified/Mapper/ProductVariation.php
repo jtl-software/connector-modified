@@ -22,7 +22,7 @@ class ProductVariation extends BaseMapper
     
     public function push($parent, $dbObj = null)
     {
-        if (!$this->connectorConfig->use_varCombi_logic) {
+        if (!$this->connectorConfig->use_var_combi_logic) {
             if (count($parent->getVariations()) > 0) {
                 $checksum = ChecksumLinker::find($parent, 1);
         
