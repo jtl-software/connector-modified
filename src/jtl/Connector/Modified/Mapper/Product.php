@@ -568,15 +568,15 @@ class Product extends BaseMapper
 
             if (count($result2) > 0) {
                 $this->db->query(
-                    sprintf("UPDATE products_attributes SET options_id = %s, options_values_price = %s, price_prefix = '%s', attributes_model = '%s', attributes_stock = %s, options_values_weight = %s, weight_prefix = '%s', sortorder = %s, attributes_ean = %s, attributes_vpe_id = %s, attributes_vpe_value = %s WHERE options_values_id = %s AND products_id = %s",
-                        $id, (double)$price, $pricePrefix, $sku, $stock, $weight, $weightPrefix, $sort, empty($ean) ? 'null' : $ean, $vpe, $vpe, $variationOptionId, $masterId
+                    sprintf("UPDATE products_attributes SET options_id = %s, options_values_price = %s, price_prefix = '%s', attributes_model = '%s', attributes_stock = %s, options_values_weight = %s, weight_prefix = '%s', sortorder = %s, attributes_ean = '%s', attributes_vpe_id = %s, attributes_vpe_value = %s WHERE options_values_id = %s AND products_id = %s",
+                        $id, (double)$price, $pricePrefix, $sku, $stock, $weight, $weightPrefix, $sort, empty($ean) ? '' : $ean, $vpe, $vpe, $variationOptionId, $masterId
                     )
                 );
         
             } else {
                 $this->db->query(
-                    sprintf("INSERT IGNORE INTO products_attributes (products_id, options_id, options_values_id, options_values_price, price_prefix, attributes_model, attributes_stock, options_values_weight, weight_prefix, sortorder, attributes_ean, attributes_vpe_id, attributes_vpe_value) VALUES (%s, %s, %s, %s, '%s', '%s', %s, %s, '%s', %s, %s, %s, %s)",
-                        $masterId, $id, $variationOptionId, (double)$price, $pricePrefix, $sku, $stock, $weight, $weightPrefix, $sort, empty($ean) ? 'null' : $ean, $vpe, $vpe
+                    sprintf("INSERT IGNORE INTO products_attributes (products_id, options_id, options_values_id, options_values_price, price_prefix, attributes_model, attributes_stock, options_values_weight, weight_prefix, sortorder, attributes_ean, attributes_vpe_id, attributes_vpe_value) VALUES (%s, %s, %s, %s, '%s', '%s', %s, %s, '%s', %s, '%s', %s, %s)",
+                        $masterId, $id, $variationOptionId, (double)$price, $pricePrefix, $sku, $stock, $weight, $weightPrefix, $sort, empty($ean) ? '' : $ean, $vpe, $vpe
                     )
                 );
             }
