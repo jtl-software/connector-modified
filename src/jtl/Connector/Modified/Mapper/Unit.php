@@ -17,4 +17,15 @@ class Unit extends BaseMapper
         	"UnitI18n|addI18n" => "i18ns",
         )
     );
+    
+    /**
+     * @todo REMOVE THIS FUNCTION AFTER UNITS ARE FIXED!
+     * @param null $parentData
+     * @param null $limit
+     * @return array
+     */
+    public function pull($parentData = null, $limit = null)
+    {
+        return [];
+    }
 }

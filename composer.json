@@ -21,7 +21,8 @@
     "require": {
         "php": ">=5.6.4",
         "jtl/connector": "^2.4.6",
-        "symfony/yaml": "^3.4"
+        "symfony/yaml": "^3.4",
+        "phing/phing": "^2.16"
 	},
     "autoload": {
         "psr-0": {
