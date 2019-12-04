@@ -1,3 +1,11 @@
+2.0.2.3
+-----
+ - CO-749 Fixed manufacturer push
+ 
+ 2.0.2.2
+ -----
+ - Updated primary key mapper
+
 2.0.2.1
 -----
  - CO-634 Disable unit pulls temporarily
