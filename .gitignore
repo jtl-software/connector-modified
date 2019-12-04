@@ -7,3 +7,4 @@ dist/**
 db/connector.s3db
 db/version
 .idea/**
+jtl-connector-modified-*.zip
