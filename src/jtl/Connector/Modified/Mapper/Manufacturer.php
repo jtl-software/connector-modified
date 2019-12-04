@@ -1,4 +1,5 @@
 <?php
+
 namespace jtl\Connector\Modified\Mapper;
 
 class Manufacturer extends BaseMapper
@@ -23,8 +24,8 @@ class Manufacturer extends BaseMapper
 
     protected function websiteUrl($data)
     {
-        $result = $this->db->query('SELECT m.manufacturers_url, l.languages_id FROM languages l LEFT JOIN manufacturers_info m ON m.languages_id=l.languages_id WHERE m.manufacturers_id='.$data['manufacturers_id'].' && l.code="'.$this->shopConfig['settings']['DEFAULT_LANGUAGE'].'"');
-        
+        $result = $this->db->query('SELECT m.manufacturers_url, l.languages_id FROM languages l LEFT JOIN manufacturers_info m ON m.languages_id=l.languages_id WHERE m.manufacturers_id=' . $data['manufacturers_id'] . ' && l.code="' . $this->shopConfig['settings']['DEFAULT_LANGUAGE'] . '"');
+
         if (count($result) > 0) {
             return $result[0]['manufacturers_url'];
         }
@@ -36,12 +37,11 @@ class Manufacturer extends BaseMapper
 
         if (!empty($id) && $id != '') {
             try {
-                $this->db->query('DELETE FROM manufacturers WHERE manufacturers_id='.$id);
-                $this->db->query('DELETE FROM manufacturers_info WHERE manufacturers_id='.$id);
+                $this->db->query('DELETE FROM manufacturers WHERE manufacturers_id=' . $id);
+                $this->db->query('DELETE FROM manufacturers_info WHERE manufacturers_id=' . $id);
 
-                $this->db->query('DELETE FROM jtl_connector_link_manufacturer WHERE endpoint_id="'.$id.'"');
-            }
-            catch (\Exception $e) {                
+                $this->db->query('DELETE FROM jtl_connector_link_manufacturer WHERE endpoint_id="' . $id . '"');
+            } catch (\Exception $e) {
             }
         }
 
@@ -53,30 +53,32 @@ class Manufacturer extends BaseMapper
         $id = $data->getId()->getEndpoint();
 
         if (!empty($id) && $id != '') {
-            $this->db->query('DELETE FROM manufacturers_info WHERE manufacturers_id='.$id);
+            $this->db->query('DELETE FROM manufacturers_info WHERE manufacturers_id=' . $id);
         }
-        
+
         $url = $data->getWebsiteUrl();
 
         $return = parent::push($data, $dbObj);
 
         $newId = $return->getId()->getEndpoint();
 
-        if(!empty($newId)) {
-            /** @var \jtl\Connector\Model\ManufacturerI18n $i18n */
-            foreach ($data->getI18ns() as $i18n) {
-                if ($lang = $this->locale2id($i18n->getLanguageIso())){
-                    $this->db->query(
-                        sprintf('INSERT INTO manufacturers_info SET manufacturers_id=%s, languages_id=%s, manufacturers_description="%s",	manufacturers_meta_title="%s", manufacturers_meta_description="%s", manufacturers_meta_keywords="%s", manufacturers_url="%s"',
-                        $newId,
-                        $lang,
-                        $i18n->getDescription(),
-                        $i18n->getTitleTag(),
-                        $i18n->getMetaDescription(),
-                        $i18n->getMetaKeywords(),
-                        $url)
-                    );
-                }
+        if (!empty($url) && !empty($newId)) {
+            $languages = $this->db->query('SELECT languages_id FROM languages');
+
+            foreach ($languages as $language) {
+                $infoData = [
+                    'manufacturers_id' => $newId,
+                    'languages_id' => $language['languages_id'],
+                    'manufacturers_description' => '',
+                    'manufacturers_meta_title' => '',
+                    'manufacturers_meta_description' => '',
+                    'manufacturers_meta_keywords' => '',
+                    'manufacturers_url' => $url,
+                ];
+
+                $sql = sprintf('INSERT INTO `manufacturers_info` (%s) VALUES (%s)', '`' . implode('`,`', array_keys($infoData)) . '`', '"' . implode('","', array_values($infoData)) . '"');
+
+                $this->db->query($sql);
             }
         }
 

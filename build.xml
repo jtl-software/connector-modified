@@ -2,101 +2,97 @@
 <project name="JTL-Connector-Modified-Endpoint" default="package">
     <property file="./build-config.yaml"/>
     <target name="build">
-        <delete dir="./dist" />
-        <mkdir dir="./dist" />
-        <mkdir dir="./dist/config" />
-        <mkdir dir="./dist/db" />
-        <mkdir dir="./dist/logs" />
-        <mkdir dir="./dist/install" />
-        <mkdir dir="./dist/plugins" />
-        <mkdir dir="./dist/tmp" />
+        <delete dir="./dist"/>
+        <mkdir dir="./dist"/>
+        <mkdir dir="./dist/config"/>
+        <mkdir dir="./dist/db"/>
+        <mkdir dir="./dist/logs"/>
+        <mkdir dir="./dist/install"/>
+        <mkdir dir="./dist/plugins"/>
+        <mkdir dir="./dist/tmp"/>
 
         <copy todir="./dist/config">
             <fileset dir="./config">
-                <include name="features.json" />
-                <include name=".htaccess" />
+                <include name="features.json"/>
+                <include name=".htaccess"/>
             </fileset>
         </copy>
         <copy todir="./dist/db">
             <fileset dir="./db">
-                <include name="connector.s3db" />
-                <include name=".htaccess" />
-                <include name="updates/*" />
+                <include name=".htaccess"/>
+                <include name="updates/*"/>
             </fileset>
         </copy>
         <copy todir="./dist/logs">
             <fileset dir="./logs">
-                <include name=".htaccess" />
+                <include name=".htaccess"/>
             </fileset>
         </copy>
         <copy todir="./dist/install">
             <fileset dir="./install">
-                <include name="index.php" />
-                <include name="loggingConfig.php" />
+                <include name="index.php"/>
             </fileset>
         </copy>
         <copy todir="./dist/plugins">
             <fileset dir="./plugins">
-                <include name=".htaccess" />
+                <include name=".htaccess"/>
             </fileset>
         </copy>
         <copy todir="./dist/tmp">
             <fileset dir="./tmp">
-                <include name=".htaccess" />
+                <include name=".htaccess"/>
             </fileset>
         </copy>
 
-        <chmod file="./dist/config" mode="0777" />
-        <chmod file="./dist/db" mode="0777" />
-        <chmod file="./dist/db/connector.s3db" mode="0777" />
-        <chmod file="./dist/logs" mode="0777" />
-        <chmod file="./dist/tmp" mode="0777" />
+        <touch file="./dist/db/connector.s3db"/>
+        <chmod file="./dist/config" mode="0777"/>
+        <chmod file="./dist/db" mode="0777"/>
+        <chmod file="./dist/db/connector.s3db" mode="0777"/>
+        <chmod file="./dist/logs" mode="0777"/>
+        <chmod file="./dist/tmp" mode="0777"/>
 
-        <delete dir="./build" />
-        <mkdir dir="./build" />
+        <delete dir="./build"/>
+        <mkdir dir="./build"/>
 
         <copy todir="./build">
             <fileset dir=".">
-                <include name="install/" />
-                <include name="src/" />
-                <include name="vendor/" />
-                <include name="index.php" />
-                <include name="build-config.yaml" />
+                <include name="install/"/>
+                <include name="src/"/>
+                <include name="vendor/"/>
+                <include name="index.php"/>
+                <include name="build-config.yaml"/>
             </fileset>
         </copy>
     </target>
 
     <target name="package" depends="build">
-        <delete file="./dist/index.php" />
         <pharpackage
-            destfile="./dist/index.phar"
-            basedir="./build"
-            compression="gzip"
-            stub="./stub.php"
-            signature="sha256">
+                destfile="./dist/index.phar"
+                basedir="./build"
+                compression="gzip"
+                stub="./stub.php"
+                signature="sha256">
             <fileset dir="./build">
-                <include name="**/**" />
+                <include name="**/**"/>
             </fileset>
             <metadata>
-                <element name="version" value="${version}" />
-                <element name="authors">
-                    <element name="Niklas Kokoschka">
-                        <element name="email" value="niklas.kokoschka@jtl-software.com" />
-                    </element>
-                </element>
+                <element name="version" value="${version}"/>
             </metadata>
         </pharpackage>
-        <move file="./dist/index.phar" tofile="./dist/index.php" />
-        <delete dir="./build" />
+        <delete file="./dist/index.php"/>
+        <move file="./dist/index.phar" tofile="./dist/index.php"/>
+        <delete dir="./build"/>
         <phingcall target="zip"/>
     </target>
 
     <target name="zip">
-        <zip destfile="./dist/${zipname}${version}.zip" basedir="./dist" prefix="jtlconnector/"/>
+        <zip destfile="./${zipname}${version}.zip" basedir="./dist" prefix="jtlconnector/"/>
     </target>
 
     <target name="clean">
-        <delete dir="./build" />
-        <delete dir="./dist" />
+        <delete dir="./build"/>
+        <delete dir="./dist"/>
     </target>
+
+    <target name="release" depends="package, clean"/>
 </project>
