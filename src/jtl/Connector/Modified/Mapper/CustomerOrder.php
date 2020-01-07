@@ -127,11 +127,6 @@ class CustomerOrder extends BaseMapper
         }
     }
     
-    protected function languageISO($data)
-    {
-        return $this->id2locale($data['languages_id']);
-    }
-    
     protected function paymentStatus($data)
     {
         $mapping = array_search($data['orders_status'], (array) $this->connectorConfig->mapping);

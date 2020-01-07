@@ -66,6 +66,7 @@ class Connector extends Module
         $this->config->auth_token = $_REQUEST['config']['auth_token'];
         $this->config->utf8 = $_REQUEST['config']['utf8'];
         $this->config->from_date = $_REQUEST['config']['from_date'];
+        $this->config->platform_root = realpath(CONNECTOR_DIR.'/../');
 
         return true;
     }

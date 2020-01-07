@@ -157,7 +157,7 @@ class CustomerOrderItem extends BaseMapper
         
         $childEndpointId = $this->db->query("SELECT products_attributes_id FROM products_attributes WHERE attributes_model = '" . $data['attributes_model'] . "'");
         if (isset($childEndpointId)){
-            return $parentEndpointId . '_' . $childEndpointId[0]['products_attributes_id'];
+            return Product::createProductEndpoint($parentEndpointId, $childEndpointId[0]['products_attributes_id']);
         }
         
         return $parentEndpointId = $data['products_id'];
