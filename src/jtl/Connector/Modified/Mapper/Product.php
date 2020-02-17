@@ -88,7 +88,7 @@ class Product extends BaseMapper
             
             /** @var \jtl\Connector\Model\Product $parent */
             if ($parent->getIsMasterProduct()) {
-                $dbResult = (new ProductVariationValue())->pull(['products_id' => $parent->getId()->getEndpoint()], $limit);
+                $dbResult = (new \jtl\Connector\Modified\Mapper\ProductVariationValue())->pull(['products_id' => $parent->getId()->getEndpoint()], $limit);
                 foreach ($dbResult as $varCombi) {
     
                     $varCombiAttr = $this->db->query(
