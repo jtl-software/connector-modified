@@ -9,7 +9,7 @@ class CustomerGroupAttr extends BaseMapper
     {
         $attrs = array();
 
-        if (!is_null($data['customers_status_min_order'])) {
+        if (isset($data['customers_status_min_order']) && !is_null($data['customers_status_min_order'])) {
             $min = new CustomerGroupAttrModel();
             $min->setId($this->identity('min'));
             $min->setCustomerGroupId($this->identity($data['customers_status_id']));
@@ -19,7 +19,7 @@ class CustomerGroupAttr extends BaseMapper
             $attrs[] = $min;
         }
 
-        if (!is_null($data['customers_status_max_order'])) {
+        if (isset($data['customers_status_max_order']) && !is_null($data['customers_status_max_order'])) {
             $max = new CustomerGroupAttrModel();
             $max->setId($this->identity('max'));
             $max->setCustomerGroupId($this->identity($data['customers_status_id']));

@@ -7,6 +7,12 @@ class Customer extends BaseMapper
 {
     protected $mapperConfig = array(
         "table" => "customers",
+        "statisticsQuery" => "SELECT COUNT(c.customers_id) as total FROM customers c
+            LEFT JOIN address_book a ON c.customers_default_address_id = a.address_book_id
+            LEFT JOIN countries co ON co.countries_id = a.entry_country_id
+            LEFT JOIN jtl_connector_link_customer l ON c.customers_id = l.endpoint_id
+            WHERE l.host_id IS NULL && c.customers_status != 0            
+            ORDER BY c.customers_date_added",
         "query" => "SELECT *, c.customers_id FROM customers c
             LEFT JOIN address_book a ON c.customers_default_address_id = a.address_book_id
             LEFT JOIN countries co ON co.countries_id = a.entry_country_id

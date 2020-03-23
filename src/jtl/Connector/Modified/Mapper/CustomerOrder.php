@@ -8,6 +8,9 @@ class CustomerOrder extends BaseMapper
 {
     protected $mapperConfig = array(
         "table" => "orders",
+        "statisticsQuery" => "SELECT COUNT(o.orders_id) as total FROM orders o
+            LEFT JOIN jtl_connector_link_customer_order l ON o.orders_id = l.endpoint_id
+            WHERE l.host_id IS NULL",
         "query" => "SELECT o.* FROM orders o
             LEFT JOIN jtl_connector_link_customer_order l ON o.orders_id = l.endpoint_id
             WHERE l.host_id IS NULL",
@@ -22,7 +25,6 @@ class CustomerOrder extends BaseMapper
             "paymentModuleCode" => null,
             "languageISO" => null,
             "currencyIso" => "currency",
-            "languageISO" => null,
             "billingAddress" => "CustomerOrderBillingAddress|setBillingAddress",
             "shippingAddress" => "CustomerOrderShippingAddress|setShippingAddress",
             "shippingMethodName" => "shipping_method",

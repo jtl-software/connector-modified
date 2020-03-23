@@ -5,6 +5,9 @@ class Category extends \jtl\Connector\Modified\Mapper\BaseMapper
 {
     protected $mapperConfig = array(
         "table" => "categories",
+        "statisticsQuery" => "SELECT COUNT(c.categories_id) as total FROM categories c
+            LEFT JOIN jtl_connector_link_category l ON c.categories_id = l.endpoint_id
+            WHERE l.host_id IS NULL",
         "query" => "SELECT c.* FROM categories c
             LEFT JOIN jtl_connector_link_category l ON c.categories_id = l.endpoint_id
             WHERE l.host_id IS NULL",

@@ -8,7 +8,6 @@ use jtl\Connector\Model\ProductVariationI18n;
 use jtl\Connector\Model\ProductVariation;
 use jtl\Connector\Model\ProductVariationValue;
 use jtl\Connector\Model\ProductVariationValueI18n;
-use jtl\Connector\Model\ProductVarCombination;
 
 class Product extends BaseMapper
 {
@@ -88,12 +87,15 @@ class Product extends BaseMapper
             
             /** @var \jtl\Connector\Model\Product $parent */
             if ($parent->getIsMasterProduct()) {
+
+                $masterVariations = [];
+
                 $dbResult = (new \jtl\Connector\Modified\Mapper\ProductVariationValue())->pull(['products_id' => $parent->getId()->getEndpoint()], $limit);
                 foreach ($dbResult as $varCombi) {
     
                     $varCombiAttr = $this->db->query(
-                        sprintf("SELECT * FROM products_attributes WHERE options_values_id = %s",
-                            $varCombi->getId()->getEndpoint()
+                        sprintf("SELECT * FROM products_attributes WHERE options_values_id = %s AND products_id = %s",
+                            $varCombi->getId()->getEndpoint(), $parent->getId()->getEndpoint()
                         )
                     );
     
@@ -112,7 +114,7 @@ class Product extends BaseMapper
                         );
                         
                         $varCombiProduct = clone $parent;
-                        $varCombiProduct->setId(new Identity($varCombiAttr[0]['products_attributes_id'], $varCombiAttr[0]['host_id']));
+                        $varCombiProduct->setId(new Identity($varCombiAttr[0]['products_attributes_id']));
                         $varCombiProduct->setMasterProductId($parent->getId());
                         $varCombiProduct->setIsMasterProduct(false);
                         $varCombiProduct->setConsiderStock(true);
@@ -133,16 +135,22 @@ class Product extends BaseMapper
                             $i18ns[] = $productI18n;
                         }
                         $varCombiProduct->setI18ns($i18ns);
-                        
+
+                        $variationId = $varCombiAttr[0]['options_id'];
+
                         $variation = new ProductVariation();
-                        $variation->setId(new Identity($varCombiAttr[0]['products_options_id'], null));
+                        $variation->setId(new Identity($variationId, null));
                         $variation->setSort($varCombi->getSort());
                         $variation->setType("select");
-    
+
+                        if(!isset($masterVariations[$variationId])){
+                            $masterVariations[$variationId] = $variation;
+                        }
+
                         $variationI18ns = [];
                         foreach ($productVariationI18ns as $variationI18n) {
                             $productVariationI18n = new ProductVariationI18n();
-                            $productVariationI18n->setProductVariationId(new Identity($varCombiAttr[0]['products_options_id'], null));
+                            $productVariationI18n->setProductVariationId(new Identity($variationId, null));
                             $productVariationI18n->setLanguageISO($this->id2locale($variationI18n['language_id']));
                             $productVariationI18n->setName($variationI18n['products_options_name']);
                             $variationI18ns[] = $productVariationI18n;
@@ -150,6 +158,7 @@ class Product extends BaseMapper
                         $variation->setI18ns($variationI18ns);
                         
                         $value = new ProductVariationValue();
+                        $value->setId($varCombi->getId());
                         $value->setExtraWeight($varCombiAttr[0]['weight_prefix'] == "+" ? (float)$varCombiAttr[0]['options_values_weight'] : (float)$varCombiAttr[0]['options_values_weight'] * -1);
                         $value->setSort($varCombi->getSort());
                         $value->setStockLevel($varCombi->getStockLevel());
@@ -158,11 +167,14 @@ class Product extends BaseMapper
                         $i18ns = [];
                         foreach ($productVariationValueI18ns as $i18n) {
                             $productI18n = new ProductVariationValueI18n();
-                            $productI18n->setProductVariationValueId(new Identity($varCombiAttr[0]['products_options_values_id'], null));
+                            $productI18n->setProductVariationValueId($value->getId());
                             $productI18n->setLanguageISO($this->id2locale($i18n['language_id']));
                             $productI18n->setName($i18n['products_options_values_name']);
                             $i18ns[] = $productI18n;
                         }
+
+                        $masterVariations[$variationId]->addValue($value);
+
                         $value->setI18ns($i18ns);
                         $variation->setValues([$value]);
                         $variation->setProductId($varCombiProduct->getId());
@@ -172,6 +184,8 @@ class Product extends BaseMapper
                         $productResult[] = $varCombiProduct;
                     }
                 }
+
+                $parent->setVariations($masterVariations);
             }
         }
         
@@ -270,21 +284,21 @@ class Product extends BaseMapper
           WHERE l.host_id IS NULL LIMIT 1
         ", ["return" => "object"]);
         
-        if (is_array($objs) && isset($objs[0])) {
-            $objs = intval($objs[0]->count);
+        if (isset($objs[0])) {
+            $objs = (int)$objs[0]->count;
         } else {
             Logger::write('No objects were found');
         }
         
         $combis = $this->db->query("
-          SELECT count(a.options_values) as count
+          SELECT count(a.products_attributes_id) as count
           FROM products_attributes a
-          LEFT JOIN jtl_connector_link_product l ON a.options_values = l.endpoint_id
+          LEFT JOIN jtl_connector_link_product l ON a.products_attributes_id = l.endpoint_id
           WHERE l.host_id IS NULL LIMIT 1
         ", ["return" => "object"]);
         
-        if (is_array($combis) && isset($combis[0])) {
-            $objs += intval($combis[0]->count);
+        if (isset($combis[0])) {
+            $objs += (int)$combis[0]->count;
         } else {
             Logger::write('No varCobis were found');
         }

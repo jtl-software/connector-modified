@@ -1,6 +1,6 @@
 {
-    "name": "jtl/connector/modified",
-    "type": "APP",
+    "name": "jtl/connector-modified",
+    "type": "app",
     "description": "XTC modified Connector PHP 5.3 based on jtl/connector",
     "keywords": ["jtl", "Connector"],
     "homepage": "http://www.jtl-software.de",
