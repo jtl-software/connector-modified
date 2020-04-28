@@ -18,9 +18,20 @@ class Manufacturer extends BaseMapper
         ),
         "mapPush" => array(
             "manufacturers_id" => "id",
-            "manufacturers_name" => "name"
+            "manufacturers_name" => "name",
+            "manufacturers_image" => null
         )
     );
+
+    /**
+     * @param $data
+     * @return string
+     * @throws \Exception
+     */
+    protected function manufacturers_image($data)
+    {
+        return $this->getDefaultColumnImageValue($data);
+    }
 
     protected function websiteUrl($data)
     {
