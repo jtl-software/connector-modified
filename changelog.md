@@ -1,3 +1,7 @@
+2.0.2.4
+-----
+ - CO-977 Fixed missing default column values when saving manufacturer and category
+ 
 2.0.2.3
 -----
  - CO-749 Fixed manufacturer push
