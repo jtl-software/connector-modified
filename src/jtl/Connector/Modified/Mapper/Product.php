@@ -51,7 +51,7 @@ class Product extends BaseMapper
             "manufacturers_id"                         => "manufacturerId",
             "products_manufacturers_model"             => "manufacturerNumber",
             "products_vpe"                             => null,
-            "products_vpe_value"                       => "measurementQuantity",
+            "products_vpe_value"                       => "basePriceDivisor",
             "products_vpe_status"                      => null,
             "products_status"                          => "isActive",
             "products_startpage"                       => "isTopProduct",
@@ -129,7 +129,7 @@ class Product extends BaseMapper
     
     protected function products_vpe($data)
     {
-        $name = $data->getBasePriceUnitName();
+        $name = sprintf("%s %s", $data->getBasePriceQuantity(), $data->getBasePriceUnitCode());
         
         if (!empty($name)) {
             foreach ($data->getI18ns() as $i18n) {
