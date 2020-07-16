@@ -293,17 +293,19 @@ class CustomerOrder extends BaseMapper
      * @param $type
      * @param array $total
      * @param array $data
+     * @param int $quantity
+     * @param int $vat
      * @return CustomerOrderItem
      */
-    protected function createOrderItem($type, array $total, array $data)
+    protected function createOrderItem($type, array $total, array $data, $quantity = 1, $vat = 0)
     {
         $customerOrderItem = new CustomerOrderItem();
         $customerOrderItem->setType($type);
         $customerOrderItem->setName($total['title']);
         $customerOrderItem->setCustomerOrderId($this->identity($data['orders_id']));
         $customerOrderItem->setId($this->identity($total['orders_total_id']));
-        $customerOrderItem->setQuantity(1);
-        $customerOrderItem->setVat(0);
+        $customerOrderItem->setQuantity($quantity);
+        $customerOrderItem->setVat($vat);
         $customerOrderItem->setPriceGross(floatval($total['value']));
 
         return $customerOrderItem;
