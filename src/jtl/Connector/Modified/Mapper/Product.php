@@ -299,7 +299,11 @@ class Product extends BaseMapper
     
     protected function products_vpe($data)
     {
-        $name = sprintf("%s %s", $data->getBasePriceQuantity(), $data->getBasePriceUnitCode());
+        if($data->getBasePriceQuantity() > 1){
+            $name = sprintf("%s %s", $data->getBasePriceQuantity(), $data->getBasePriceUnitCode());
+        } else {
+            $name = $data->getBasePriceUnitCode();
+        }
         
         if (!empty($name)) {
             foreach ($data->getI18ns() as $i18n) {
