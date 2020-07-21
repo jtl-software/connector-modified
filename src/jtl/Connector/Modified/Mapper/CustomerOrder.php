@@ -275,6 +275,7 @@ class CustomerOrder extends BaseMapper
                     break;
                 case 'ot_coupon':
                 case 'ot_discount':
+                case 'ot_gv':
                     $model->addItem($this->createOrderItem(CustomerOrderItem::TYPE_COUPON, $total, $data));
                     break;
                 case 'ot_payment':
@@ -299,6 +300,11 @@ class CustomerOrder extends BaseMapper
      */
     protected function createOrderItem($type, array $total, array $data, $quantity = 1, $vat = 0)
     {
+        $priceGross = floatval($total['value']);
+        if ($type === CustomerOrderItem::TYPE_COUPON && $priceGross > 0) {
+            $priceGross *= -1;
+        }
+
         $customerOrderItem = new CustomerOrderItem();
         $customerOrderItem->setType($type);
         $customerOrderItem->setName($total['title']);
@@ -306,7 +312,7 @@ class CustomerOrder extends BaseMapper
         $customerOrderItem->setId($this->identity($total['orders_total_id']));
         $customerOrderItem->setQuantity($quantity);
         $customerOrderItem->setVat($vat);
-        $customerOrderItem->setPriceGross(floatval($total['value']));
+        $customerOrderItem->setPriceGross($priceGross);
 
         return $customerOrderItem;
     }
