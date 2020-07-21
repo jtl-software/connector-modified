@@ -129,10 +129,9 @@ class Product extends BaseMapper
     
     protected function products_vpe($data)
     {
-        if($data->getBasePriceQuantity() > 1){
+        $name = $data->getBasePriceUnitCode();
+        if($data->getBasePriceQuantity() !== 1.){
             $name = sprintf("%s %s", $data->getBasePriceQuantity(), $data->getBasePriceUnitCode());
-        } else {
-            $name = $data->getBasePriceUnitCode();
         }
         
         if (!empty($name)) {
