@@ -40,7 +40,7 @@ class CustomerGroupI18n extends BaseMapper
             $grp->customers_status_add_tax_ot = $data->getApplyNetPrice() === true ? 1 : 0;
             $grp->customers_status_show_price_tax = $data->getApplyNetPrice() === true ? 0 : 1;
 
-            foreach($data->getAttributes() as $attr) {
+            foreach ($data->getAttributes() as $attr) {
                 if ($attr->getKey() == 'Mindestbestellwert') {
                     $grp->customers_status_min_order = $attr->getValue();
                 } elseif ($attr->getKey() == 'Hoechstbestellwert') {

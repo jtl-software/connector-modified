@@ -16,7 +16,7 @@ class CrossSelling extends BaseMapper
             "id" => "products_id",
             "productId" => "products_id",
             "items" => "CrossSellingItem|addItem"
-        )        
+        )
     );
 
     public function push($data, $dbObj = null)
@@ -24,7 +24,7 @@ class CrossSelling extends BaseMapper
         $id = $data->getProductId()->getEndpoint();
 
         if (!empty($id)) {
-            $this->db->query('DELETE FROM products_xsell WHERE products_id='.$id);    
+            $this->db->query('DELETE FROM products_xsell WHERE products_id='.$id);
         
             foreach ($data->getItems() as $item) {
                 foreach ($item->getProductIds() as $xsellid) {
@@ -48,8 +48,7 @@ class CrossSelling extends BaseMapper
         if (!empty($id) && $id != '') {
             try {
                 $this->db->query('DELETE FROM products_xsell WHERE products_id="'.$id.'"');
-            }
-            catch(\Exception $e) {            
+            } catch (\Exception $e) {
             }
         }
 

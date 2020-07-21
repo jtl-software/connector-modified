@@ -34,7 +34,7 @@ class Currency extends BaseMapper
         foreach ($data->getCurrencies() as $currency) {
             $check = $this->db->query('SELECT currencies_id FROM currencies WHERE code="'.$currency->getIso().'"');
             if (count($check) > 0) {
-                $currency->getId()->setEndpoint($check[0]['currencies_id']);                
+                $currency->getId()->setEndpoint($check[0]['currencies_id']);
             }
         }
 

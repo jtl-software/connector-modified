@@ -42,7 +42,7 @@ class ProductI18n extends BaseMapper
             LEFT JOIN products p ON p.products_shippingtime = s.shipping_status_id
             WHERE p.products_id ='.$data['products_id'].' && s.language_id ='.$data['language_id']);
 
-        if(count($query) > 0) {
+        if (count($query) > 0) {
             return $query[0]['shipping_status_name'];
         }
     }
@@ -64,7 +64,7 @@ class ProductI18n extends BaseMapper
             LEFT JOIN products_vpe v ON v.products_vpe_id = p.products_vpe
             WHERE products_id='.$data['products_id'].' && v.language_id='.$data['language_id']);
 
-        if(count($sql) > 0) {
+        if (count($sql) > 0) {
             return $sql[0]['products_vpe_name'];
         }
     }

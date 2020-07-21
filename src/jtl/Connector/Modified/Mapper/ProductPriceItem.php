@@ -22,7 +22,6 @@ class ProductPriceItem extends BaseMapper
             $priceData['customers_status_id'] = $data['customers_status_id'];
 
             $return[] = $this->generateModel($priceData);
-
         }
 
         return $return;

@@ -402,15 +402,15 @@ class Image extends BaseMapper
         $imgInfo = getimagesize($this->shopConfig['shop']['path'].$this->shopConfig['img']['original'].$fileName);
 
         switch ($imgInfo[2]) {
-            case 1: 
+            case 1:
                 $image = imagecreatefromgif($this->shopConfig['shop']['path'].$this->shopConfig['img']['original'].$fileName);
                 break;
-            case 2: 
+            case 2:
                 $image = imagecreatefromjpeg($this->shopConfig['shop']['path'].$this->shopConfig['img']['original'].$fileName);
                 break;
-            case 3: 
+            case 3:
                 $image = imagecreatefrompng($this->shopConfig['shop']['path'].$this->shopConfig['img']['original'].$fileName);
-                break;            
+                break;
         }
         
         $width = imagesx($image);
@@ -446,7 +446,7 @@ class Image extends BaseMapper
             $thumb = imagecreatetruecolor($thumb_width, $thumb_height);
             imagefill($thumb, 0, 0, imagecolorallocate($thumb, 255, 255, 255));
             
-            if($imgInfo[2] == 1 || $imgInfo[2] == 3){
+            if ($imgInfo[2] == 1 || $imgInfo[2] == 3) {
                 imagealphablending($thumb, false);
                 imagesavealpha($thumb, true);
                 $transparent = imagecolorallocatealpha($thumb, 255, 255, 255, 127);
@@ -467,7 +467,7 @@ class Image extends BaseMapper
             );
 
             switch ($imgInfo[2]) {
-                case 1: 
+                case 1:
                     imagegif($thumb, $this->shopConfig['shop']['path'].$this->shopConfig['img'][$folder].$fileName);
                     break;
                 case 2:
@@ -476,7 +476,7 @@ class Image extends BaseMapper
                 case 3:
                     imagepng($thumb, $this->shopConfig['shop']['path'].$this->shopConfig['img'][$folder].$fileName);
                     break;
-            }            
+            }
         }
     }
 }
