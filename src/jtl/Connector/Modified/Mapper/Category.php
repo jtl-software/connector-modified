@@ -22,6 +22,7 @@ class Category extends \jtl\Connector\Modified\Mapper\BaseMapper
         "mapPush" => array(
             "categories_id" => "id",
             "parent_id" => null,
+            "categories_image" => null,
             "sort_order" => "sort",
             "CategoryI18n|addI18n" => "i18ns",
             "CategoryInvisibility|addInvisibility|true" => "invisibilities",
@@ -32,6 +33,16 @@ class Category extends \jtl\Connector\Modified\Mapper\BaseMapper
 
     private $tree = array();
     private static $idCache = array();
+
+    /**
+     * @param $data
+     * @return string
+     * @throws \Exception
+     */
+    protected function categories_image($data)
+    {
+        return $this->getDefaultColumnImageValue($data);
+    }
 
     protected function last_modified($data)
     {
