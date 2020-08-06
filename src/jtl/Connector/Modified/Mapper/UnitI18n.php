@@ -15,7 +15,7 @@ class UnitI18n extends BaseMapper
         "mapPush" => array(
             "products_vpe_id" => "unitId",
             "language_id" => null,
-            "products_vpe_name" => "name"
+            "products_vpe_name" => "name"  
         )
     );
 

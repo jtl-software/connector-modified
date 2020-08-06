@@ -178,7 +178,7 @@ class Check extends Module
           INDEX (host_id)          
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci';
 
-        foreach ($types as $id => $name) {
+        foreach($types as $id => $name) {
             if ($id == 16 || $id == 64) {
                 $this->db->query(sprintf($queryChar, 'jtl_connector_link_'.$name));
             } else {

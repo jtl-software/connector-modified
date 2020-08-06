@@ -16,7 +16,7 @@ class ShippingMethod extends BaseMapper
         $moduleStr = $this->db->query('SELECT configuration_value FROM configuration WHERE configuration_key ="MODULE_SHIPPING_INSTALLED"');
 
         if (count($moduleStr) > 0) {
-            $modules = explode(';', $moduleStr[0]['configuration_value']);
+            $modules = explode(';',$moduleStr[0]['configuration_value']);
             if (count($modules) > 0) {
                 $return = array();
 

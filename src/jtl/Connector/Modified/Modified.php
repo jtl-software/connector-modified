@@ -43,7 +43,7 @@ class Modified extends BaseConnector
             ));
         }
 
-        if (isset($session->connectorConfig->utf8) && $session->connectorConfig->utf8 !== '0') {
+        if(isset($session->connectorConfig->utf8) && $session->connectorConfig->utf8 !== '0') {
             $db->setNames();
             $db->setCharset();
         }
@@ -102,13 +102,12 @@ class Modified extends BaseConnector
 
     private function update($db)
     {
-        if (version_compare(file_get_contents(CONNECTOR_DIR.'/db/version'), CONNECTOR_VERSION) == -1) {
+        if(version_compare(file_get_contents(CONNECTOR_DIR.'/db/version'), CONNECTOR_VERSION) == -1) {
             foreach (new \DirectoryIterator(CONNECTOR_DIR.'/db/updates') as $updateFile) {
-                if ($updateFile->isDot()) {
-                    continue;
-                }
 
-                if (version_compare(file_get_contents(CONNECTOR_DIR.'/db/version'), $updateFile->getBasename('.php')) == -1) {
+                if($updateFile->isDot()) continue;
+
+                if(version_compare(file_get_contents(CONNECTOR_DIR.'/db/version'), $updateFile->getBasename('.php')) == -1) {
                     include(CONNECTOR_DIR.'/db/updates/'.$updateFile);
                 }
             }

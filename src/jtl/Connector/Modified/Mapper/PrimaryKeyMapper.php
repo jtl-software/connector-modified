@@ -31,6 +31,7 @@ class PrimaryKeyMapper implements IPrimaryKeyMapper
     public function getHostId($endpointId, $type)
     {
         if (isset(static::$types[$type])) {
+            
             $dbResult = $this->db->query("SELECT host_id FROM jtl_connector_link_" . static::$types[$type] . " WHERE endpoint_id = '" . $endpointId . "'");
     
             $host_id = (count($dbResult) > 0) ? $dbResult[0]['host_id'] : null;
@@ -88,7 +89,7 @@ class PrimaryKeyMapper implements IPrimaryKeyMapper
     {
         Logger::write('Clearing linking tables', Logger::DEBUG, 'linker');
 
-        foreach (static::$types as $id => $name) {
+        foreach(static::$types as $id => $name) {
             $this->db->query('TRUNCATE TABLE jtl_connector_link_'.$name);
         }
 

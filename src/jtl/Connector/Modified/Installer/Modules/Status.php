@@ -82,7 +82,7 @@ class Status extends Module
         } else {
             $this->config->mapping = $_REQUEST['status'];
 
-            return true;
+            return true; 
         }
     }
 }

@@ -28,8 +28,5 @@
         "psr-0": {
             "jtl\\Connector\\Modified": "src/"
         }
-    },
-    "require-dev": {
-        "friendsofphp/php-cs-fixer": "^2.16"
     }
 }

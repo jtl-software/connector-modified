@@ -21,7 +21,7 @@ class CustomerOrderBillingAddress extends BaseMapper
             "countryIso" => null,
             "eMail" => "customers_email_address",
             "phone" => "customers_telephone",
-            "vatNumber" => "customers_vat_id"
+			"vatNumber" => "customers_vat_id"
         ),
         "mapPush" => array(
             "customers_name" => null,
@@ -44,7 +44,7 @@ class CustomerOrderBillingAddress extends BaseMapper
             "billing_state" => "state",
             "billing_country_iso_code_2" => "countryIso",
             "customers_email_address" => "eMail",
-            "customers_vat_id" => "vatNumber"
+			"customers_vat_id" => "vatNumber"
         )
     );
 

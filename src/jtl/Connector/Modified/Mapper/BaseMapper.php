@@ -211,12 +211,12 @@ class BaseMapper
                 if (!empty($checkEmpty)) {
                     if (isset($this->mapperConfig['identity'])) {
                         $currentId = $obj->{$this->mapperConfig['identity']}()->getEndpoint();
-                    }
+                    }                    
 
                     if (!empty($currentId)) {
                         $insertResult = $this->db->updateRow($dbObj, $this->mapperConfig['table'], $whereKey, $whereValue);
                         $insertResult->setKey($currentId);
-                    } else {
+                    } else {                    
                         $insertResult = $this->db->deleteInsertRow($dbObj, $this->mapperConfig['table'], $whereKey, $whereValue);
                     }
 
@@ -246,7 +246,7 @@ class BaseMapper
 
                     $values = $subMapper->push($obj);
 
-                    if (!is_null($values) && is_array($values)) {
+                    if(!is_null($values) && is_array($values)) {
                         foreach ($values as $setObj) {
                             $model->$navSetMethod($setObj);
                         }
@@ -422,7 +422,7 @@ class BaseMapper
     {
         $table = $this->mapperConfig['table'];
 
-        switch ($table) {
+        switch($table){
             case 'manufacturers':
                 $column = 'manufacturers_image';
                 break;

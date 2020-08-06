@@ -130,7 +130,7 @@ class Product extends BaseMapper
     protected function products_vpe($data)
     {
         $name = $data->getBasePriceUnitCode();
-        if ($data->getBasePriceQuantity() !== 1.) {
+        if($data->getBasePriceQuantity() !== 1.){
             $name = sprintf("%s %s", $data->getBasePriceQuantity(), $data->getBasePriceUnitCode());
         }
         
@@ -153,12 +153,8 @@ class Product extends BaseMapper
                             $status->language_id = $this->locale2id($i18n->getLanguageISO());
                             $status->products_vpe_name = $name;
                             
-                            $this->db->deleteInsertRow(
-                                $status,
-                                'products_vpe',
-                                ['products_vpe_id', 'language_id'],
-                                [$status->product_vpe_id, $status->language_id]
-                            );
+                            $this->db->deleteInsertRow($status, 'products_vpe', ['products_vpe_id', 'language_id'],
+                                [$status->product_vpe_id, $status->language_id]);
                         }
                         
                         return $id;
@@ -193,12 +189,9 @@ class Product extends BaseMapper
                             $status->language_id = $this->locale2id($i18n->getLanguageISO());
                             $status->shipping_status_name = $i18n->getDeliveryStatus();
                             
-                            $this->db->deleteInsertRow(
-                                $status,
-                                'shipping_status',
+                            $this->db->deleteInsertRow($status, 'shipping_status',
                                 ['shipping_status_id', 'langauge_id'],
-                                [$status->shipping_status_id, $status->language_id]
-                            );
+                                [$status->shipping_status_id, $status->language_id]);
                         }
                         
                         return $id;

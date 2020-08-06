@@ -6,8 +6,7 @@ use jtl\Connector\Model\CategoryAttrI18n as CategoryAttrI18nModel;
 
 class CategoryAttr extends BaseMapper
 {
-    public function pull($data = null, $limit = null)
-    {
+    public function pull($data = null, $limit = null) {
         $attr = new CategoryAttrModel();
         $attr->setId($this->identity(1));
         $attr->setCategoryId($this->identity($data['categories_id']));
@@ -23,8 +22,7 @@ class CategoryAttr extends BaseMapper
         return [$attr];
     }
 
-    public function push($data, $dbObj = null)
-    {
+    public function push($data, $dbObj = null) {
         $dbObj->categories_status = 1;
 
         foreach ($data->getAttributes() as $attr) {
@@ -32,8 +30,8 @@ class CategoryAttr extends BaseMapper
                 if ($i18n->getName() == 'Aktiv' && $i18n->getValue() == '0') {
                     $dbObj->categories_status = 0;
                     break;
-                }
-            }
+                }                    
+            }            
         }
 
         return $data->getAttributes();
