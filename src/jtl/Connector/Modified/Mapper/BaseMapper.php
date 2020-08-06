@@ -429,9 +429,11 @@ class BaseMapper
         switch($table){
             case 'manufacturers':
                 $column = 'manufacturers_image';
+                $where = 'manufacturers_id';
                 break;
             case 'categories':
                 $column = 'categories_image';
+                $where = 'categories_id';
                 break;
             default:
                 throw new \Exception(sprintf("Unknown table %s", $table));
@@ -441,12 +443,12 @@ class BaseMapper
         $endpointId = $data->getId()->getEndpoint();
         $image = '';
         if (!empty($endpointId)) {
-            $manufacturerImage = $this->db->query(
-                sprintf('SELECT %s FROM %s WHERE manufacturers_id = %s', $column, $table, $endpointId)
+            $dbImage = $this->db->query(
+                sprintf('SELECT %s FROM %s WHERE %s = %s', $column, $table, $where, $endpointId)
             );
 
-            if (!empty($manufacturerImage) && isset($manufacturerImage[0][$column])) {
-                $image = $manufacturerImage[0][$column];
+            if (isset($dbImage[0][$column])) {
+                $image = $dbImage[0][$column];
             }
         }
         return $image;
