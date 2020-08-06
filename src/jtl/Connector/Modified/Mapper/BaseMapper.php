@@ -416,4 +416,39 @@ class BaseMapper
     {
         return new Identity($id);
     }
+
+    /**
+     * @param $data
+     * @return string
+     * @throws \Exception
+     */
+    protected function getDefaultColumnImageValue($data)
+    {
+        $table = $this->mapperConfig['table'];
+
+        switch($table){
+            case 'manufacturers':
+                $column = 'manufacturers_image';
+                break;
+            case 'categories':
+                $column = 'categories_image';
+                break;
+            default:
+                throw new \Exception(sprintf("Unknown table %s", $table));
+        }
+
+
+        $endpointId = $data->getId()->getEndpoint();
+        $image = '';
+        if (!empty($endpointId)) {
+            $manufacturerImage = $this->db->query(
+                sprintf('SELECT %s FROM %s WHERE manufacturers_id = %s', $column, $table, $endpointId)
+            );
+
+            if (!empty($manufacturerImage) && isset($manufacturerImage[0][$column])) {
+                $image = $manufacturerImage[0][$column];
+            }
+        }
+        return $image;
+    }
 }

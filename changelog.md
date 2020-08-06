@@ -1,3 +1,13 @@
+2.0.3
+-----
+- CO-917  Fixed importing coupons in orders
+- CO-1027 Fixed importing cash on delivery fee in orders
+- CO-1051 Fixed sending base price on products
+
+2.0.2.4
+-----
+ - CO-977 Fixed missing default column values when saving manufacturer and category
+ 
 2.0.2.3
 -----
  - CO-749 Fixed manufacturer push
