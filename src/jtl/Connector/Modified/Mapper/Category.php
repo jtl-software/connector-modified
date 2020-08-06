@@ -44,7 +44,7 @@ class Category extends \jtl\Connector\Modified\Mapper\BaseMapper
      */
     protected function categories_image($data)
     {
-        return $this->getDefaultColumnImageValue($data);
+        return $this->getDefaultColumnImageValue($data->getId()->getEndpoint(), $this->mapperConfig['table'], 'categories_image','categories_id');
     }
 
     protected function last_modified($data)

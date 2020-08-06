@@ -418,37 +418,22 @@ class BaseMapper
     }
 
     /**
-     * @param $data
-     * @return string
-     * @throws \Exception
+     * @param $endpointId
+     * @param $table
+     * @param $imageColumn
+     * @param $whereColumn
+     * @return mixed|string
      */
-    protected function getDefaultColumnImageValue($data)
+    protected function getDefaultColumnImageValue($endpointId, $table, $imageColumn, $whereColumn)
     {
-        $table = $this->mapperConfig['table'];
-
-        switch($table){
-            case 'manufacturers':
-                $column = 'manufacturers_image';
-                $where = 'manufacturers_id';
-                break;
-            case 'categories':
-                $column = 'categories_image';
-                $where = 'categories_id';
-                break;
-            default:
-                throw new \Exception(sprintf("Unknown table %s", $table));
-        }
-
-
-        $endpointId = $data->getId()->getEndpoint();
         $image = '';
         if (!empty($endpointId)) {
             $dbImage = $this->db->query(
-                sprintf('SELECT %s FROM %s WHERE %s = %s', $column, $table, $where, $endpointId)
+                sprintf('SELECT %s FROM %s WHERE %s = %s', $imageColumn, $table, $whereColumn, $endpointId)
             );
 
-            if (isset($dbImage[0][$column])) {
-                $image = $dbImage[0][$column];
+            if (isset($dbImage[0][$imageColumn])) {
+                $image = $dbImage[0][$imageColumn];
             }
         }
         return $image;
