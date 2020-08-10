@@ -114,7 +114,7 @@ class Product extends BaseMapper
                         );
                         
                         $varCombiProduct = clone $parent;
-                        $varCombiProduct->setId(new Identity($varCombiAttr[0]['products_attributes_id']));
+                        $varCombiProduct->setId(new Identity($parent->getId()->getEndpoint().'_'.$varCombiAttr[0]['products_attributes_id']));
                         $varCombiProduct->setMasterProductId($parent->getId());
                         $varCombiProduct->setIsMasterProduct(false);
                         $varCombiProduct->setConsiderStock(true);
