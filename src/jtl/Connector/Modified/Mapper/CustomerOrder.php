@@ -228,66 +228,86 @@ class CustomerOrder extends BaseMapper
     }
 
     /**
+     * @param $ordersId
+     * @return bool|float
+     */
+    public function determineDefaultTaxRate($ordersId)
+    {
+        $sql = sprintf('SELECT MAX(`products_tax`) `tax_rate` FROM `orders_products` WHERE `orders_id` = %d', $ordersId);
+        $taxRate = $this->db->query($sql);
+        return isset($taxRate[0]['tax_rate']) ? (float)$taxRate[0]['tax_rate'] : 0.;
+    }
+
+
+    /**
      * @param \jtl\Connector\Model\CustomerOrder $model
      * @param $data
      */
     public function addData($model, $data)
     {
-        $shipping = new CustomerOrderItem();
-        $shipping->setType(CustomerOrderItem::TYPE_SHIPPING);
-        $shipping->setCustomerOrderId($this->identity($data['orders_id']));
-        $shipping->setId($this->identity($data['shipping_class']));
-        $shipping->setQuantity(1);
-        $shipping->setVat(0);
+        $defaultTaxRate = $this->determineDefaultTaxRate($data['orders_id']);
 
-        $totalData = $this->db->query('SELECT class,value,title FROM orders_total WHERE orders_id=' . $data['orders_id']);
-
+        $totalData = $this->db->query('SELECT class,value,title FROM orders_total WHERE orders_id=' . $data['orders_id'].' ORDER BY sort_order ASC');
         foreach ($totalData as $total) {
             switch ($total['class']) {
                 case 'ot_total':
                     $model->setTotalSum(floatval($total['value']));
                     break;
                 case 'ot_shipping':
-                    $vat = 0;
-                    $price = floatval($total['value']);
-
-                    list($shippingModule, $shippingName) = explode('_', $data['shipping_class']);
-
-                    $moduleTaxClass = $this->db->query('SELECT configuration_value FROM configuration WHERE configuration_key ="MODULE_SHIPPING_' . strtoupper($shippingModule) . '_TAX_CLASS"');
-                    if (count($moduleTaxClass) > 0) {
-                        if (!empty($moduleTaxClass[0]['configuration_value']) && !empty($data['delivery_country_iso_code_2'])) {
-                            $rateResult = $this->db->query('SELECT r.tax_rate FROM countries c
-                          LEFT JOIN zones_to_geo_zones z ON z.zone_country_id = c.countries_id
-                          LEFT JOIN tax_rates r ON r.tax_zone_id = z.geo_zone_id
-                          WHERE c.countries_iso_code_2 = "' . $data['delivery_country_iso_code_2'] . '" && r.tax_class_id=' . $moduleTaxClass[0]['configuration_value']);
-
-                            if (count($rateResult) > 0 && isset($rateResult[0]['tax_rate'])) {
-                                $vat = floatval($rateResult[0]['tax_rate']);
-                            }
-                        }
-                    }
-
-                    $shipping->setPriceGross($price);
-                    $shipping->setVat($vat);
-                    $shipping->setName($total['title']);
-
+                    $model->addItem($this->createShippingItem($total, $data));
                     $model->setShippingMethodName($total['title']);
                     break;
                 case 'ot_coupon':
                 case 'ot_discount':
-                case 'ot_gv':
-                    $model->addItem($this->createOrderItem(CustomerOrderItem::TYPE_COUPON, $total, $data));
+                    $model->addItem($this->createOrderItem(CustomerOrderItem::TYPE_COUPON, $total, $data, 1, $defaultTaxRate));
                     break;
                 case 'ot_payment':
-                    $model->addItem($this->createOrderItem(CustomerOrderItem::TYPE_PRODUCT, $total, $data));
+                    $model->addItem($this->createOrderItem(CustomerOrderItem::TYPE_PRODUCT, $total, $data, 1, $defaultTaxRate));
                     break;
                 case 'ot_cod_fee':
-                    $model->addItem($this->createOrderItem(CustomerOrderItem::TYPE_SURCHARGE, $total, $data));
+                    $model->addItem($this->createOrderItem(CustomerOrderItem::TYPE_SURCHARGE, $total, $data, 1, $defaultTaxRate));
                     break;
             }
         }
+    }
 
-        $model->addItem($shipping);
+    /**
+     * @param array $total
+     * @param array $data
+     * @return CustomerOrderItem
+     */
+    protected function createShippingItem(array $total, array $data)
+    {
+        $shipping = new CustomerOrderItem();
+        $shipping->setType(CustomerOrderItem::TYPE_SHIPPING);
+        $shipping->setCustomerOrderId($this->identity($data['orders_id']));
+        $shipping->setId($this->identity($data['shipping_class']));
+        $shipping->setQuantity(1);
+
+        $vat = 0;
+        $price = floatval($total['value']);
+
+        list($shippingModule, $shippingName) = explode('_', $data['shipping_class']);
+
+        $moduleTaxClass = $this->db->query('SELECT configuration_value FROM configuration WHERE configuration_key ="MODULE_SHIPPING_' . strtoupper($shippingModule) . '_TAX_CLASS"');
+        if (count($moduleTaxClass) > 0) {
+            if (!empty($moduleTaxClass[0]['configuration_value']) && !empty($data['delivery_country_iso_code_2'])) {
+                $rateResult = $this->db->query('SELECT r.tax_rate FROM countries c
+                          LEFT JOIN zones_to_geo_zones z ON z.zone_country_id = c.countries_id
+                          LEFT JOIN tax_rates r ON r.tax_zone_id = z.geo_zone_id
+                          WHERE c.countries_iso_code_2 = "' . $data['delivery_country_iso_code_2'] . '" && r.tax_class_id=' . $moduleTaxClass[0]['configuration_value']);
+
+                if (count($rateResult) > 0 && isset($rateResult[0]['tax_rate'])) {
+                    $vat = floatval($rateResult[0]['tax_rate']);
+                }
+            }
+        }
+
+        $shipping->setPriceGross($price);
+        $shipping->setVat($vat);
+        $shipping->setName($total['title']);
+
+        return $shipping;
     }
 
     /**
