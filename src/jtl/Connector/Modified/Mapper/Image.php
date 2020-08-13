@@ -131,104 +131,110 @@ class Image extends BaseMapper
                     break;
                 
                 case ImageRelationType::TYPE_PRODUCT:
-                    if ($data->getSort() == 1) {
-                        $imgId = $data->getId()->getEndpoint();
-                        
-                        if (!empty($imgId)) {
-                            $prevImgQuery = $this->db->query('SELECT image_name FROM products_images WHERE image_id = "' . $imgId . '"');
-                            if (count($prevImgQuery) > 0) {
-                                $prevImage = $prevImgQuery[0]['image_name'];
-                            }
-                            
-                            if (!empty($prevImage)) {
-                                @unlink($this->shopConfig['shop']['path'] . $this->shopConfig['img']['original'] . $prevImage);
-                                foreach ($this->thumbConfig as $folder => $sizes) {
-                                    unlink($this->shopConfig['shop']['path'] . $this->shopConfig['img'][$folder] . $prevImage);
+                    if (Product::isVarCombi($data->getForeignKey()->getEndpoint()) === false) {
+                        if ($data->getSort() == 1) {
+                            $imgId = $data->getId()->getEndpoint();
+
+                            if (!empty($imgId)) {
+                                $prevImgQuery = $this->db->query('SELECT image_name FROM products_images WHERE image_id = "' . $imgId . '"');
+                                if (count($prevImgQuery) > 0) {
+                                    $prevImage = $prevImgQuery[0]['image_name'];
                                 }
-                            }
-                            
-                            $this->db->query('DELETE FROM products_images WHERE image_id="' . $imgId . '"');
-                        }
-                        
-                        $oldImage = $this->db->query('SELECT products_image FROM products WHERE products_id = "' . $data->getForeignKey()->getEndpoint() . '"');
-                        $oldImage = $oldImage[0]['products_image'];
-                        
-                        if (!empty($oldImage)) {
-                            @unlink($this->shopConfig['shop']['path'] . $this->shopConfig['img']['original'] . $oldImage);
-                        }
-                        
-                        $imgFileName = $this->generateImageName($data);
-                        
-                        if (!rename($data->getFilename(), $this->shopConfig['shop']['path'] . $this->shopConfig['img']['original'] . $imgFileName)) {
-                            throw new \Exception('Cannot move uploaded image file');
-                        }
-                        
-                        $this->generateThumbs($imgFileName, $oldImage);
-                        
-                        $productsObj = new \stdClass();
-                        $productsObj->products_image = $imgFileName;
-                        
-                        $this->db->updateRow($productsObj, 'products', 'products_id', $data->getForeignKey()->getEndpoint());
-                        
-                        $data->getId()->setEndpoint('pID_' . $data->getForeignKey()->getEndpoint());
-                        
-                        $this->db->query('DELETE FROM jtl_connector_link_image WHERE endpoint_id="' . $data->getId()->getEndpoint() . '"');
-                        $this->db->query('DELETE FROM jtl_connector_link_image WHERE host_id=' . $data->getId()->getHost());
-                        $this->db->query('INSERT INTO jtl_connector_link_image SET host_id="' . $data->getId()->getHost() . '", endpoint_id="' . $data->getId()->getEndpoint() . '"');
-                    } else {
-                        $oldImage = null;
-                        $imgObj = new \stdClass();
-                        
-                        $imgId = $data->getId()->getEndpoint();
-                        
-                        if (!empty($imgId)) {
-                            $prevImgQuery = $this->db->query('SELECT image_name FROM products_images WHERE image_id = "' . $imgId . '"');
-                            if (count($prevImgQuery) > 0) {
-                                $prevImage = $prevImgQuery[0]['image_name'];
-                            }
-                            
-                            if (!empty($prevImage)) {
-                                @unlink($this->shopConfig['shop']['path'] . $this->shopConfig['img']['original'] . $prevImage);
-                                foreach ($this->thumbConfig as $folder => $sizes) {
-                                    unlink($this->shopConfig['shop']['path'] . $this->shopConfig['img'][$folder] . $prevImage);
+
+                                if (!empty($prevImage)) {
+                                    @unlink($this->shopConfig['shop']['path'] . $this->shopConfig['img']['original'] . $prevImage);
+                                    foreach ($this->thumbConfig as $folder => $sizes) {
+                                        unlink($this->shopConfig['shop']['path'] . $this->shopConfig['img'][$folder] . $prevImage);
+                                    }
                                 }
+
+                                $this->db->query('DELETE FROM products_images WHERE image_id="' . $imgId . '"');
                             }
-                            
-                            $this->db->query('DELETE FROM products_images WHERE image_id="' . $imgId . '"');
+
+                            $oldImage = $this->db->query('SELECT products_image FROM products WHERE products_id = "' . $data->getForeignKey()->getEndpoint() . '"');
+                            $oldImage = $oldImage[0]['products_image'];
+
+                            if (!empty($oldImage)) {
+                                @unlink($this->shopConfig['shop']['path'] . $this->shopConfig['img']['original'] . $oldImage);
+                            }
+
+                            $imgFileName = $this->generateImageName($data);
+
+                            if (!rename($data->getFilename(),
+                                $this->shopConfig['shop']['path'] . $this->shopConfig['img']['original'] . $imgFileName)) {
+                                throw new \Exception('Cannot move uploaded image file');
+                            }
+
+                            $this->generateThumbs($imgFileName, $oldImage);
+
+                            $productsObj = new \stdClass();
+                            $productsObj->products_image = $imgFileName;
+
+                            $this->db->updateRow($productsObj, 'products', 'products_id',
+                                $data->getForeignKey()->getEndpoint());
+
+                            $data->getId()->setEndpoint('pID_' . $data->getForeignKey()->getEndpoint());
+
+                            $this->db->query('DELETE FROM jtl_connector_link_image WHERE endpoint_id="' . $data->getId()->getEndpoint() . '"');
+                            $this->db->query('DELETE FROM jtl_connector_link_image WHERE host_id=' . $data->getId()->getHost());
+                            $this->db->query('INSERT INTO jtl_connector_link_image SET host_id="' . $data->getId()->getHost() . '", endpoint_id="' . $data->getId()->getEndpoint() . '"');
+                        } else {
+                            $oldImage = null;
+                            $imgObj = new \stdClass();
+
+                            $imgId = $data->getId()->getEndpoint();
+
+                            if (!empty($imgId)) {
+                                $prevImgQuery = $this->db->query('SELECT image_name FROM products_images WHERE image_id = "' . $imgId . '"');
+                                if (count($prevImgQuery) > 0) {
+                                    $prevImage = $prevImgQuery[0]['image_name'];
+                                }
+
+                                if (!empty($prevImage)) {
+                                    @unlink($this->shopConfig['shop']['path'] . $this->shopConfig['img']['original'] . $prevImage);
+                                    foreach ($this->thumbConfig as $folder => $sizes) {
+                                        unlink($this->shopConfig['shop']['path'] . $this->shopConfig['img'][$folder] . $prevImage);
+                                    }
+                                }
+
+                                $this->db->query('DELETE FROM products_images WHERE image_id="' . $imgId . '"');
+                            }
+
+                            $oldImageQuery = $this->db->query('SELECT image_name FROM products_images WHERE products_id = "' . $data->getForeignKey()->getEndpoint() . '" && image_nr=' . ($data->getSort() - 1));
+                            if (count($oldImageQuery) > 0) {
+                                $oldImage = $oldImageQuery[0]['image_name'];
+                            }
+
+                            if (!empty($oldImage)) {
+                                @unlink($this->shopConfig['shop']['path'] . $this->shopConfig['img']['original'] . $oldImage);
+                            }
+
+                            $imgObj->image_id = $data->getId()->getEndpoint();
+
+                            $imgFileName = $this->generateImageName($data);
+
+                            if (!rename($data->getFilename(),
+                                $this->shopConfig['shop']['path'] . $this->shopConfig['img']['original'] . $imgFileName)) {
+                                throw new \Exception('Cannot move uploaded image file');
+                            }
+
+                            $this->generateThumbs($imgFileName, $oldImage);
+
+                            $imgObj->products_id = $data->getForeignKey()->getEndpoint();
+                            $imgObj->image_name = $imgFileName;
+                            $imgObj->image_nr = ($data->getSort() - 1);
+
+                            $newIdQuery = $this->db->deleteInsertRow($imgObj, 'products_images',
+                                ['image_nr', 'products_id'], [$imgObj->image_nr, $imgObj->products_id]);
+                            $newId = $newIdQuery->getKey();
+
+                            $this->db->query('DELETE FROM jtl_connector_link_image WHERE host_id=' . $data->getId()->getHost());
+                            $this->db->query('INSERT INTO jtl_connector_link_image SET host_id="' . $data->getId()->getHost() . '", endpoint_id="' . $newId . '"');
+
+                            $data->getId()->setEndpoint($newId);
                         }
-                        
-                        $oldImageQuery = $this->db->query('SELECT image_name FROM products_images WHERE products_id = "' . $data->getForeignKey()->getEndpoint() . '" && image_nr=' . ($data->getSort() - 1));
-                        if (count($oldImageQuery) > 0) {
-                            $oldImage = $oldImageQuery[0]['image_name'];
-                        }
-                        
-                        if (!empty($oldImage)) {
-                            @unlink($this->shopConfig['shop']['path'] . $this->shopConfig['img']['original'] . $oldImage);
-                        }
-                        
-                        $imgObj->image_id = $data->getId()->getEndpoint();
-                        
-                        $imgFileName = $this->generateImageName($data);
-                        
-                        if (!rename($data->getFilename(), $this->shopConfig['shop']['path'] . $this->shopConfig['img']['original'] . $imgFileName)) {
-                            throw new \Exception('Cannot move uploaded image file');
-                        }
-                        
-                        $this->generateThumbs($imgFileName, $oldImage);
-                        
-                        $imgObj->products_id = $data->getForeignKey()->getEndpoint();
-                        $imgObj->image_name = $imgFileName;
-                        $imgObj->image_nr = ($data->getSort() - 1);
-                        
-                        $newIdQuery = $this->db->deleteInsertRow($imgObj, 'products_images', ['image_nr', 'products_id'], [$imgObj->image_nr, $imgObj->products_id]);
-                        $newId = $newIdQuery->getKey();
-                        
-                        $this->db->query('DELETE FROM jtl_connector_link_image WHERE host_id=' . $data->getId()->getHost());
-                        $this->db->query('INSERT INTO jtl_connector_link_image SET host_id="' . $data->getId()->getHost() . '", endpoint_id="' . $newId . '"');
-                        
-                        $data->getId()->setEndpoint($newId);
                     }
-                    
+
                     break;
             }
             
