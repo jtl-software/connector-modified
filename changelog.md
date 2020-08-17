@@ -1,3 +1,8 @@
+3.0.0
+-----
+- CO-1027 Fixed importing cod fee
+- CO-308 VarCombi support
+
 2.0.3
 -----
 - CO-917  Fixed importing coupons in orders
