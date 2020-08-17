@@ -2,6 +2,7 @@
 -----
 - CO-1027 Fixed importing cod fee
 - CO-308 VarCombi support
+- CO-419 Fixed importing order language
 
 2.0.3
 -----
