@@ -30,7 +30,7 @@ class Manufacturer extends BaseMapper
      */
     protected function manufacturers_image($data)
     {
-        return $this->getDefaultColumnImageValue($data);
+        return $this->getDefaultColumnImageValue($data->getId()->getEndpoint(), $this->mapperConfig['table'], 'manufacturers_image', 'manufacturers_id');
     }
 
     protected function websiteUrl($data)

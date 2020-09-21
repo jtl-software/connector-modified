@@ -13,17 +13,22 @@ class ProductStockLevel extends BaseMapper
 
         return array($stockLevel);
     }
-
+    
     public function push(ProductStockLevelModel $stockLevel)
     {
         $productId = $stockLevel->getProductId()->getEndpoint();
-
-        if (!empty($productId)) {
+        $isVarCombi = Product::isVarCombi($productId);
+        
+        if (!empty($productId) && $isVarCombi == false) {
             $this->db->query('UPDATE products SET products_quantity='.round($stockLevel->getStockLevel()).' WHERE products_id='.$productId);
-
+            
+            return $stockLevel;
+        } elseif (!empty($productId) && $isVarCombi == true) {
+            $this->db->query('UPDATE products_attributes SET attributes_stock ='. round($stockLevel->getStockLevel()) .' WHERE options_values_id =' . Product::extractOptionValueId($productId));
+            
             return $stockLevel;
         }
-
+        
         return false;
     }
 }

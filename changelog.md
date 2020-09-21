@@ -1,3 +1,9 @@
+3.0.0
+-----
+- CO-1027 Fixed importing cod fee
+- CO-308 VarCombi support
+- CO-419 Fixed importing order language
+
 2.0.3
 -----
 - CO-917  Fixed importing coupons in orders
@@ -12,7 +18,7 @@
 -----
  - CO-749 Fixed manufacturer push
  
- 2.0.2.2
+2.0.2.2
  -----
  - Updated primary key mapper
 

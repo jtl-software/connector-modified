@@ -58,10 +58,21 @@ class Modified extends BaseConnector
         $this->setTokenLoader(new TokenLoader());
         $this->setChecksumLoader(new ChecksumLoader());
     }
+    
+    
 
     private function readConfigFile()
     {
+        
         require_once(CONNECTOR_DIR.'/../includes/configure.php');
+        require_once(CONNECTOR_DIR.'/../inc/set_admin_directory.inc.php');
+        
+        if (defined('DIR_ADMIN')){
+            require_once(CONNECTOR_DIR.'/../' . DIR_ADMIN . '/includes/version.php');
+        } else {
+            require_once(CONNECTOR_DIR.'/../admin/includes/version.php');
+        }
+        
 
         return array(
             'shop' => array(
@@ -74,7 +85,8 @@ class Modified extends BaseConnector
                 'host' => DB_SERVER,
                 'name' => DB_DATABASE,
                 'user' => DB_SERVER_USERNAME,
-                'pass' => DB_SERVER_PASSWORD
+                'pass' => DB_SERVER_PASSWORD,
+                'version' => ltrim(DB_VERSION, 'MOD_')
             ),
             'img' => array(
                 'original' => DIR_WS_ORIGINAL_IMAGES,

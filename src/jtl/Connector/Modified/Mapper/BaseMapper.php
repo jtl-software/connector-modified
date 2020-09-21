@@ -340,11 +340,15 @@ class BaseMapper
      */
     public function statistic()
     {
-        if (isset($this->mapperConfig['query'])) {
+        if (isset($this->mapperConfig['statisticsQuery'])) {
+            $result = $this->db->query($this->mapperConfig['statisticsQuery']);
+            return isset($result[0]['total']) ? (int)$result[0]['total'] : 0;
+        } elseif (isset($this->mapperConfig['query'])) {
             $result = $this->db->query($this->mapperConfig['query']);
             return count($result);
         } else {
-            $objs = $this->db->query("SELECT count(*) as count FROM {$this->mapperConfig['table']} LIMIT 1", array("return" => "object"));
+            $objs = $this->db->query("SELECT count(*) as count FROM {$this->mapperConfig['table']} LIMIT 1",
+                array("return" => "object"));
         }
 
         return $objs !== null ? intval($objs[0]->count) : 0;
@@ -414,35 +418,22 @@ class BaseMapper
     }
 
     /**
-     * @param $data
-     * @return string
-     * @throws \Exception
+     * @param $endpointId
+     * @param $table
+     * @param $imageColumn
+     * @param $whereColumn
+     * @return mixed|string
      */
-    protected function getDefaultColumnImageValue($data)
+    protected function getDefaultColumnImageValue($endpointId, $table, $imageColumn, $whereColumn)
     {
-        $table = $this->mapperConfig['table'];
-
-        switch($table){
-            case 'manufacturers':
-                $column = 'manufacturers_image';
-                break;
-            case 'categories':
-                $column = 'categories_image';
-                break;
-            default:
-                throw new \Exception(sprintf("Unknown table %s", $table));
-        }
-
-
-        $endpointId = $data->getId()->getEndpoint();
         $image = '';
         if (!empty($endpointId)) {
-            $manufacturerImage = $this->db->query(
-                sprintf('SELECT %s FROM %s WHERE manufacturers_id = %s', $column, $table, $endpointId)
+            $dbImage = $this->db->query(
+                sprintf('SELECT %s FROM %s WHERE %s = %s', $imageColumn, $table, $whereColumn, $endpointId)
             );
 
-            if (!empty($manufacturerImage) && isset($manufacturerImage[0][$column])) {
-                $image = $manufacturerImage[0][$column];
+            if (isset($dbImage[0][$imageColumn])) {
+                $image = $dbImage[0][$imageColumn];
             }
         }
         return $image;

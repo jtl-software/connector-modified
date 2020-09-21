@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>JTL-Connector configuration for Modified Shop</title>
-
+    
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
     <style type="text/css">
         body {
@@ -81,6 +81,8 @@
             $('.nav-tabs a').on('shown.bs.tab', function(e) {
                 window.location.hash = e.target.hash;
             });
+
+            $('[data-toggle="tooltip"]').tooltip();
         });
     </script>
   </body>
