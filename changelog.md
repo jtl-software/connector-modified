@@ -1,3 +1,8 @@
+3.1.0
+-----
+- CO-1184 - Fixed import discount items
+- CO-1127 - Fixed problems with DateTime properties
+
 3.0.0
 -----
 - CO-1027 Fixed importing cod fee
