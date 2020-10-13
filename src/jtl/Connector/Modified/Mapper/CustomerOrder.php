@@ -259,6 +259,7 @@ class CustomerOrder extends BaseMapper
                     break;
                 case 'ot_coupon':
                 case 'ot_discount':
+                case 'ot_gv':
                     $model->addItem($this->createOrderItem(CustomerOrderItem::TYPE_COUPON, $total, $data, 1, $defaultTaxRate));
                     break;
                 case 'ot_payment':
