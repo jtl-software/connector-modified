@@ -81,7 +81,10 @@ class BaseMapper
                     $type = $this->type->getProperty($host)->getType();
 
                     if ($type == "DateTime" && !is_null($value)) {
-                        $value = $value == '0000-00-00 00:00:00' ? new \DateTime() : new \DateTime($value);
+                        $value = new \DateTime($value);
+                        if ((int)$value->format("Y") <= 0){
+                            $value = null;
+                        }
                     } else {
                         settype($value, $type);
                     }
