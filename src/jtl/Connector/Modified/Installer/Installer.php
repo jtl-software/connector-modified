@@ -39,7 +39,8 @@ class Installer
 
         $db->setNames();
 
-        $moduleInstances = array();
+        $moduleInstances = [];
+        $moduleErrors = [];
 
         foreach ($this->modules as $id => $module) {
             $className = '\\jtl\\Connector\\Modified\\Installer\\Modules\\'.$module;
@@ -95,8 +96,6 @@ class Installer
             echo '</ul>
 	        	<br>
 	        	<div class="tab-content">';
-
-            $moduleErrors = array();
 
             foreach ($moduleInstances as $class => $instance) {
                 $active = $class == 'check' ? ' active' : '';
