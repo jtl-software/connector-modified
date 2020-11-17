@@ -1,4 +1,12 @@
-﻿<!DOCTYPE html>
+﻿<?php
+include('../index.php');
+
+use jtl\Connector\Modified\Installer\Installer;
+
+$installer = new Installer();
+
+?>
+<!DOCTYPE html>
 <html lang="de">
   <head>
     <meta charset="utf-8">
@@ -46,9 +54,7 @@
                 echo '<li>'.$error.'</li>';
             }
             echo '</ul></div>';
-        } else {
-            include('../index.php');
-            ?>
+        } else { ?>
             <div class="panel panel-primary">
                 <div class="panel-heading">
                     <h3 class="panel-title">
@@ -58,14 +64,12 @@
                 <div class="panel-body">
                     <form class="form-horizontal" role="form" method="post">
                         <?php
-                        new \jtl\Connector\Modified\Installer\Installer();
+                            $installer->show();
                         ?>
                     </form>
                 </div>
             </div>
-            <?php
-        }
-        ?>
+        <?php } ?>
     </div>
 
     <script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
