@@ -2,6 +2,7 @@
 namespace jtl\Connector\Modified\Installer;
 
 use jtl\Connector\Core\Database\Mysql;
+use jtl\Connector\Core\Exception\DatabaseException;
 use jtl\Connector\Modified\Installer\Config;
 
 class Installer
@@ -15,16 +16,27 @@ class Installer
         'dev_logging' => 'DevLogging'
     );
 
-    private $connectorConfig = null;
-
+    /**
+     * Installer constructor.
+     * @throws \Exception
+     */
     public function __construct()
     {
+        if (session_start() === false) {
+            throw new \Exception('Cannot start session.');
+        }
+
         error_reporting(E_ALL ^ E_NOTICE);
         ini_set('display_errors', 1);
-        session_start();
-        
+    }
+
+    /**
+     * @throws DatabaseException
+     */
+    public function show()
+    {
         $shopConfig = $this->readConfigFile();
-        $this->connectorConfig = new Config(CONNECTOR_DIR.'/config/config.json');
+        $connectorConfig = new Config(CONNECTOR_DIR.'/config/config.json');
 
         $db = Mysql::getInstance();
 
@@ -44,7 +56,7 @@ class Installer
 
         foreach ($this->modules as $id => $module) {
             $className = '\\jtl\\Connector\\Modified\\Installer\\Modules\\'.$module;
-            $moduleInstances[$id] = new $className($db, $this->connectorConfig, $shopConfig);
+            $moduleInstances[$id] = new $className($db, $connectorConfig, $shopConfig);
         }
     
         if (isset($_REQUEST['save'])) {
@@ -58,7 +70,7 @@ class Installer
         
         if (isset($_REQUEST['save'])) {
             if (count($moduleErrors) == 0) {
-                if (!$this->connectorConfig->save()) {
+                if (!$connectorConfig->save()) {
                     $_SESSION['error'] = true;
                     header("Location: " . $_SERVER['HTTP_REFERER']);
                     exit();
@@ -131,6 +143,9 @@ class Installer
         }
     }
 
+    /**
+     * @return array[]
+     */
     private function readConfigFile()
     {
         require_once realpath(CONNECTOR_DIR.'/../').'/includes/configure.php';
