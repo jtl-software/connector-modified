@@ -1,6 +1,6 @@
 3.2.0
 -----
-- CO-1184 - Fixed installation/config procedure 
+- CO-1214 - Fixed installation/config procedure 
 
 3.1.0
 -----
