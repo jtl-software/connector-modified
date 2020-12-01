@@ -1,3 +1,7 @@
+3.2.0
+-----
+- CO-1184 - Fixed installation/config procedure 
+
 3.1.0
 -----
 - CO-1184 - Fixed import discount items
