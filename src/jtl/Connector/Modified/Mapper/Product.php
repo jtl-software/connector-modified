@@ -384,7 +384,7 @@ class Product extends BaseMapper
             }
         }
         
-        return '';
+        return 0;
     }
     
     protected function products_vpe_status($data)
@@ -470,8 +470,7 @@ class Product extends BaseMapper
     protected function isMasterProduct($data)
     {
         $childCount = $this->db->query("SELECT COUNT(*) AS cnt FROM products_attributes WHERE products_id = " . $data['products_id']);
-        $result = (int)$childCount[0]['cnt'] > 0 ? true : false;
-        return $result;
+        return (int)$childCount[0]['cnt'] > 0;
     }
     
     protected function addVarCombiAsVariation($data, $masterId)
@@ -480,21 +479,44 @@ class Product extends BaseMapper
             
             $i18nId = array_search($variationI18n, $data->getVariations()[0]->getValues()[0]->getI18ns());
             $langId = parent::locale2id($data->getVariations()[0]->getValues()[0]->getI18ns()[$i18nId]->getLanguageISO());
-            
-            $variationId = $this->db->query(
-                sprintf("SELECT * FROM products_options WHERE language_id = %s",
-                $langId
-                )
-            );
-            
-            if (count($variationId) == 0) {
-                $this->db->query(
-                    sprintf("INSERT IGNORE INTO  products_options (products_options_id, language_id, products_options_name, products_options_sortorder) VALUES (1, %s, 'Variation', 0)",
-                    $langId
-                    )
-                );
+
+            $variationName = [];
+            /** @var ProductVariation $variation */
+            foreach ($data->getVariations() as $variation) {
+                foreach($variation->getI18ns() as $variationI18N){
+                    if ($langId === parent::locale2id($variationI18N->getLanguageISO())) {
+                        $variationName[] = $variationI18N->getName();
+                    }
+                }
             }
-            
+            $productsOptionName = 'Variation';
+            if (!empty($variationName)) {
+                $productsOptionName = join(' & ', $variationName);
+            }
+
+            $variationId = $this->db->query(sprintf("SELECT * FROM products_options WHERE language_id = %s AND products_options_name = '%s'", $langId, $productsOptionName));
+
+            if (count($variationId) == 0) {
+                $maxId = $this->db->query("SELECT MAX(products_options_id) as maxId FROM products_options");
+                $maxId = isset($maxId[0]['maxId']) ? $maxId[0]['maxId'] + 1 : 1;
+
+                $this->db->query(
+                    sprintf("INSERT IGNORE INTO products_options (products_options_id, language_id, products_options_name, products_options_sortorder) VALUES (%s, %s, '%s', 0)", $maxId, $langId,
+                        $productsOptionName)
+                );
+
+                $id = $this->db->query(
+                    sprintf("SELECT products_options_id FROM products_options WHERE language_id = %s AND products_options_name = '%s' ORDER BY products_options_id DESC LIMIT 0,1", $langId,
+                        $productsOptionName)
+                );
+                if (isset($id[0]["products_options_id"])) {
+                    $id = ((int)$id[0]["products_options_id"]);
+                }
+            } else {
+                $id = $variationId[0]['products_options_id'];
+            }
+
+
             if(isset(static::$idCache[$data->getId()->getHost()]['valuesId'])) {
                 $variationOptionId = static::$idCache[$data->getId()->getHost()]['valuesId'];
             } else {
@@ -546,15 +568,6 @@ class Product extends BaseMapper
             $this->db->deleteInsertRow($variationValue, 'products_options_values',
                 ['products_options_values_id', 'langauge_id'],
                 [$variationOptionId, $langId]);
-
-            $id = $this->db->query(
-                sprintf("SELECT products_options_id FROM products_options WHERE language_id = %s ORDER BY products_options_id DESC LIMIT 0,1",
-                    $langId
-                )
-            );
-            if (isset($id[0]["products_options_id"])) {
-                $id = ((int)$id[0]["products_options_id"]);
-            }
     
             $price = $this->db->query("SELECT products_price FROM products WHERE products_id = " . $masterId);
             if(!end($data->getPrices())->getItems()[0] || !isset($price[0]['products_price'])){
