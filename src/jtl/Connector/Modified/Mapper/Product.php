@@ -491,19 +491,20 @@ class Product extends BaseMapper
             }
             $productsOptionName = 'Variation';
             if (!empty($variationName)) {
-                $productsOptionName = join(' & ', $variationName);
+                $productsOptionName = join(' / ', $variationName);
             }
 
             $variationId = $this->db->query(sprintf("SELECT * FROM products_options WHERE language_id = %s AND products_options_name = '%s'", $langId, $productsOptionName));
 
             if (count($variationId) == 0) {
+                $this->db->DB()->begin_transaction();
                 $maxId = $this->db->query("SELECT MAX(products_options_id) as maxId FROM products_options");
                 $maxId = isset($maxId[0]['maxId']) ? $maxId[0]['maxId'] + 1 : 1;
-
                 $this->db->query(
                     sprintf("INSERT IGNORE INTO products_options (products_options_id, language_id, products_options_name, products_options_sortorder) VALUES (%s, %s, '%s', 0)", $maxId, $langId,
                         $productsOptionName)
                 );
+                $this->db->commit();
 
                 $id = $this->db->query(
                     sprintf("SELECT products_options_id FROM products_options WHERE language_id = %s AND products_options_name = '%s' ORDER BY products_options_id DESC LIMIT 0,1", $langId,
