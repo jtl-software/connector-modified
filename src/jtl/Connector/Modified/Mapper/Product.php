@@ -383,8 +383,8 @@ class Product extends BaseMapper
                 }
             }
         }
-        
-        return '';
+
+        return $this->shopConfig['settings']['DEFAULT_SHIPPING_STATUS_ID'];
     }
     
     protected function products_vpe_status($data)
