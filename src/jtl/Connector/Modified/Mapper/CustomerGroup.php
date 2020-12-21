@@ -5,7 +5,9 @@ class CustomerGroup extends BaseMapper
 {
     protected $mapperConfig = array(
         "table" => "customers_status",
-        "query" => "SELECT customers_status_id, customers_status_discount, customers_status_add_tax_ot FROM customers_status WHERE customers_status_id != 0 GROUP BY customers_status_id, customers_status_discount, customers_status_add_tax_ot",
+        "query" => "SELECT customers_status_id, customers_status_discount, customers_status_add_tax_ot 
+             FROM customers_status  
+             GROUP BY customers_status_id, customers_status_discount, customers_status_add_tax_ot",
         "identity" => "getId",
         "getMethod" => "getCustomerGroups",
         "mapPull" => array(

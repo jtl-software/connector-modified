@@ -1,7 +1,8 @@
-3.2.1
+3.3.0
 -----
 - CO-1212 Fixed using variation names for variations
 - CO-1299 Fixed setting default shipping status as fallback
+- Added importing customer admin group into  JTL-Wawi
 
 3.2.0
 -----
