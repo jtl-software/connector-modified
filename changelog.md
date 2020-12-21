@@ -1,3 +1,8 @@
+3.2.1
+-----
+- CO-1212 Fixed using variation names for variations
+- CO-1299 Fixed setting default shipping status as fallback
+
 3.2.0
 -----
 - CO-1214 - Fixed installation/config procedure 
