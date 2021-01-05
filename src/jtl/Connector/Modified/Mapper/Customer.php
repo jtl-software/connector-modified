@@ -41,7 +41,8 @@ class Customer extends BaseMapper
             "eMail" => "customers_email_address",
             "vatNumber" => "customers_vat_id",
             "hasNewsletterSubscription" => null,
-            "creationDate" => "customers_date_added"
+            "creationDate" => "customers_date_added",
+            "hasCustomerAccount" => null
         ),
         "mapPush" => array(
             "customers_id" => "id",
@@ -60,7 +61,16 @@ class Customer extends BaseMapper
             "customers_password" => null
         )
     );
-    
+
+    /**
+     * @param $data
+     * @return bool
+     */
+    protected function hasCustomerAccount($data)
+    {
+        return !$data["account_type"];
+    }
+
     protected function salutation($data)
     {
         if ($data['customers_gender'] == 'm') {
