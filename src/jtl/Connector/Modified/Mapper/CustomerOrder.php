@@ -81,7 +81,8 @@ class CustomerOrder extends BaseMapper
         parent::__construct();
 
         if (!empty($this->connectorConfig->from_date)) {
-            $this->mapperConfig['query'] .= ' && date_purchased >= "' . $this->connectorConfig->from_date . '"';
+            $this->mapperConfig['query'] .= ' AND date_purchased >= "' . $this->connectorConfig->from_date . '"';
+            $this->mapperConfig['statisticsQuery'] .= ' AND date_purchased >= "' . $this->connectorConfig->from_date . '"';
         }
     }
 
