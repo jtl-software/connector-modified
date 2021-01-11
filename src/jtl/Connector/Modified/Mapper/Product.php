@@ -194,22 +194,15 @@ class Product extends BaseMapper
     
     public function push($data, $dbObj = null)
     {
-        $useVarKombis = $this->connectorConfig->use_var_combi_logic;
-        
         if (isset(static::$idCache[$data->getMasterProductId()->getHost()]['parentId'])) {
             $data->getMasterProductId()->setEndpoint(static::$idCache[$data->getMasterProductId()->getHost()]['parentId']);
         }
         
         $masterId = $data->getMasterProductId()->getEndpoint();
-        $hostMasterId = $data->getMasterProductId()->getHost();
-        $variations = $data->getVariations();
-        
-        if (!empty($masterId) && $useVarKombis) {
+
+        if (count($data->getVariations()) > 0 && !$data->getIsMasterProduct() && $data->getMasterProductId()->getHost() !== 0) {
             $this->addVarCombiAsVariation($data, $masterId);
-            
             return $data;
-        } elseif ( ((!empty($hostMasterId) || $data->getIsMasterProduct()) && !$useVarKombis) || ($useVarKombis && !empty($variations) && !$data->getIsMasterProduct())){
-            return null;
         }
         
         $id = $data->getId()->getEndpoint();
