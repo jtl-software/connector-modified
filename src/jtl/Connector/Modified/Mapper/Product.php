@@ -90,7 +90,9 @@ class Product extends BaseMapper
 
                 $masterVariations = [];
 
-                $dbResult = (new \jtl\Connector\Modified\Mapper\ProductVariationValue())->pull(['products_id' => $parent->getId()->getEndpoint()], $limit);
+                $dbResult = (new \jtl\Connector\Modified\Mapper\ProductVariationValue($this->db, $this->shopConfig, $this->connectorConfig))
+                    ->pull(['products_id' => $parent->getId()->getEndpoint()], $limit);
+
                 foreach ($dbResult as $varCombi) {
     
                     $varCombiAttr = $this->db->query(

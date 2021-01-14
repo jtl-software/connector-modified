@@ -21,9 +21,9 @@ class Image extends BaseMapper
     
     private $thumbConfig;
     
-    public function __construct()
+    public function __construct($db, $shopConfig, $connectorConfig)
     {
-        parent::__construct();
+        parent::__construct($db, $shopConfig, $connectorConfig);
         
         $this->thumbConfig = [
             'info'       => [

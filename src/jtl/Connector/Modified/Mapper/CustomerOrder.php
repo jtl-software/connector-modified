@@ -76,9 +76,9 @@ class CustomerOrder extends BaseMapper
         'worldpay' => 'pm_worldpay'
     );
 
-    public function __construct()
+    public function __construct($db, $shopConfig, $connectorConfig)
     {
-        parent::__construct();
+        parent::__construct($db, $shopConfig, $connectorConfig);
 
         if (!empty($this->connectorConfig->from_date)) {
             $this->mapperConfig['query'] .= ' && date_purchased >= "' . $this->connectorConfig->from_date . '"';

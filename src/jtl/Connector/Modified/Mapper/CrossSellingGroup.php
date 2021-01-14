@@ -31,7 +31,7 @@ class CrossSellingGroup extends BaseMapper
             /** @var \jtl\Connector\Model\CrossSellingGroupI18n $i18n */
             foreach ($group->getI18ns() as $i18n) {
                 $i18n->setCrossSellingGroupId($group->getId());
-                $i18ns[] = (new CrossSellingGroupI18n)->push($i18n);
+                $i18ns[] = (new CrossSellingGroupI18n($this->db, $this->shopConfig, $this->connectorConfig))->push($i18n);
             }
             $group->setI18ns($i18ns);
             
