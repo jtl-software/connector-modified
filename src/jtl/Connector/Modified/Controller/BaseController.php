@@ -1,7 +1,6 @@
 <?php
 namespace jtl\Connector\Modified\Controller;
 
-use jtl\Connector\Core\Controller\Controller;
 use jtl\Connector\Core\Database\Mysql;
 use jtl\Connector\Result\Action;
 use jtl\Connector\Core\Rpc\Error;
@@ -10,16 +9,11 @@ use jtl\Connector\Core\Model\DataModel;
 use jtl\Connector\Core\Model\QueryFilter;
 use jtl\Connector\Core\Logger\Logger;
 use jtl\Connector\Formatter\ExceptionFormatter;
+use Jtl\Connector\XtcComponents\AbstractBaseController;
+use Jtl\Connector\XtcComponents\AbstractBaseMapper;
 
-class BaseController extends Controller
+class BaseController extends AbstractBaseController
 {
-    protected $db;
-
-    public function __construct()
-    {
-        $this->db = Mysql::getInstance();
-    }
-
     public function pull(QueryFilter $queryfilter)
     {
         $action = new Action();
@@ -33,7 +27,7 @@ class BaseController extends Controller
                 throw new \Exception("Class ".$class." not available");
             }
 
-            $mapper = new $class();
+            $mapper = new $class(Mysql::getInstance(), $this->shopConfig, $this->connectorConfig);
 
             $result = $mapper->pull(null, $queryfilter->getLimit());
 
@@ -64,7 +58,8 @@ class BaseController extends Controller
                 throw new \Exception("Class ".$class." not available");
             }
 
-            $mapper = new $class();
+            /** @var AbstractBaseMapper $mapper */
+            $mapper = new $class(Mysql::getInstance(), $this->shopConfig, $this->connectorConfig);
 
             $result = $mapper->push($model);
 
@@ -91,7 +86,7 @@ class BaseController extends Controller
             $action->setHandled(true);
 
             try {
-                $mapper = new $class();
+                $mapper = new $class(Mysql::getInstance(), $this->shopConfig, $this->connectorConfig);
 
                 $statModel = new Statistic();
 
@@ -126,7 +121,7 @@ class BaseController extends Controller
                 throw new \Exception("Class ".$class." not available");
             }
 
-            $mapper = new $class();
+            $mapper = new $class(Mysql::getInstance(), $this->shopConfig, $this->connectorConfig);
 
             $result = $mapper->delete($model);
 

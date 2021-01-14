@@ -4,52 +4,48 @@ namespace jtl\Connector\Modified;
 use \jtl\Connector\Core\Rpc\RequestPacket;
 use \jtl\Connector\Core\Utilities\RpcMethod;
 use \jtl\Connector\Core\Database\Mysql;
-use \jtl\Connector\Core\Rpc\ResponsePacket;
-use \jtl\Connector\Session\SessionHelper;
 use \jtl\Connector\Base\Connector as BaseConnector;
-use \jtl\Connector\Core\Rpc\Error as Error;
-use \jtl\Connector\Core\Http\Response;
 use \jtl\Connector\Core\Rpc\Method;
 use \jtl\Connector\Modified\Mapper\PrimaryKeyMapper;
 use \jtl\Connector\Result\Action;
 use \jtl\Connector\Modified\Auth\TokenLoader;
 use \jtl\Connector\Modified\Checksum\ChecksumLoader;
-use \jtl\Connector\Core\Logger\Logger;
 
 class Modified extends BaseConnector
 {
     protected $controller;
     protected $action;
 
+    protected $shopConfig;
+    protected $connectorConfig;
+
     public function initialize()
     {
-        $session = new SessionHelper("modified");
-
-        if (!isset($session->shopConfig)) {
-            $session->shopConfig = $this->readConfigFile();
+        if (!isset($this->shopConfig)) {
+            $this->shopConfig = $this->readConfigFile();
         }
-        if (!isset($session->connectorConfig)) {
-            $session->connectorConfig = json_decode(@file_get_contents(CONNECTOR_DIR.'/config/config.json'));
+        if (!isset($this->connectorConfig)) {
+            $this->connectorConfig = json_decode(@file_get_contents(CONNECTOR_DIR.'/config/config.json'));
         }
 
         $db = Mysql::getInstance();
 
         if (!$db->isConnected()) {
             $db->connect(array(
-                "host" => $session->shopConfig['db']["host"],
-                "user" => $session->shopConfig['db']["user"],
-                "password" => $session->shopConfig['db']["pass"],
-                "name" => $session->shopConfig['db']["name"]
+                "host" => $this->shopConfig['db']["host"],
+                "user" => $this->shopConfig['db']["user"],
+                "password" => $this->shopConfig['db']["pass"],
+                "name" => $this->shopConfig['db']["name"]
             ));
         }
 
-        if(isset($session->connectorConfig->utf8) && $session->connectorConfig->utf8 !== '0') {
+        if(isset($this->connectorConfig->utf8) && $this->connectorConfig->utf8 !== '0') {
             $db->setNames();
             $db->setCharset();
         }
 
-        if (!isset($session->shopConfig['settings'])) {
-            $session->shopConfig += $this->readConfigDb($db);
+        if (!isset($this->shopConfig['settings'])) {
+            $this->shopConfig += $this->readConfigDb($db);
         }
 
         $this->update($db);
@@ -132,7 +128,10 @@ class Modified extends BaseConnector
         $class = "\\jtl\\Connector\\Modified\\Controller\\{$controller}";
 
         if (class_exists($class)) {
-            $this->controller = $class::getInstance();
+
+            $db = Mysql::getInstance();
+
+            $this->controller = new $class($db, $this->shopConfig, $this->connectorConfig);
             $this->action = RpcMethod::buildAction($this->getMethod()->getAction());
 
             return is_callable(array($this->controller, $this->action));

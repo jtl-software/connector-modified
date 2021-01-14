@@ -9,8 +9,9 @@ use jtl\Connector\Core\Model\DataModel;
 use jtl\Connector\Core\Model\QueryFilter;
 use jtl\Connector\Model\ConnectorIdentification;
 use jtl\Connector\Session\SessionHelper;
+use Jtl\Connector\XtcComponents\AbstractBaseController;
 
-class Connector extends Controller
+class Connector extends AbstractBaseController
 {
     public function statistic(QueryFilter $filter)
     {
