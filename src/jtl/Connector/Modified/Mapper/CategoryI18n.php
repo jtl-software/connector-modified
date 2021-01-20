@@ -1,7 +1,10 @@
 <?php
 namespace jtl\Connector\Modified\Mapper;
 
-class CategoryI18n extends \jtl\Connector\Modified\Mapper\BaseMapper
+use jtl\Connector\Model\CategoryI18n as CategoryI18nModel;
+use jtl\Connector\Model\Category as CategoryModel;
+
+class CategoryI18n extends BaseMapper
 {
     protected $mapperConfig = array(
         "table" => "categories_description",
@@ -42,10 +45,10 @@ class CategoryI18n extends \jtl\Connector\Modified\Mapper\BaseMapper
         return $this->locale2id($data->getLanguageISO());
     }
 
-    protected function categories_id($data, $return, $parent)
+    protected function categories_id(CategoryI18nModel $i18n, $dbObj, CategoryModel $category)
     {
-        $return->setCategoryId($this->identity($parent->getId()->getEndpoint()));
+        $i18n->getCategoryId()->setEndpoint($category->getId()->getEndpoint());
 
-        return $parent->getId()->getEndpoint();
+        return $i18n->getCategoryId()->getEndpoint();
     }
 }
