@@ -74,8 +74,7 @@ class Connector extends AbstractBaseController
         $action = new Action();
         $action->setHandled(true);
 
-        $session = new SessionHelper("modified");
-        $config = $session->connectorConfig;
+        $config = $this->connectorConfig;
 
         define('_VALID_XTC', true);
 
