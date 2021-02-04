@@ -8,6 +8,8 @@ use jtl\Connector\Model\ProductVariationI18n;
 use jtl\Connector\Model\ProductVariation;
 use jtl\Connector\Model\ProductVariationValue;
 use jtl\Connector\Model\ProductVariationValueI18n;
+use jtl\Connector\Model\ProductPrice as ProductPriceModel;
+use jtl\Connector\Model\ProductPriceItem as ProductPriceItemModel;
 
 class Product extends BaseMapper
 {
@@ -564,11 +566,12 @@ class Product extends BaseMapper
                 [$variationOptionId, $langId]);
 
             $price = $this->db->query("SELECT products_price FROM products WHERE products_id = " . $masterId);
-            if(!end($data->getPrices())->getItems()[0] || !isset($price[0]['products_price'])){
+            $jtlPriceItem = self::getDefaultPriceItem(...$data->getPrices());
+            if(is_null($jtlPriceItem) || !isset($price[0]['products_price'])){
                 throw new \RuntimeException('The VarCombi price has not been set');
             }
 
-            $price = (double)end($data->getPrices())->getItems()[0]->getNetPrice() - $price[0]['products_price'];
+            $price = $jtlPriceItem->getNetPrice() - (float)$price[0]['products_price'];
             if ($price >= 0) {
                 $pricePrefix = "+";
             } else {
@@ -619,6 +622,25 @@ class Product extends BaseMapper
                 );
             }
         }
+    }
+
+    /**
+     * @param ProductPriceModel ...$prices
+     * @return ProductPriceItemModel
+     */
+    public static function getDefaultPriceItem(ProductPriceModel ...$prices): ?ProductPriceItemModel
+    {
+        foreach ($prices as $price) {
+            if ($price->getCustomerGroupId()->getHost() === 0 && $price->getCustomerId()->getHost() === 0) {
+                foreach ($price->getItems() as $priceItem) {
+                    if ($priceItem->getQuantity() === 0) {
+                        return $priceItem;
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 
     public static function createProductEndpoint($parentId, $optionValueId)
