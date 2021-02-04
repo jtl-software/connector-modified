@@ -26,7 +26,7 @@ class ProductVariation extends BaseMapper
 
             $checksum = ChecksumLinker::find($parent, 1);
 
-            if ($checksum === null || $checksum->hasChanged() === false) {
+            if ($checksum === null || $checksum->hasChanged() === true) {
                 $totalStock = 0;
 
                 // clear existing product variations
