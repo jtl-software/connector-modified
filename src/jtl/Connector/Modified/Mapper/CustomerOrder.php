@@ -30,7 +30,8 @@ class CustomerOrder extends BaseMapper
             "shippingMethodName" => "shipping_method",
             "items" => "CustomerOrderItem|addItem",
             "status" => null,
-            "paymentStatus" => null
+            "paymentStatus" => null,
+            "paymentInfo" => 'CustomerOrderPaymentInfo|setPaymentInfo'
         ),
         "mapPush" => array(
             "orders_id" => "id",
