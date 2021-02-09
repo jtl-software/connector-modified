@@ -1,3 +1,10 @@
+3.4.0
+-----
+- CO-1153 Added importing customers bank details in customer orders paid by direct debit
+- CO-1280 Added has customer account flag to customer import
+- CO-1300 Removed use_varcombi_logic flag. Connector can differentiate by its own if it is a simple or complex product variant
+- CO-1307 Fixed customer order statistics
+
 3.3.0
 -----
 - CO-1212 Fixed using variation names for variations

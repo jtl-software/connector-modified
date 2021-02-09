@@ -13,7 +13,7 @@ class Check extends Module
     private static $checks = array(
         'phpVersion' => array(
             'title' => 'PHP Version',
-            'info' => 'PHP 5.6.4 oder neuer ist für den JTL Connector notwendig.',
+            'info' => 'PHP 7.1.3 oder neuer ist für den JTL Connector notwendig.',
             'ok' => 'Ihre version ist: %s',
             'fault' => 'Ihre Version ist: %s',
         ),
@@ -112,7 +112,7 @@ class Check extends Module
 
     private function phpVersion()
     {
-        return array((version_compare(PHP_VERSION, '5.6.4') >= 0),array(PHP_VERSION));
+        return array((version_compare(PHP_VERSION, '7.1.3') >= 0),array(PHP_VERSION));
     }
 
     private function gdlib()
@@ -139,7 +139,7 @@ class Check extends Module
     {
         $path = CONNECTOR_DIR.'/db/connector.s3db';
 
-        return array(is_writable($path), array($path));
+        return [!file_exists($path) && is_writable(dirname($path)) || is_writable($path), [$path]];
     }
 
     private function connectorLog()
