@@ -13,7 +13,6 @@ class Config
             $this->data = \Noodlehaus\Config::load($file)->all();
         } catch (FileNotFoundException $e) {
             $this->data = [];
-            $this->data['use_var_combi_logic'] = false;
         }
     }
 
