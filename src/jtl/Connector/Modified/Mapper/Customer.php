@@ -34,7 +34,7 @@ class Customer extends BaseMapper
             "extraAddressLine" => "entry_suburb",
             "zipCode" => "entry_postcode",
             "city" => "entry_city",
-            "countryIso" => null,
+            "countryIso" => "countries_iso_code_2",
             "languageISO" => null,
             "phone" => "customers_telephone",
             "fax" => "customers_fax",
@@ -94,11 +94,6 @@ class Customer extends BaseMapper
         if (!empty($data['countries_iso_code_2'])) {
             return $this->fullLocale(strtolower($data['countries_iso_code_2']));
         }
-    }
-
-    protected function countryIso($data)
-    {
-        return strtolower($data['countries_iso_code_2']);
     }
 
     protected function hasNewsletterSubscription($data)
