@@ -50,7 +50,7 @@ class CustomerOrderBillingAddress extends BaseMapper
 
     protected function countryIso($data)
     {
-        return Country::map(strtolower($data['billing_country_iso_code_2']));
+        return strtolower($data['billing_country_iso_code_2']);
     }
 
     public function pull($data = null, $limit = null)
