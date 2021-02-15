@@ -98,7 +98,7 @@ class Customer extends BaseMapper
 
     protected function countryIso($data)
     {
-        return Country::map(strtolower($data['countries_iso_code_2']));
+        return strtolower($data['countries_iso_code_2']);
     }
 
     protected function hasNewsletterSubscription($data)
