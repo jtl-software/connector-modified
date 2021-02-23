@@ -21,8 +21,8 @@ class BaseMapper extends AbstractBaseMapper
     /**
      * @return string
      */
-    protected function getMapperNamespace(): string
+    protected function getMainNamespace(): string
     {
-        return "jtl\\Connector\\Modified\\Mapper";
+        return "jtl\\Connector\\Modified";
     }
 }

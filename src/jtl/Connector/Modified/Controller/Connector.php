@@ -11,7 +11,7 @@ use jtl\Connector\Model\ConnectorIdentification;
 use jtl\Connector\Session\SessionHelper;
 use Jtl\Connector\XtcComponents\AbstractBaseController;
 
-class Connector extends AbstractBaseController
+class Connector extends \jtl\Connector\Modified\Controller
 {
     public function statistic(QueryFilter $filter)
     {
