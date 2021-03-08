@@ -3,7 +3,6 @@ namespace jtl\Connector\Modified\Installer;
 
 use jtl\Connector\Core\Database\Mysql;
 use jtl\Connector\Core\Exception\DatabaseException;
-use jtl\Connector\Modified\Installer\Config;
 
 class Installer
 {
@@ -33,7 +32,7 @@ class Installer
     /**
      * @throws DatabaseException
      */
-    public function show()
+    public function runAndGetFormData()
     {
         $shopConfig = $this->readConfigFile();
         $connectorConfig = new Config(CONNECTOR_DIR.'/config/config.json');
@@ -97,34 +96,35 @@ class Installer
             }
         }
 
+        $html = '';
         if ($moduleInstances['check']->hasPassed()) {
-            echo '<ul class="nav nav-tabs">';
+            $html .= '<ul class="nav nav-tabs">';
 
             foreach ($moduleInstances as $class => $instance) {
                 $active = $class == 'check' ? 'active' : '';
-                echo '<li class="'.$active.'"><a href="#'.$class.'" data-toggle="tab"><b>'.$instance::$name.'</b></a></li>';
+                $html .= '<li class="'.$active.'"><a href="#'.$class.'" data-toggle="tab"><b>'.$instance::$name.'</b></a></li>';
             }
 
-            echo '</ul>
+            $html .= '</ul>
 	        	<br>
 	        	<div class="tab-content">';
 
             foreach ($moduleInstances as $class => $instance) {
                 $active = $class == 'check' ? ' active' : '';
 
-                echo '<div class="tab-pane'.$active.'" id="'.$class.'">';
-                echo $instance->form();
-                echo '</div>';
+                $html .= '<div class="tab-pane'.$active.'" id="'.$class.'">';
+                $html .= $instance->form();
+                $html .= '</div>';
             }
             
             if (isset($_SESSION['error']))
             {
-                echo '<div class="alert alert-danger">Fehler beim Schreiben der config.json Datei.</div>';
+                $html .= '<div class="alert alert-danger">Fehler beim Schreiben der config.json Datei.</div>';
                 unset($_SESSION['error']);
             } elseif (isset($_SESSION['success']))
             {
-                echo '<div class="alert alert-success">Connector Konfiguration wurde gespeichert.</div>';
-                echo '<div class="alert alert-danger"><b>ACHTUNG:</b><br/>
+                $html .= '<div class="alert alert-success">Connector Konfiguration wurde gespeichert.</div>';
+                $html .= '<div class="alert alert-danger"><b>ACHTUNG:</b><br/>
                             Bitte sorgen Sie nach erfolgreicher Installation des Connectors unbedingt dafür, dass dieser Installer
                             sowie die Datei config.json im Verzeichnis config nicht öffentlich les- und ausführbar sind!</div>';
                 unset($_SESSION['success']);
@@ -133,14 +133,16 @@ class Installer
                 echo $_SESSION['fail'];
                 unset($_SESSION['fail']);
             }
-            
-            echo '</div>';
 
-            echo '<button type="submit" name="save" class="btn btn-primary btn-block"><span class="glyphicon glyphicon-save"></span> Connector Konfiguration speichern</button>';
+            $html .= '</div>';
+
+            $html .= '<button type="submit" name="save" class="btn btn-primary btn-block"><span class="glyphicon glyphicon-save"></span> Connector Konfiguration speichern</button>';
         } else {
-            echo '<div class="alert alert-danger">Bitte beheben Sie die angezeigten Fehler bevor Sie mit der Konfiguration fortfahren können.</div>';
-            echo $moduleInstances['check']->form();
+            $html .= '<div class="alert alert-danger">Bitte beheben Sie die angezeigten Fehler bevor Sie mit der Konfiguration fortfahren können.</div>';
+            $html .= $moduleInstances['check']->form();
         }
+
+        return $html;
     }
 
     /**
@@ -148,7 +150,7 @@ class Installer
      */
     private function readConfigFile()
     {
-        require_once realpath(CONNECTOR_DIR.'/../').'/includes/configure.php';
+        require_once dirname(CONNECTOR_DIR).'/includes/configure.php';
 
         return array(
             'shop' => array(

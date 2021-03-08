@@ -10,8 +10,7 @@ class DevLogging extends Module
     
     public function form()
     {
-        $html = "";
-        $html .= '
+        $html = '
         <div>
         <div class="form-group">
             <label for="logging" class="col-xs-2 control-label">Developer Logging</label>

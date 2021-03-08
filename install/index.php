@@ -1,10 +1,9 @@
-﻿<?php
+<?php
 include('../index.php');
 
 use jtl\Connector\Modified\Installer\Installer;
 
-$installer = new Installer();
-
+$formData = (new Installer())->runAndGetFormData();
 ?>
 <!DOCTYPE html>
 <html lang="de">
@@ -63,9 +62,7 @@ $installer = new Installer();
                 </div>
                 <div class="panel-body">
                     <form class="form-horizontal" role="form" method="post">
-                        <?php
-                            $installer->show();
-                        ?>
+                        <?php echo $formData; ?>
                     </form>
                 </div>
             </div>
