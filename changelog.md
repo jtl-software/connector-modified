@@ -1,3 +1,9 @@
+3.5.0
+-----
+- CO-1369 Fixed country code in customer order
+- CO-1392 Added support for grad discount (ot_grad_discount) module
+- Fixed and improved installation/config procedure
+
 3.4.0
 -----
 - CO-1153 Added importing customers bank details in customer orders paid by direct debit
