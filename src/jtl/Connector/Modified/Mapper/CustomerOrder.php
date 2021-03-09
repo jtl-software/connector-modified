@@ -259,8 +259,9 @@ class CustomerOrder extends BaseMapper
                     $model->addItem($this->createShippingItem($total, $data));
                     $model->setShippingMethodName($total['title']);
                     break;
-                case 'ot_coupon':
+                case 'ot_grad_discount':
                 case 'ot_discount':
+                case 'ot_coupon':
                 case 'ot_gv':
                     $model->addItem($this->createOrderItem(CustomerOrderItem::TYPE_COUPON, $total, $data, 1, $defaultTaxRate));
                     break;
