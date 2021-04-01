@@ -146,34 +146,49 @@ class CustomerOrderItem extends BaseMapper
         return $parent->getId()->getEndpoint();
     }
 
-    protected function type($data)
+    /**
+     * @param array $data
+     * @return string
+     */
+    protected function type(array $data): string
     {
         return 'product';
     }
-    
-    protected function productId($data)
+
+    /**
+     * @param array $data
+     * @return string
+     */
+    protected function productId(array $data): string
     {
-        $parentEndpointId = $data['products_id'];
+        $productId = $data['products_id'];
         
-        $childEndpointId = $this->db->query("SELECT products_attributes_id FROM products_attributes WHERE attributes_model = '" . $data['attributes_model'] . "'");
-        if (isset($childEndpointId)){
-            return Product::createProductEndpoint($parentEndpointId, $childEndpointId[0]['products_attributes_id']);
+        $combiId = $this->db->query(sprintf('SELECT products_attributes_id FROM products_attributes WHERE attributes_model = \'%s\'', $data['attributes_model']));
+        if (is_array($combiId) && count($combiId) === 1){
+            return Product::createProductEndpoint($productId, $combiId[0]['products_attributes_id']);
         }
         
-        return $parentEndpointId = $data['products_id'];
+        return $productId;
     }
-    
-    protected function name($data)
+
+    /**
+     * @param $data
+     * @return string
+     */
+    protected function name(array $data): string
     {
-        $attributeData = $this->db->query(
-            sprintf("SELECT * FROM orders_products_attributes WHERE orders_id = %s AND orders_products_id = %s",
-                $data['orders_id'], $data['orders_products_id']
-            )
+        $productOptionsValues = $this->db->query(
+            sprintf("SELECT products_options_values FROM orders_products_attributes WHERE orders_id = %s AND orders_products_id = %s", $data['orders_id'], $data['orders_products_id'])
         );
-        if (!isset($attributeData)){
+
+        if (empty($productOptionsValues) || !is_array($productOptionsValues)){
             return $data['products_name'];
         }
-    
-        return $data['products_name'] . ' ' . $attributeData[0]['products_options_values'];
+
+        $productOptionsValues = array_map(function(array $data) {
+            return $data['products_options_values'];
+        }, $productOptionsValues);
+
+        return sprintf('%s %s', $data['products_name'], implode(' / ', $productOptionsValues));
     }
 }
