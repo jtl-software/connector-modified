@@ -4,6 +4,7 @@ namespace jtl\Connector\Modified\Mapper;
 
 use jtl\Connector\Drawing\ImageRelationType;
 use \jtl\Connector\Model\Image as ImageModel;
+use Nette\Utils\Strings;
 
 class Image extends BaseMapper
 {
@@ -493,31 +494,31 @@ class Image extends BaseMapper
     }
     
     /**
-     * @param \jtl\Connector\Model\Image $data
+     * @param ImageModel $jtlImage
      * @return false|string
      */
-    private function generateImageName(ImageModel $data)
+    protected function generateImageName(ImageModel $jtlImage)
     {
-        $imgFileName = substr($data->getFilename(), strrpos($data->getFilename(), '/') + 1);
-        
-        if (!empty($data->getName())) {
-            $fileEnding = substr($data->getFilename(), strrpos($data->getFilename(), '.'));
-            $newFileName = strtolower(preg_replace("([^\w\s\d\-_~\(\).])", "", $data->getName()));
-            $newFileName = preg_replace("([\s])", "-", $newFileName);
-            $imgFileName = $newFileName . $fileEnding;
-            
-            $duplicates = $this->db->query(sprintf('SELECT image_name FROM products_images
-                                    WHERE image_name LIKE "%s(%%)%s" OR image_name = "%s"
-                                    ORDER BY image_name DESC', $newFileName, $fileEnding, $imgFileName));
-            
-            if (count($duplicates) > 0) {
-                $highestDuplicateIndex = $imgFileName === $duplicates[0]['image_name'] ? 1 : 0;
-                
-                preg_match("/(\d+?)\)\.[a-zA-Z]{3}$/", $duplicates[$highestDuplicateIndex]['image_name'], $duplicateNumbers);
-                $imgFileName = sprintf("%s(%s)%s", $newFileName, $duplicateNumbers[$highestDuplicateIndex] + 1, $fileEnding);
-            }
-        }
-        
-        return $imgFileName;
+        $suffix = '';
+        $i = 1;
+
+        $info = pathinfo($jtlImage->getFilename());
+        $extension = $info['extension'] ?? null;
+        $filename = $info['filename'] ?? null;
+
+        $name = !empty($jtlImage->getName()) ? $jtlImage->getName() : $filename;
+
+        do {
+            $imageName = sprintf('%s.%s', Strings::webalize(sprintf('%s%s', $name, $suffix)), $extension);
+            $duplicates = $this->getDb()->query(
+                sprintf('SELECT image_name FROM products_images
+                                 WHERE image_name LIKE image_name = "%s"
+                                 ORDER BY image_name DESC', $imageName)
+            );
+            $suffix = sprintf('-%s', $i++);
+            $duplicateFound = count($duplicates) > 0;
+        } while ($duplicateFound);
+        return $imageName;
+
     }
 }

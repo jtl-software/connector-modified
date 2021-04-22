@@ -28,6 +28,14 @@ class BaseMapper
     }
 
     /**
+     * @return Mysql
+     */
+    public function getDb(): Mysql
+    {
+        return $this->db;
+    }
+
+    /**
      * Generate model from db data
      * @param  array  $data
      * @return object
