@@ -64,6 +64,7 @@ class Modified extends BaseConnector
 
     /**
      *
+     * @throws \Exception
      */
     protected function createFeaturesFile(): void
     {
@@ -71,8 +72,16 @@ class Modified extends BaseConnector
         $featuresFile = sprintf('%s/features.json', $featuresDir);
         $exampleFeaturesFile = sprintf('%s/features.json.example', $featuresDir);
 
+        if(!file_exists($exampleFeaturesFile)){
+            throw new \Exception(sprintf('File features.json.example doesn\'t exists. Please check file path %s.', $featuresFile));
+        }
+
         if (!file_exists($featuresFile)) {
             copy($exampleFeaturesFile, $featuresFile);
+        }
+
+        if(!file_exists($featuresFile)){
+            throw new \Exception(sprintf('File features.json doesn\'t exists. Please check file path %s.', $featuresFile));
         }
     }
 
