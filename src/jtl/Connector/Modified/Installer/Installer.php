@@ -37,8 +37,6 @@ class Installer
         $shopConfig = $this->readConfigFile();
         $connectorConfig = new Config(CONNECTOR_DIR.'/config/config.json');
 
-        self::updateFeaturesJson();
-
         $db = Mysql::getInstance();
 
         if (!$db->isConnected()) {

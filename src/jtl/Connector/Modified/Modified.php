@@ -115,8 +115,6 @@ class Modified extends BaseConnector
 
     private function update($db)
     {
-        Installer::updateFeaturesJson();
-
         if(version_compare(file_get_contents(CONNECTOR_DIR.'/db/version'), CONNECTOR_VERSION) == -1) {
             foreach (new \DirectoryIterator(CONNECTOR_DIR.'/db/updates') as $updateFile) {
 
