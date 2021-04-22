@@ -26,6 +26,8 @@ class Modified extends BaseConnector
     {
         $session = new SessionHelper("modified");
 
+        $this->createFeaturesFile();
+
         if (!isset($session->shopConfig)) {
             $session->shopConfig = $this->readConfigFile();
         }
@@ -59,8 +61,20 @@ class Modified extends BaseConnector
         $this->setTokenLoader(new TokenLoader());
         $this->setChecksumLoader(new ChecksumLoader());
     }
-    
-    
+
+    /**
+     *
+     */
+    protected function createFeaturesFile(): void
+    {
+        $featuresDir = CONNECTOR_DIR . '/config';
+        $featuresFile = sprintf('%s/features.json', $featuresDir);
+        $exampleFeaturesFile = sprintf('%s/features.json.example', $featuresDir);
+
+        if (!file_exists($featuresFile)) {
+            copy($exampleFeaturesFile, $featuresFile);
+        }
+    }
 
     private function readConfigFile()
     {
