@@ -512,7 +512,7 @@ class Image extends BaseMapper
             $imageName = sprintf('%s.%s', Strings::webalize(sprintf('%s%s', $name, $suffix)), $extension);
             $duplicates = $this->getDb()->query(
                 sprintf('SELECT image_name FROM products_images
-                                 WHERE image_name LIKE image_name = "%s"
+                                 WHERE image_name = "%s"
                                  ORDER BY image_name DESC', $imageName)
             );
             $suffix = sprintf('-%s', $i++);
