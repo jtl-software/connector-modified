@@ -5,6 +5,7 @@ use \jtl\Connector\Core\Rpc\RequestPacket;
 use \jtl\Connector\Core\Utilities\RpcMethod;
 use \jtl\Connector\Core\Database\Mysql;
 use \jtl\Connector\Core\Rpc\ResponsePacket;
+use jtl\Connector\Modified\Installer\Installer;
 use \jtl\Connector\Session\SessionHelper;
 use \jtl\Connector\Base\Connector as BaseConnector;
 use \jtl\Connector\Core\Rpc\Error as Error;
@@ -114,6 +115,8 @@ class Modified extends BaseConnector
 
     private function update($db)
     {
+        Installer::updateFeaturesJson();
+
         if(version_compare(file_get_contents(CONNECTOR_DIR.'/db/version'), CONNECTOR_VERSION) == -1) {
             foreach (new \DirectoryIterator(CONNECTOR_DIR.'/db/updates') as $updateFile) {
 

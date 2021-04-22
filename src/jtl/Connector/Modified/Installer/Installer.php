@@ -37,6 +37,8 @@ class Installer
         $shopConfig = $this->readConfigFile();
         $connectorConfig = new Config(CONNECTOR_DIR.'/config/config.json');
 
+        self::updateFeaturesJson();
+
         $db = Mysql::getInstance();
 
         if (!$db->isConnected()) {
@@ -143,6 +145,29 @@ class Installer
         }
 
         return $html;
+    }
+
+    /**
+     * @param array $overwriteProperties
+     * @throws \Exception
+     */
+    public static function updateFeaturesJson(array $overwriteProperties = [])
+    {
+        $featuresDir = CONNECTOR_DIR . '/config';
+        $featuresFile = sprintf('%s/features.json', $featuresDir);
+        $exampleFeaturesFile = sprintf('%s/features.json.example', $featuresDir);
+
+        if (!file_exists($featuresFile)) {
+            $features = json_decode(file_get_contents($exampleFeaturesFile), true);
+        } else {
+            $features = json_decode(file_get_contents($featuresFile), true);
+        }
+
+        $newFeatures = array_replace_recursive($features, $overwriteProperties);
+        $wasSaved = file_put_contents($featuresFile, json_encode($newFeatures, JSON_PRETTY_PRINT));
+        if ($wasSaved === false) {
+            throw new \Exception('File features.json was not saved.');
+        }
     }
 
     /**
