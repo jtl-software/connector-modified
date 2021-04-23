@@ -20,6 +20,7 @@ class CustomerOrderItem extends BaseMapper
             "price" => null,
             "vat" => "products_tax",
             "sku" => null,
+            "variations" => "CustomerOrderItemVariation|addVariation",
             "type" => null
         ),
         "mapPush" => array(
@@ -102,13 +103,8 @@ class CustomerOrderItem extends BaseMapper
     
     protected function sku($data)
     {
-        $attributeData = $this->db->query(
-            sprintf("SELECT * FROM orders_products_attributes WHERE orders_id = %s AND orders_products_id = %s",
-                $data['orders_id'], $data['orders_products_id']
-            )
-        );
-        
-        if (isset($attributeData[0]['attributes_model'])){
+        $attributeData = $this->db->query(sprintf("SELECT * FROM orders_products_attributes WHERE orders_id = %s AND orders_products_id = %s", $data['orders_id'], $data['orders_products_id']));
+        if (count($attributeData) === 1 && isset($attributeData[0]['attributes_model'])){
             return $attributeData[0]['attributes_model'];
         } else {
             return $data['products_model'];
