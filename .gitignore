@@ -4,6 +4,7 @@ config/config.json
 logs/**
 build/**
 dist/**
+plugins/**
 db/connector.s3db
 db/version
 .idea/**
