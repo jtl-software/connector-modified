@@ -1,7 +1,6 @@
 <?php
-namespace jtl\Connector\Modified\Mapper;
 
-use jtl\Connector\Core\Logger\Logger;
+namespace jtl\Connector\Modified\Mapper;
 
 class CustomerOrderItem extends BaseMapper
 {
@@ -62,8 +61,8 @@ class CustomerOrderItem extends BaseMapper
         $totals = [];
 
         $ot_shipping = new \stdClass();
-        $ot_shipping->title = $parent->getShippingMethodName().':';
-        $ot_shipping->text = number_format($shippingCosts, 2, ',', '.').' '.$parent->getCurrencyIso();
+        $ot_shipping->title = $parent->getShippingMethodName() . ':';
+        $ot_shipping->text = number_format($shippingCosts, 2, ',', '.') . ' ' . $parent->getCurrencyIso();
         $ot_shipping->value = $shippingCosts;
         $ot_shipping->sort_order = 30;
         $ot_shipping->class = 'ot_shipping';
@@ -71,7 +70,7 @@ class CustomerOrderItem extends BaseMapper
 
         $ot_subtotal = new \stdClass();
         $ot_subtotal->title = 'Zwischensumme:';
-        $ot_subtotal->text = number_format($sum, 2, ',', '.').' '.$parent->getCurrencyIso();
+        $ot_subtotal->text = number_format($sum, 2, ',', '.') . ' ' . $parent->getCurrencyIso();
         $ot_subtotal->value = $sum;
         $ot_subtotal->sort_order = 10;
         $ot_subtotal->class = 'ot_subtotal';
@@ -79,7 +78,7 @@ class CustomerOrderItem extends BaseMapper
 
         $ot_total = new \stdClass();
         $ot_total->title = '<b>Summe</b>:';
-        $ot_total->text = '<b> '.number_format($sum+$shippingCosts, 2, ',', '.').' '.$parent->getCurrencyIso().'</b>';
+        $ot_total->text = '<b> ' . number_format($sum + $shippingCosts, 2, ',', '.') . ' ' . $parent->getCurrencyIso() . '</b>';
         $ot_total->value = $sum + $shippingCosts;
         $ot_total->sort_order = 99;
         $ot_total->class = 'ot_total';
@@ -87,7 +86,7 @@ class CustomerOrderItem extends BaseMapper
 
         $ot_tax = new \stdClass();
         $ot_tax->title = 'Steuer:';
-        $ot_tax->text = number_format($taxes, 2, ',', '.').' '.$parent->getCurrencyIso();
+        $ot_tax->text = number_format($taxes, 2, ',', '.') . ' ' . $parent->getCurrencyIso();
         $ot_tax->value = $taxes;
         $ot_tax->sort_order = 30;
         $ot_tax->class = 'ot_tax';
@@ -100,18 +99,18 @@ class CustomerOrderItem extends BaseMapper
 
         return $return;
     }
-    
-    protected function sku($data)
+
+    protected function sku(array $data)
     {
         $attributeData = $this->db->query(sprintf("SELECT * FROM orders_products_attributes WHERE orders_id = %s AND orders_products_id = %s", $data['orders_id'], $data['orders_products_id']));
-        if (count($attributeData) === 1 && isset($attributeData[0]['attributes_model'])){
+        if (count($attributeData) === 1 && isset($attributeData[0]['attributes_model'])) {
             return $attributeData[0]['attributes_model'];
         } else {
             return $data['products_model'];
         }
     }
-    
-    protected function price($data)
+
+    protected function price(array $data)
     {
         if ($data['allow_tax'] == "0") {
             return $data['products_price'];
@@ -120,22 +119,22 @@ class CustomerOrderItem extends BaseMapper
         }
     }
 
-    protected function products_price($data)
+    protected function products_price(array $data)
     {
         return ($data->getPrice() / 100) * (100 + $data->getVat());
     }
 
-    protected function final_price($data)
+    protected function final_price(array $data)
     {
         return (($data->getPrice() / 100) * (100 + $data->getVat())) * $data->getQuantity();
     }
 
-    protected function allow_tax($data)
+    protected function allow_tax(array $data)
     {
         return 1;
     }
 
-    protected function orders_id($data, $model, $parent)
+    protected function orders_id(array $data, $model, $parent)
     {
         $data->setCustomerOrderId($parent->getId());
 
@@ -158,33 +157,31 @@ class CustomerOrderItem extends BaseMapper
     protected function productId(array $data): string
     {
         $productId = $data['products_id'];
-        
+
         $combiId = $this->db->query(sprintf('SELECT products_attributes_id FROM products_attributes WHERE attributes_model = \'%s\'', $data['attributes_model']));
-        if (is_array($combiId) && count($combiId) === 1){
+        if (is_array($combiId) && count($combiId) === 1) {
             return Product::createProductEndpoint($productId, $combiId[0]['products_attributes_id']);
         }
-        
+
         return $productId;
     }
 
     /**
-     * @param $data
+     * @param array $data
      * @return string
      */
     protected function name(array $data): string
     {
-        $productOptionsValues = $this->db->query(
+        $productOptionsValuesResult = $this->db->query(
             sprintf("SELECT products_options_values FROM orders_products_attributes WHERE orders_id = %s AND orders_products_id = %s", $data['orders_id'], $data['orders_products_id'])
         );
 
-        if (empty($productOptionsValues) || !is_array($productOptionsValues)){
-            return $data['products_name'];
+        $itemName = $data['products_name'];
+        $productOptionsValues = array_column($productOptionsValuesResult, 'products_options_values');
+        if (count($productOptionsValues) > 0) {
+            $itemName .= sprintf(' %s', implode(' / ', $productOptionsValues));
         }
 
-        $productOptionsValues = array_map(function(array $data) {
-            return $data['products_options_values'];
-        }, $productOptionsValues);
-
-        return sprintf('%s %s', $data['products_name'], implode(' / ', $productOptionsValues));
+        return $itemName;
     }
 }
