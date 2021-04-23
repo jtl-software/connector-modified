@@ -235,7 +235,7 @@ class Product extends BaseMapper
 
         if (!empty($id) && $id != '') {
             try {
-                if (Product::isVarCombi($id)){
+                if (Product::isVariationChild($id)){
                     $this->db->query('DELETE FROM products_attributes WHERE options_values_id=' . Product::extractOptionValueId($id));
                     $this->db->query('DELETE FROM products_options_values WHERE products_options_values_id=' . Product::extractOptionValueId($id));
                     $this->db->query('DELETE FROM products_options_values_to_products_options WHERE products_options_values_id=' . Product::extractOptionValueId($id));
@@ -288,7 +288,7 @@ class Product extends BaseMapper
         $sql = 'SELECT count(a.products_attributes_id) as count 
                 FROM products p
                 LEFT JOIN products_attributes a ON p.products_id = a.products_id
-                WHERE CONCAT(a.products_id, \'_\', a.options_values_id) NOT IN (SELECT l.endpoint_id FROM jtl_connector_link_product l WHERE LOCATE(\'_\', l.endpoint_id) > 0)';
+                WHERE CONCAT(a.products_id, \'_\', a.products_attributes_id) NOT IN (SELECT l.endpoint_id FROM jtl_connector_link_product l WHERE LOCATE(\'_\', l.endpoint_id) > 0)';
 
         $combis = $this->db->query($sql, ["return" => "object"]);
 
@@ -650,7 +650,7 @@ class Product extends BaseMapper
 
     public static function extractParentId($endpoint)
     {
-        if (self::isVarCombi($endpoint)) {
+        if (self::isVariationChild($endpoint)) {
             $data = explode('_', (string)$endpoint);
             return $data[0];
         } else
@@ -661,7 +661,7 @@ class Product extends BaseMapper
 
     public static function extractOptionValueId($endpoint)
     {
-        if (self::isVarCombi($endpoint)) {
+        if (self::isVariationChild($endpoint)) {
             $data = explode('_', (string)$endpoint);
             return $data[1];
         }
@@ -670,7 +670,7 @@ class Product extends BaseMapper
         }
     }
 
-    public static function isVarCombi($endpoint)
+    public static function isVariationChild($endpoint)
     {
         $data = explode('_', (string)$endpoint);
         return isset($data[1]) ? true : false;
