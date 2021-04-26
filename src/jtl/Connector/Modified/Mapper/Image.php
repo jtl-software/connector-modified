@@ -99,7 +99,7 @@ class Image extends BaseMapper
                     $oldImageResult = $this->db->query(sprintf('SELECT %s_image FROM %s WHERE %s_id = %d', $subject, $subject, $subject, $data->getForeignKey()->getEndpoint()));
 
                     $imageIndex = sprintf('%s_image', $subject);
-                    if(isset($oldImageResult[0][$imageIndex]) && $oldImageResult[0][$imageIndex] !== '') {
+                    if (isset($oldImageResult[0][$imageIndex]) && $oldImageResult[0][$imageIndex] !== '') {
                         $oldImage = $oldImageResult[0][$imageIndex];
 
                         $oldImageFilePath = $this->createImageFilePath($oldImage, $data->getRelationType());
@@ -116,7 +116,7 @@ class Image extends BaseMapper
 
                     $relatedObject = new \stdClass();
                     $relatedObject->{$imageIndex} = $imgFileName;
-                    if($data->getRelationType() === ImageRelationType::TYPE_MANUFACTURER) {
+                    if ($data->getRelationType() === ImageRelationType::TYPE_MANUFACTURER) {
                         $relatedObject->{$imageIndex} = sprintf('%s/%s', $subject, $imgFileName);
                     }
 
@@ -127,50 +127,55 @@ class Image extends BaseMapper
                     break;
                 case ImageRelationType::TYPE_PRODUCT:
                     if (!Product::isVariationChild($data->getForeignKey()->getEndpoint())) {
+                        $oldImage = null;
+                        $prevImage = null;
+                        $imgId = $data->getId()->getEndpoint();
+                        if (!empty($imgId)) {
+                            $prevImgQuery = $this->db->query('SELECT image_name FROM products_images WHERE image_id = "' . $imgId . '"');
+                            if (count($prevImgQuery) > 0) {
+                                $prevImage = $prevImgQuery[0]['image_name'];
+                            }
+
+                            if (!empty($prevImage)) {
+                                $prevImagePath = $this->createImageFilePath($prevImage, $data->getRelationType());
+                                if (is_file($prevImagePath)) {
+                                    @unlink($prevImagePath);
+                                }
+
+                                foreach ($this->thumbConfig as $folder => $sizes) {
+                                    $thumbnailPath = $this->shopConfig['shop']['path'] . $this->shopConfig['img'][$folder] . $prevImage;
+                                    if (is_file($thumbnailPath)) {
+                                        @unlink($thumbnailPath);
+                                    }
+                                }
+                            }
+
+                            $this->db->query('DELETE FROM products_images WHERE image_id="' . $imgId . '"');
+                        }
+
                         if ($data->getSort() == 1) {
-                            $imgId = $data->getId()->getEndpoint();
-
-                            if (!empty($imgId)) {
-                                $prevImgQuery = $this->db->query('SELECT image_name FROM products_images WHERE image_id = "' . $imgId . '"');
-                                if (count($prevImgQuery) > 0) {
-                                    $prevImage = $prevImgQuery[0]['image_name'];
-                                }
-
-                                if (!empty($prevImage)) {
-                                    $prevImagePath = $this->createImageFilePath($prevImage, $data->getRelationType());
-                                    if (is_file($prevImagePath)) {
-                                        @unlink($prevImagePath);
-                                    }
-
-                                    foreach ($this->thumbConfig as $folder => $sizes) {
-                                        $thumbnailPath = $this->shopConfig['shop']['path'] . $this->shopConfig['img'][$folder] . $prevImage;
-                                        if (is_file($thumbnailPath)) {
-                                            @unlink($thumbnailPath);
-                                        }
-                                    }
-                                }
-
-                                $this->db->query('DELETE FROM products_images WHERE image_id="' . $imgId . '"');
-                            }
-
-                            $oldImage = null;
                             $oldImageResult = $this->db->query('SELECT products_image FROM products WHERE products_id = "' . $data->getForeignKey()->getEndpoint() . '"');
-                            if (isset($oldImageResult[0])) {
-                                $oldImage = $oldImageResult[0]['products_image'];
-                                $oldImageFilePath = $this->createImageFilePath($oldImage, $data->getRelationType());
-                                if (is_file($oldImageFilePath)) {
-                                    @unlink($oldImageFilePath);
-                                }
+                        } else {
+                            $oldImageResult = $this->db->query('SELECT image_name FROM products_images WHERE products_id = "' . $data->getForeignKey()->getEndpoint() . '" && image_nr=' . ($data->getSort() - 1));
+                        }
+
+                        if (isset($oldImageResult[0])) {
+                            $oldImage = $oldImageResult[0]['products_image'];
+                            $oldImageFilePath = $this->createImageFilePath($oldImage, $data->getRelationType());
+                            if (is_file($oldImageFilePath)) {
+                                @unlink($oldImageFilePath);
                             }
+                        }
 
-                            $imgFileName = $this->generateImageName($data);
-                            $imageFilePath = $this->createImageFilePath($imgFileName, $data->getRelationType());
-                            if (!rename($data->getFilename(), $imageFilePath)) {
-                                throw new \Exception('Cannot move uploaded image file');
-                            }
+                        $imgFileName = $this->generateImageName($data);
+                        $imageFilePath = $this->createImageFilePath($imgFileName, $data->getRelationType());
+                        if (!rename($data->getFilename(), $imageFilePath)) {
+                            throw new \Exception('Cannot move uploaded image file');
+                        }
 
-                            $this->generateThumbs($imgFileName, $oldImage);
+                        $this->generateThumbs($imgFileName, $oldImage);
 
+                        if ($data->getSort() == 1) {
                             $productsObj = new \stdClass();
                             $productsObj->products_image = $imgFileName;
 
@@ -181,55 +186,8 @@ class Image extends BaseMapper
                             $this->db->query('DELETE FROM jtl_connector_link_image WHERE host_id=' . $data->getId()->getHost());
                             $this->db->query('INSERT INTO jtl_connector_link_image SET host_id="' . $data->getId()->getHost() . '", endpoint_id="' . $data->getId()->getEndpoint() . '"');
                         } else {
-                            $oldImage = null;
                             $imgObj = new \stdClass();
-
-                            $imgId = $data->getId()->getEndpoint();
-                            $prevImage = null;
-                            if (!empty($imgId)) {
-                                $prevImgQuery = $this->db->query('SELECT image_name FROM products_images WHERE image_id = "' . $imgId . '"');
-                                if (count($prevImgQuery) > 0) {
-                                    $prevImage = $prevImgQuery[0]['image_name'];
-                                }
-
-                                if (!empty($prevImage)) {
-                                    $prevImagePath = $this->createImageFilePath($prevImage, $data->getRelationType());
-                                    if (is_file($prevImagePath)) {
-                                        @unlink($prevImagePath);
-                                    }
-
-                                    foreach ($this->thumbConfig as $folder => $sizes) {
-                                        $thumbnailPath = $this->shopConfig['shop']['path'] . $this->shopConfig['img'][$folder] . $prevImage;
-                                        if (is_file($thumbnailPath)) {
-                                            @unlink($thumbnailPath);
-                                        }
-                                    }
-                                }
-
-                                $this->db->query('DELETE FROM products_images WHERE image_id="' . $imgId . '"');
-                            }
-
-                            $oldImageResult = $this->db->query('SELECT image_name FROM products_images WHERE products_id = "' . $data->getForeignKey()->getEndpoint() . '" && image_nr=' . ($data->getSort() - 1));
-                            if (count($oldImageResult) > 0) {
-                                $oldImage = $oldImageResult[0]['image_name'];
-                                if (!empty($oldImage)) {
-                                    $oldImageFilePath = $this->createImageFilePath($oldImage, $data->getRelationType());
-                                    if (is_file($oldImageFilePath)) {
-                                        @unlink($oldImageFilePath);
-                                    }
-                                }
-                            }
-
                             $imgObj->image_id = (int)$data->getId()->getEndpoint();
-
-                            $imgFileName = $this->generateImageName($data);
-                            $imageFilePath = $this->createImageFilePath($imgFileName, $data->getRelationType());
-                            if (!rename($data->getFilename(), $imageFilePath)) {
-                                throw new \Exception('Cannot move uploaded image file');
-                            }
-
-                            $this->generateThumbs($imgFileName, $oldImage);
-
                             $imgObj->products_id = $data->getForeignKey()->getEndpoint();
                             $imgObj->image_name = $imgFileName;
                             $imgObj->image_nr = ($data->getSort() - 1);
