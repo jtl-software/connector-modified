@@ -13,7 +13,7 @@
 
         <copy todir="./dist/config">
             <fileset dir="./config">
-                <include name="features.json"/>
+                <include name="features.json.example"/>
                 <include name=".htaccess"/>
             </fileset>
         </copy>

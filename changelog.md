@@ -1,3 +1,9 @@
+3.6.0
+-----
+- CO-1422 Fixed endpoint column type in checksum table
+- CO-1453 Added variation names to customer order item during pull
+- CO-1502 S
+
 3.5.0
 -----
 - CO-1369 Fixed country code in customer order
