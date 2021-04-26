@@ -10,13 +10,13 @@ class Status extends Module
     private $modifiedStats = null;
     private $defaultLanguage = null;
 
-    private $jtlStats = array(
+    private $jtlStats = [
         'pending' => 'In Bearbeitung',
         'paid' => 'Bezahlt',
         'shipped' => 'Versendet',
         'completed' => 'Bezahlt &amp; Versendet',
         'canceled' => 'Storniert'
-    );
+    ];
 
     public function __construct($db, $config, $shopConfig)
     {
@@ -82,7 +82,7 @@ class Status extends Module
         } else {
             $this->config->mapping = $_REQUEST['status'];
 
-            return true; 
+            return true;
         }
     }
 }

@@ -19,7 +19,7 @@ class Connector extends Controller
 
         $return = [];
 
-        $mainControllers = array(
+        $mainControllers = [
             'Category',
             'Customer',
             'CustomerOrder',
@@ -27,7 +27,7 @@ class Connector extends Controller
             'Product',
             'Manufacturer',
             'CrossSelling'
-        );
+        ];
 
         foreach ($mainControllers as $controller) {
             $class = "\\jtl\\Connector\\Modified\\Mapper\\{$controller}";
@@ -85,7 +85,7 @@ class Connector extends Controller
             }
         }
 
-        $returnMegaBytes = function($value) {
+        $returnMegaBytes = function ($value) {
             $value = trim($value);
             $unit = strtolower($value[strlen($value) - 1]);
             switch ($unit) {

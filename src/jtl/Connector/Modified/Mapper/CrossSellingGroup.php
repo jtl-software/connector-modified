@@ -3,16 +3,16 @@ namespace jtl\Connector\Modified\Mapper;
 
 class CrossSellingGroup extends BaseMapper
 {
-    protected $mapperConfig = array(
+    protected $mapperConfig = [
         "table" => "products_xsell_grp_name",
         "query" => "SELECT * FROM products_xsell_grp_name GROUP BY products_xsell_grp_name_id",
         "identity" => "getId",
         "getMethod" => "getCrossSellingGroups",
-        "mapPull" => array(
+        "mapPull" => [
             "id" => "products_xsell_grp_name_id",
             "i18ns" => "CrossSellingGroupI18n|addI18n",
-        ),
-    );
+        ],
+    ];
     
     public function push($data, $dbObj = null)
     {
@@ -41,17 +41,19 @@ class CrossSellingGroup extends BaseMapper
         
         $ids = implode(",", $ids);
         
-        if (!empty($ids))
-        {
-            $this->db->query(sprintf(" DELETE FROM products_xsell WHERE products_xsell_grp_name_id NOT IN (%s)",
+        if (!empty($ids)) {
+            $this->db->query(sprintf(
+                " DELETE FROM products_xsell WHERE products_xsell_grp_name_id NOT IN (%s)",
                 $ids
             ));
     
-            $this->db->query(sprintf(" DELETE FROM products_xsell_grp_name WHERE products_xsell_grp_name_id NOT IN (%s)",
+            $this->db->query(sprintf(
+                " DELETE FROM products_xsell_grp_name WHERE products_xsell_grp_name_id NOT IN (%s)",
                 $ids
             ));
     
-            $this->db->query(sprintf(" DELETE FROM jtl_connector_link_crossselling_group WHERE endpoint_id NOT IN (%s)",
+            $this->db->query(sprintf(
+                " DELETE FROM jtl_connector_link_crossselling_group WHERE endpoint_id NOT IN (%s)",
                 $ids
             ));
         } else {

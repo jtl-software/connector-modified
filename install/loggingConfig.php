@@ -31,7 +31,6 @@ if (isset($_REQUEST['download'])) {
     header('Content-type: application/zip');
     header('Content-Disposition: attachment; filename="logs.zip"');
     readfile($downloadFolder . 'logs.zip');
-
 } elseif (isset($_REQUEST['clear'])) {
     //Clear all logs
     foreach (scandir($logFolder) as $file) {

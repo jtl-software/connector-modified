@@ -4,24 +4,24 @@ namespace jtl\Connector\Modified\Mapper;
 
 class Manufacturer extends BaseMapper
 {
-    protected $mapperConfig = array(
+    protected $mapperConfig = [
         "table" => "manufacturers",
         "query" => "SELECT m.* FROM manufacturers m
             LEFT JOIN jtl_connector_link_manufacturer l ON m.manufacturers_id = l.endpoint_id
             WHERE l.host_id IS NULL",
         "where" => "manufacturers_id",
         "identity" => "getId",
-        "mapPull" => array(
+        "mapPull" => [
             "id" => "manufacturers_id",
             "name" => "manufacturers_name",
             "websiteUrl" => null
-        ),
-        "mapPush" => array(
+        ],
+        "mapPush" => [
             "manufacturers_id" => "id",
             "manufacturers_name" => "name",
             "manufacturers_image" => null
-        )
-    );
+        ]
+    ];
 
     /**
      * @param $data

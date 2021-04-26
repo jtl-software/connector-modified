@@ -6,18 +6,18 @@ use jtl\Connector\Model\ProductPriceItem as ProductPriceItemModel;
 
 class ProductPrice extends BaseMapper
 {
-    protected $mapperConfig = array(
+    protected $mapperConfig = [
         "getMethod" => "getPrices",
-        "mapPull" => array(
+        "mapPull" => [
             "id" => null,
             "customerGroupId" => "customers_status_id",
             "productId" => "products_id",
             "items" => "ProductPriceItem|addItem"
-        ),
-        "mapPush" => array(
+        ],
+        "mapPush" => [
             "ProductPriceItem|addItem" => "items"
-        )
-    );
+        ]
+    ];
 
     public function pull($data = null, $limit = null)
     {

@@ -13,7 +13,7 @@ class ThumbMode extends Module
             <label for="thumbs" class="col-xs-2 control-label">Thumbnail-Modus</label>
                 <div class="col-xs-6">
                     <select class="form-control" name="thumbs" id="thumbs">
-                        <option value="fit"'.($this->config->thumbs !== 'fit' ?: 'selected' ) .'>Einpassen</option>
+                        <option value="fit"'.($this->config->thumbs !== 'fit' ?: 'selected') .'>Einpassen</option>
                         <option value="fill"'.($this->config->thumbs !== 'fill' ?: 'selected') .'>Füllen</option>
                     </select>
                     <span id="helpBlock" class="help-block">

@@ -4,7 +4,7 @@ namespace jtl\Connector\Modified\Mapper;
 
 class ProductVariationValue extends BaseMapper
 {
-    protected $mapperConfig = array(
+    protected $mapperConfig = [
         "table" => "products_attributes",
         "query" => 'SELECT * FROM products_attributes WHERE products_id=[[products_id]]',
         "getMethod" => "getValues",
@@ -15,7 +15,7 @@ class ProductVariationValue extends BaseMapper
             "stockLevel"            => "attributes_stock",
             "i18ns"                 => "ProductVariationValueI18n|addI18n"
         ]
-    );
+    ];
     
     protected function extraWeight($data)
     {

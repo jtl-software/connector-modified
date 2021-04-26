@@ -6,19 +6,19 @@ use jtl\Connector\Model\ShippingMethod as ShippingMethodModel;
 
 class ShippingMethod extends BaseMapper
 {
-    protected $mapperConfig = array(
+    protected $mapperConfig = [
         "identity" => "getId",
         "getMethod" => "getShippingMethods"
-    );
+    ];
 
     public function pull($data = null, $limit = null)
     {
         $moduleStr = $this->db->query('SELECT configuration_value FROM configuration WHERE configuration_key ="MODULE_SHIPPING_INSTALLED"');
 
         if (count($moduleStr) > 0) {
-            $modules = explode(';',$moduleStr[0]['configuration_value']);
+            $modules = explode(';', $moduleStr[0]['configuration_value']);
             if (count($modules) > 0) {
-                $return = array();
+                $return = [];
 
                 foreach ($modules as $moduleFile) {
                     if (!empty($moduleFile)) {

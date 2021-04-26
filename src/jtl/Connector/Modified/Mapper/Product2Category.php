@@ -3,22 +3,22 @@ namespace jtl\Connector\Modified\Mapper;
 
 class Product2Category extends BaseMapper
 {
-    protected $mapperConfig = array(
+    protected $mapperConfig = [
         "table" => "products_to_categories",
         "getMethod" => "getCategories",
         "identity" => "getId",
-        "where" => array("categories_id","products_id"),
+        "where" => ["categories_id","products_id"],
         "query" => 'SELECT *,CONCAT(products_id,"_",categories_id) AS id FROM products_to_categories WHERE products_id=[[products_id]]',
-        "mapPull" => array(
+        "mapPull" => [
             "id" => "id",
             "categoryId" => "categories_id",
             "productId" => "products_id"
-        ),
-        "mapPush" => array(
+        ],
+        "mapPush" => [
             "categories_id" => "categoryId",
             "products_id" => "productId"
-        )
-    );
+        ]
+    ];
 
     public function push($parent, $dbObj = null)
     {

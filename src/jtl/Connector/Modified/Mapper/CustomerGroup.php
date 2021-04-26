@@ -3,25 +3,25 @@ namespace jtl\Connector\Modified\Mapper;
 
 class CustomerGroup extends BaseMapper
 {
-    protected $mapperConfig = array(
+    protected $mapperConfig = [
         "table" => "customers_status",
         "query" => "SELECT customers_status_id, customers_status_discount, customers_status_add_tax_ot 
              FROM customers_status  
              GROUP BY customers_status_id, customers_status_discount, customers_status_add_tax_ot",
         "identity" => "getId",
         "getMethod" => "getCustomerGroups",
-        "mapPull" => array(
+        "mapPull" => [
             "id" => "customers_status_id",
             "discount" => "customers_status_discount",
             "applyNetPrice" => "customers_status_add_tax_ot",
             "isDefault" => null,
             "i18ns" => "CustomerGroupI18n|addI18n",
             "attributes" => "CustomerGroupAttr|addAttribute"
-        ),
-        "mapPush" => array(
+        ],
+        "mapPush" => [
             "CustomerGroupI18n|addI18n" => "i18ns"
-        )
-    );
+        ]
+    ];
 
     protected function isDefault($data)
     {

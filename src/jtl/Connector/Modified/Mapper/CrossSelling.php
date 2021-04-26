@@ -3,7 +3,7 @@ namespace jtl\Connector\Modified\Mapper;
 
 class CrossSelling extends BaseMapper
 {
-    protected $mapperConfig = array(
+    protected $mapperConfig = [
         "table" => "products_xsell",
         "query" => "SELECT p.*, (
                 SELECT COUNT(products_xsell.products_id) 
@@ -12,12 +12,12 @@ class CrossSelling extends BaseMapper
             ) xsells FROM products p            
             LEFT JOIN jtl_connector_link_crossselling l ON p.products_id = l.endpoint_id
             WHERE l.host_id IS NULL HAVING xsells > 0",
-        "mapPull" => array(
+        "mapPull" => [
             "id" => "products_id",
             "productId" => "products_id",
             "items" => "CrossSellingItem|addItem"
-        )        
-    );
+        ]
+    ];
 
     public function push($data, $dbObj = null)
     {
@@ -48,8 +48,7 @@ class CrossSelling extends BaseMapper
         if (!empty($id) && $id != '') {
             try {
                 $this->db->query('DELETE FROM products_xsell WHERE products_id="'.$id.'"');
-            }
-            catch(\Exception $e) {            
+            } catch (\Exception $e) {
             }
         }
 

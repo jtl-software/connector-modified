@@ -3,12 +3,12 @@ namespace jtl\Connector\Modified\Mapper;
 
 class Currency extends BaseMapper
 {
-    protected $mapperConfig = array(
+    protected $mapperConfig = [
         "table" => "currencies",
         "where" => "currencies_id",
         "identity" => "getId",
         "getMethod" => "getCurrencies",
-        "mapPull" => array(
+        "mapPull" => [
             "id" => "currencies_id",
             "name" => "title",
             "factor" => "value",
@@ -16,8 +16,8 @@ class Currency extends BaseMapper
             "delimiterThousand" => "thousands_point",
             "isDefault" => null,
             "iso" => "code"
-        ),
-        "mapPush" => array(
+        ],
+        "mapPush" => [
             "currencies_id" => "id",
             "title" => "name",
             "value" => "factor",
@@ -26,15 +26,15 @@ class Currency extends BaseMapper
             "code" => null,
             "decimal_places" => null,
             "symbol_right" => "name"
-        )
-    );
+        ]
+    ];
 
     public function push($data, $parent = null)
     {
         foreach ($data->getCurrencies() as $currency) {
             $check = $this->db->query('SELECT currencies_id FROM currencies WHERE code="'.$currency->getIso().'"');
             if (count($check) > 0) {
-                $currency->getId()->setEndpoint($check[0]['currencies_id']);                
+                $currency->getId()->setEndpoint($check[0]['currencies_id']);
             }
         }
 

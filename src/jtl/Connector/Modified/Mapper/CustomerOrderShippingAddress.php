@@ -5,10 +5,10 @@ use jtl\Connector\Core\Utilities\Country;
 
 class CustomerOrderShippingAddress extends BaseMapper
 {
-    protected $mapperConfig = array(
+    protected $mapperConfig = [
         "table" => "customer_orders",
         "getMethod" => "getShippingAddress",
-        "mapPull" => array(
+        "mapPull" => [
             "id" => null,
             "customerId" => "customers_id",
             "firstName" => "delivery_firstname",
@@ -22,8 +22,8 @@ class CustomerOrderShippingAddress extends BaseMapper
             "countryIso" => "delivery_country_iso_code_2",
             "eMail" => "customers_email_address",
             "phone" => "customers_telephone"
-        ),
-        "mapPush" => array(
+        ],
+        "mapPush" => [
             "delivery_name" => null,
             "delivery_firstname" => "firstName",
             "delivery_lastname" => "lastName",
@@ -34,12 +34,12 @@ class CustomerOrderShippingAddress extends BaseMapper
             "delivery_city" => "city",
             "delivery_state" => "state",
             "delivery_country_iso_code_2" => "countryIso"
-        )
-    );
+        ]
+    ];
 
     public function pull($data = null, $limit = null)
     {
-        return array($this->generateModel($data));
+        return [$this->generateModel($data)];
     }
 
     protected function id($data)

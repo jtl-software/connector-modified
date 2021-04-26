@@ -5,7 +5,7 @@ use \jtl\Connector\Core\Utilities\Country;
 
 class Customer extends BaseMapper
 {
-    protected $mapperConfig = array(
+    protected $mapperConfig = [
         "table" => "customers",
         "statisticsQuery" => "SELECT COUNT(c.customers_id) as total FROM customers c
             LEFT JOIN address_book a ON c.customers_default_address_id = a.address_book_id
@@ -21,7 +21,7 @@ class Customer extends BaseMapper
             ORDER BY c.customers_date_added",
         "where" => "customers_id",
         "identity" => "getId",
-        "mapPull" => array(
+        "mapPull" => [
             "id" => "customers_id",
             "customerGroupId" => "customers_status",
             "customerNumber" => "customers_cid",
@@ -43,8 +43,8 @@ class Customer extends BaseMapper
             "hasNewsletterSubscription" => null,
             "creationDate" => "customers_date_added",
             "hasCustomerAccount" => null
-        ),
-        "mapPush" => array(
+        ],
+        "mapPush" => [
             "customers_id" => "id",
             "customers_status" => "customerGroupId",
             "customers_cid" => "customerNumber",
@@ -59,8 +59,8 @@ class Customer extends BaseMapper
             "customers_newsletter" => "hasNewsletterSubscription",
             "customers_date_added" => "creationDate",
             "customers_password" => null
-        )
-    );
+        ]
+    ];
 
     /**
      * @param $data
@@ -168,10 +168,9 @@ class Customer extends BaseMapper
             $this->db->query('DELETE FROM customers WHERE customers_id='.$data->getId()->getEndpoint());
             $this->db->query('DELETE FROM address_book WHERE customers_id='.$data->getId()->getEndpoint());
             $this->db->query('DELETE FROM customers_info WHERE customers_info_id='.$data->getId()->getEndpoint());
-    		
-    		$this->db->query('DELETE FROM jtl_connector_link_customer WHERE endpoint_id='.$data->getId()->getEndpoint());
-        }
-        catch(\Exception $e) {            
+            
+            $this->db->query('DELETE FROM jtl_connector_link_customer WHERE endpoint_id='.$data->getId()->getEndpoint());
+        } catch (\Exception $e) {
         }
 
         return $data;

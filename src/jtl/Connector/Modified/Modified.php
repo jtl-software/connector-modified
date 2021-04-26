@@ -33,15 +33,15 @@ class Modified extends BaseConnector
         $db = Mysql::getInstance();
 
         if (!$db->isConnected()) {
-            $db->connect(array(
+            $db->connect([
                 "host" => $session->shopConfig['db']["host"],
                 "user" => $session->shopConfig['db']["user"],
                 "password" => $session->shopConfig['db']["pass"],
                 "name" => $session->shopConfig['db']["name"]
-            ));
+            ]);
         }
 
-        if(isset($session->connectorConfig->utf8) && $session->connectorConfig->utf8 !== '0') {
+        if (isset($session->connectorConfig->utf8) && $session->connectorConfig->utf8 !== '0') {
             $db->setNames();
             $db->setCharset();
         }
@@ -68,13 +68,13 @@ class Modified extends BaseConnector
         $exampleFeaturesFile = sprintf('%s/features.json.example', $featuresDir);
 
         if (!file_exists($featuresFile)) {
-            if(!file_exists($exampleFeaturesFile)){
+            if (!file_exists($exampleFeaturesFile)) {
                 throw new \Exception(sprintf('File "features.json.example" doesn\'t exist. Please check file path %s.', $featuresFile));
             }
 
             copy($exampleFeaturesFile, $featuresFile);
 
-            if(!file_exists($featuresFile)){
+            if (!file_exists($featuresFile)) {
                 throw new \Exception(sprintf('File "features.json" doesn\'t exist. Please check file path %s.', $featuresFile));
             }
         }
@@ -85,33 +85,33 @@ class Modified extends BaseConnector
         require_once(CONNECTOR_DIR.'/../includes/configure.php');
         require_once(CONNECTOR_DIR.'/../inc/set_admin_directory.inc.php');
         
-        if (defined('DIR_ADMIN')){
+        if (defined('DIR_ADMIN')) {
             require_once(CONNECTOR_DIR.'/../' . DIR_ADMIN . '/includes/version.php');
         } else {
             require_once(CONNECTOR_DIR.'/../admin/includes/version.php');
         }
 
-        return array(
-            'shop' => array(
+        return [
+            'shop' => [
                 'url' => HTTP_SERVER,
                 'folder' => DIR_WS_CATALOG,
                 'path' => DIR_FS_DOCUMENT_ROOT,
                 'fullUrl' => HTTP_SERVER.DIR_WS_CATALOG
-            ),
-            'db' => array(
+            ],
+            'db' => [
                 'host' => DB_SERVER,
                 'name' => DB_DATABASE,
                 'user' => DB_SERVER_USERNAME,
                 'pass' => DB_SERVER_PASSWORD,
                 'version' => ltrim(DB_VERSION, 'MOD_')
-            ),
-            'img' => array(
+            ],
+            'img' => [
                 'original' => DIR_WS_ORIGINAL_IMAGES,
                 'thumbnails' => DIR_WS_THUMBNAIL_IMAGES,
                 'info' => DIR_WS_INFO_IMAGES,
                 'popup' => DIR_WS_POPUP_IMAGES
-            )
-        );
+            ]
+        ];
     }
 
     /**
@@ -122,15 +122,15 @@ class Modified extends BaseConnector
     {
         $configDb = $db->query("SElECT configuration_key,configuration_value FROM configuration");
 
-        $return = array();
+        $return = [];
 
         foreach ($configDb as $entry) {
             $return[$entry['configuration_key']] = $entry['configuration_value'] == 'true' ? 1 : ($entry['configuration_value'] == 'false' ? 0 : $entry['configuration_value']);
         }
 
-        return array(
+        return [
             'settings' => $return
-        );
+        ];
     }
 
     /**
@@ -166,7 +166,7 @@ class Modified extends BaseConnector
             $this->controller = $class::getInstance();
             $this->action = RpcMethod::buildAction($this->getMethod()->getAction());
 
-            return is_callable(array($this->controller, $this->action));
+            return is_callable([$this->controller, $this->action]);
         }
 
         return false;
@@ -181,7 +181,7 @@ class Modified extends BaseConnector
     {
         $this->controller->setMethod($this->getMethod());
 
-        $result = array();
+        $result = [];
 
         if ($this->action === Method::ACTION_PUSH || $this->action === Method::ACTION_DELETE) {
             if (!is_array($requestpacket->getParams())) {
@@ -189,7 +189,7 @@ class Modified extends BaseConnector
             }
 
             $action = new Action();
-            $results = array();
+            $results = [];
             foreach ($requestpacket->getParams() as $param) {
                 $result = $this->controller->{$this->action}($param);
                 $results[] = $result->getResult();

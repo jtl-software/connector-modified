@@ -6,14 +6,14 @@ use jtl\Connector\Core\Exception\DatabaseException;
 
 class Installer
 {
-    private $modules = array(
+    private $modules = [
         'check' => 'Check',
         'connector' => 'Connector',
         'status' => 'Status',
         'thumbs' => 'ThumbMode',
         'tax_rate' => 'TaxRate',
         'dev_logging' => 'DevLogging'
-    );
+    ];
 
     /**
      * Installer constructor.
@@ -40,12 +40,12 @@ class Installer
         $db = Mysql::getInstance();
 
         if (!$db->isConnected()) {
-            $db->connect(array(
+            $db->connect([
                 "host" => $shopConfig['db']["host"],
                 "user" => $shopConfig['db']["user"],
                 "password" => $shopConfig['db']["pass"],
                 "name" => $shopConfig['db']["name"],
-            ));
+            ]);
         }
 
         $db->setNames();
@@ -117,19 +117,16 @@ class Installer
                 $html .= '</div>';
             }
             
-            if (isset($_SESSION['error']))
-            {
+            if (isset($_SESSION['error'])) {
                 $html .= '<div class="alert alert-danger">Fehler beim Schreiben der config.json Datei.</div>';
                 unset($_SESSION['error']);
-            } elseif (isset($_SESSION['success']))
-            {
+            } elseif (isset($_SESSION['success'])) {
                 $html .= '<div class="alert alert-success">Connector Konfiguration wurde gespeichert.</div>';
                 $html .= '<div class="alert alert-danger"><b>ACHTUNG:</b><br/>
                             Bitte sorgen Sie nach erfolgreicher Installation des Connectors unbedingt dafür, dass dieser Installer
                             sowie die Datei config.json im Verzeichnis config nicht öffentlich les- und ausführbar sind!</div>';
                 unset($_SESSION['success']);
-            }elseif (isset($_SESSION['fail']))
-            {
+            } elseif (isset($_SESSION['fail'])) {
                 echo $_SESSION['fail'];
                 unset($_SESSION['fail']);
             }
@@ -170,21 +167,21 @@ class Installer
     {
         require_once dirname(CONNECTOR_DIR).'/includes/configure.php';
 
-        return array(
-            'shop' => array(
+        return [
+            'shop' => [
                 'url' => HTTP_SERVER,
                 'folder' => DIR_WS_CATALOG,
                 'fullUrl' => HTTP_SERVER.DIR_WS_CATALOG,
-            ),
-            'db' => array(
+            ],
+            'db' => [
                 'host' => DB_SERVER,
                 'name' => DB_DATABASE,
                 'user' => DB_SERVER_USERNAME,
                 'pass' => DB_SERVER_PASSWORD,
-            ),
-            'img' => array(
+            ],
+            'img' => [
                 'original' => DIR_WS_ORIGINAL_IMAGES,
-            )
-        );
+            ]
+        ];
     }
 }

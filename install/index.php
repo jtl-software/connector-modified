@@ -31,7 +31,7 @@ $formData = (new Installer())->runAndGetFormData();
         <br>
         <br>
         <?php
-        $errors = array();
+        $errors = [];
 
         if (!is_writable(sys_get_temp_dir())) {
             $errors[] = 'Das temporäre Verzeichnis "'.sys_get_temp_dir().'" ist nicht beschreibbar.';
@@ -42,7 +42,7 @@ $formData = (new Installer())->runAndGetFormData();
         }
 
         if (extension_loaded('suhosin')) {
-            if (strpos(ini_get('suhosin.executor.include.whitelist'),'phar') === false) {
+            if (strpos(ini_get('suhosin.executor.include.whitelist'), 'phar') === false) {
                 $errors[] = 'Die PHP Extension Suhosin ist installiert, unterbindet jedoch die notwendige Verwendung von PHAR-Archiven.';
             }
         }
