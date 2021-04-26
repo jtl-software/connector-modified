@@ -1,21 +1,16 @@
 <?php
 namespace jtl\Connector\Modified;
 
-use \jtl\Connector\Core\Rpc\RequestPacket;
-use \jtl\Connector\Core\Utilities\RpcMethod;
-use \jtl\Connector\Core\Database\Mysql;
-use \jtl\Connector\Core\Rpc\ResponsePacket;
-use jtl\Connector\Modified\Installer\Installer;
-use \jtl\Connector\Session\SessionHelper;
-use \jtl\Connector\Base\Connector as BaseConnector;
-use \jtl\Connector\Core\Rpc\Error as Error;
-use \jtl\Connector\Core\Http\Response;
-use \jtl\Connector\Core\Rpc\Method;
-use \jtl\Connector\Modified\Mapper\PrimaryKeyMapper;
-use \jtl\Connector\Result\Action;
-use \jtl\Connector\Modified\Auth\TokenLoader;
-use \jtl\Connector\Modified\Checksum\ChecksumLoader;
-use \jtl\Connector\Core\Logger\Logger;
+use jtl\Connector\Core\Rpc\RequestPacket;
+use jtl\Connector\Core\Utilities\RpcMethod;
+use jtl\Connector\Core\Database\Mysql;
+use jtl\Connector\Session\SessionHelper;
+use jtl\Connector\Base\Connector as BaseConnector;
+use jtl\Connector\Core\Rpc\Method;
+use jtl\Connector\Modified\Mapper\PrimaryKeyMapper;
+use jtl\Connector\Result\Action;
+use jtl\Connector\Modified\Auth\TokenLoader;
+use jtl\Connector\Modified\Checksum\ChecksumLoader;
 
 class Modified extends BaseConnector
 {
@@ -87,7 +82,6 @@ class Modified extends BaseConnector
 
     private function readConfigFile()
     {
-        
         require_once(CONNECTOR_DIR.'/../includes/configure.php');
         require_once(CONNECTOR_DIR.'/../inc/set_admin_directory.inc.php');
         
@@ -96,7 +90,6 @@ class Modified extends BaseConnector
         } else {
             require_once(CONNECTOR_DIR.'/../admin/includes/version.php');
         }
-        
 
         return array(
             'shop' => array(
@@ -121,7 +114,11 @@ class Modified extends BaseConnector
         );
     }
 
-    private function readConfigDb($db)
+    /**
+     * @param Mysql $db
+     * @return array[]
+     */
+    private function readConfigDb(Mysql $db): array
     {
         $configDb = $db->query("SElECT configuration_key,configuration_value FROM configuration");
 
@@ -136,15 +133,25 @@ class Modified extends BaseConnector
         );
     }
 
-    private function update($db)
+    /**
+     * @param Mysql $db
+     */
+    private function update(Mysql $db): void
     {
-        if(version_compare(file_get_contents(CONNECTOR_DIR.'/db/version'), CONNECTOR_VERSION) == -1) {
-            foreach (new \DirectoryIterator(CONNECTOR_DIR.'/db/updates') as $updateFile) {
+        if (version_compare(file_get_contents(CONNECTOR_DIR.'/db/version'), CONNECTOR_VERSION) == -1) {
+            $versions = [];
+            foreach (new \DirectoryIterator(CONNECTOR_DIR.'/db/updates') as $item) {
+                if ($item->isFile()) {
+                    $versions[] = $item->getBasename('.php');
+                }
+            }
 
-                if($updateFile->isDot()) continue;
+            sort($versions);
 
-                if(version_compare(file_get_contents(CONNECTOR_DIR.'/db/version'), $updateFile->getBasename('.php')) == -1) {
-                    include(CONNECTOR_DIR.'/db/updates/'.$updateFile);
+            foreach ($versions as $version) {
+                if (version_compare(file_get_contents(CONNECTOR_DIR.'/db/version'), $version) == -1) {
+                    include(CONNECTOR_DIR.'/db/updates/' . $version . '.php');
+                    file_put_contents(CONNECTOR_DIR.'/db/version', $version);
                 }
             }
         }
@@ -165,6 +172,11 @@ class Modified extends BaseConnector
         return false;
     }
 
+    /**
+     * @param RequestPacket $requestpacket
+     * @return Action
+     * @throws \Exception
+     */
     public function handle(RequestPacket $requestpacket)
     {
         $this->controller->setMethod($this->getMethod());
@@ -178,8 +190,6 @@ class Modified extends BaseConnector
 
             $action = new Action();
             $results = array();
-            $errors = array();
-
             foreach ($requestpacket->getParams() as $param) {
                 $result = $this->controller->{$this->action}($param);
                 $results[] = $result->getResult();
