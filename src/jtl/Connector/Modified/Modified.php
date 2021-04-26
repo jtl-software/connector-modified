@@ -5,6 +5,7 @@ use \jtl\Connector\Core\Rpc\RequestPacket;
 use \jtl\Connector\Core\Utilities\RpcMethod;
 use \jtl\Connector\Core\Database\Mysql;
 use \jtl\Connector\Core\Rpc\ResponsePacket;
+use jtl\Connector\Modified\Installer\Installer;
 use \jtl\Connector\Session\SessionHelper;
 use \jtl\Connector\Base\Connector as BaseConnector;
 use \jtl\Connector\Core\Rpc\Error as Error;
@@ -24,6 +25,8 @@ class Modified extends BaseConnector
     public function initialize()
     {
         $session = new SessionHelper("modified");
+
+        $this->createFeaturesFile();
 
         if (!isset($session->shopConfig)) {
             $session->shopConfig = $this->readConfigFile();
@@ -58,8 +61,29 @@ class Modified extends BaseConnector
         $this->setTokenLoader(new TokenLoader());
         $this->setChecksumLoader(new ChecksumLoader());
     }
-    
-    
+
+    /**
+     *
+     * @throws \Exception
+     */
+    protected function createFeaturesFile(): void
+    {
+        $featuresDir = CONNECTOR_DIR . '/config';
+        $featuresFile = sprintf('%s/features.json', $featuresDir);
+        $exampleFeaturesFile = sprintf('%s/features.json.example', $featuresDir);
+
+        if (!file_exists($featuresFile)) {
+            if(!file_exists($exampleFeaturesFile)){
+                throw new \Exception(sprintf('File "features.json.example" doesn\'t exist. Please check file path %s.', $featuresFile));
+            }
+
+            copy($exampleFeaturesFile, $featuresFile);
+
+            if(!file_exists($featuresFile)){
+                throw new \Exception(sprintf('File "features.json" doesn\'t exist. Please check file path %s.', $featuresFile));
+            }
+        }
+    }
 
     private function readConfigFile()
     {
