@@ -2,7 +2,8 @@
 -----
 - CO-1422 Fixed endpoint column type in checksum table
 - CO-1453 Added variation names to customer order item during pull
-- CO-1502 S
+- CO-1502 Added not overriding features.json on every updated
+- CO-1503 Fixed product image push
 
 3.5.0
 -----
