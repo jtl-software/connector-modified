@@ -5,7 +5,7 @@ $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__ . '/install')
     ->name('*.php');
 
-return (new PhpCsFixer\Config)
+return (new PhpCsFixer\Config())
     ->setRiskyAllowed(true)
     ->setLineEnding("\n")
     ->setUsingCache(false)
