@@ -32,6 +32,7 @@ class ProductVariation extends BaseMapper
                 // clear existing product variations
                 $this->db->query('DELETE FROM products_attributes WHERE products_id=' . $parent->getId()->getEndpoint());
 
+                /** @var \jtl\Connector\Model\ProductVariation $variation */
                 foreach ($parent->getVariations() as $variation) {
                     // get variation name in default language
                     foreach ($variation->getI18ns() as $i18n) {
@@ -57,7 +58,7 @@ class ProductVariation extends BaseMapper
                         $varObj->products_options_id = $variationId;
                         $varObj->language_id = $this->locale2id($i18n->getLanguageISO());
                         $varObj->products_options_name = $i18n->getName();
-                        $varObj->products_options_sortorder = 0;
+                        $varObj->products_options_sortorder = $variation->getSort();
 
                         $this->db->deleteInsertRow($varObj, 'products_options', array('products_options_id', 'language_id'), array($variationId, $varObj->language_id));
                     }
