@@ -561,9 +561,7 @@ class Product extends BaseMapper
                 $variationValue->products_options_values_sortorder = 0;
             }
 
-            $this->db->deleteInsertRow($variationValue, 'products_options_values',
-                ['products_options_values_id', 'langauge_id'],
-                [$variationOptionId, $langId]);
+            $this->db->deleteInsertRow($variationValue, 'products_options_values', ['products_options_values_id', 'language_id'], [$variationOptionId, $langId]);
 
             $price = $this->db->query("SELECT products_price FROM products WHERE products_id = " . $masterId);
             $jtlPriceItem = self::getDefaultPriceItem(...$data->getPrices());
@@ -579,11 +577,7 @@ class Product extends BaseMapper
                 $price = $price * -1;
             }
 
-            $result2 = $this->db->query(
-                sprintf("SELECT * FROM products_attributes WHERE options_values_id = %s AND products_id = %s" ,
-                    $variationOptionId, $masterId
-                )
-            );
+            $result2 = $this->db->query(sprintf("SELECT * FROM products_attributes WHERE options_values_id = %s AND products_id = %s", $variationOptionId, $masterId));
 
             $sku = $data->getSku();
             $stock = $data->getStockLevel()->getStockLevel();

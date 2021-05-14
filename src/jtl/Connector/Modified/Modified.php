@@ -4,6 +4,7 @@ namespace jtl\Connector\Modified;
 use jtl\Connector\Core\Rpc\RequestPacket;
 use jtl\Connector\Core\Utilities\RpcMethod;
 use jtl\Connector\Core\Database\Mysql;
+use jtl\Connector\Event\Product\ProductAfterPushEvent;
 use jtl\Connector\Session\SessionHelper;
 use jtl\Connector\Base\Connector as BaseConnector;
 use jtl\Connector\Core\Rpc\Method;
@@ -55,6 +56,34 @@ class Modified extends BaseConnector
         $this->setPrimaryKeyMapper(new PrimaryKeyMapper());
         $this->setTokenLoader(new TokenLoader());
         $this->setChecksumLoader(new ChecksumLoader());
+
+        $this->eventDispatcher->addListener(ProductAfterPushEvent::EVENT_NAME, function ($event) use ($db) {
+            $db->query('
+                DELETE FROM products_options_values
+                WHERE products_options_values_id IN (
+                    SELECT * FROM (
+                        SELECT v.products_options_values_id
+                        FROM products_options_values v
+                        LEFT JOIN products_attributes a ON v.products_options_values_id = a.options_values_id
+                        WHERE a.products_attributes_id IS NULL
+                        GROUP BY v.products_options_values_id
+                    ) relations
+                )
+            ');
+
+            $db->query('
+                DELETE FROM products_options
+                WHERE products_options_id IN (
+                    SELECT * FROM (
+                        SELECT o.products_options_id
+                        FROM products_options o
+                        LEFT JOIN products_attributes a ON o.products_options_id = a.options_id
+                        WHERE a.products_attributes_id IS NULL
+                        GROUP BY o.products_options_id
+                    ) relations
+                )
+            ');
+        });
     }
 
     /**

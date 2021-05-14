@@ -2,6 +2,8 @@
 
 namespace jtl\Connector\Modified\Mapper;
 
+use jtl\Connector\Core\Logger\Logger;
+use jtl\Connector\Formatter\ExceptionFormatter;
 use jtl\Connector\Linker\ChecksumLinker;
 
 class ProductVariation extends BaseMapper
@@ -68,6 +70,7 @@ class ProductVariation extends BaseMapper
                         foreach ($value->getI18ns() as $i18n) {
                             if ($i18n->getLanguageISO() == $this->fullLocale($this->shopConfig['settings']['DEFAULT_LANGUAGE'])) {
                                 $valueName = $i18n->getName();
+                                break;
                             }
                         }
 
@@ -135,40 +138,7 @@ class ProductVariation extends BaseMapper
                 }
             }
 
-
-            $this->clearUnusedVariations();
-
             return $parent->getVariations();
         }
     }
-
-    private function clearUnusedVariations()
-    {
-        $this->db->query('
-            DELETE FROM products_options_values
-            WHERE products_options_values_id IN (
-                SELECT * FROM (
-                    SELECT v.products_options_values_id
-                    FROM products_options_values v
-                    LEFT JOIN products_attributes a ON v.products_options_values_id = a.options_values_id
-                    WHERE a.products_attributes_id IS NULL
-                    GROUP BY v.products_options_values_id
-                ) relations
-            )
-        ');
-
-        $this->db->query('
-            DELETE FROM products_options
-            WHERE products_options_id IN (
-                SELECT * FROM (
-                    SELECT o.products_options_id
-                    FROM products_options o
-                    LEFT JOIN products_attributes a ON o.products_options_id = a.options_id
-                    WHERE a.products_attributes_id IS NULL
-                    GROUP BY o.products_options_id
-                ) relations
-            )
-        ');
-    }
-
 }
