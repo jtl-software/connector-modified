@@ -117,12 +117,13 @@ class Product extends BaseMapper
                         );
 
                         $varCombiProduct = clone $parent;
-                        $varCombiProduct->setId(new Identity($parent->getId()->getEndpoint().'_'.$varCombiAttr[0]['products_attributes_id']));
-                        $varCombiProduct->setMasterProductId($parent->getId());
-                        $varCombiProduct->setIsMasterProduct(false);
-                        $varCombiProduct->setConsiderStock(true);
-                        $varCombiProduct->setIsActive(true);
-                        $varCombiProduct->setSku($varCombiAttr[0]['attributes_model']);
+                        $varCombiProduct
+                            ->setId(new Identity(Product::createProductEndpoint($parent->getId()->getEndpoint(), $varCombiAttr[0]['options_values_id'])))
+                            ->setMasterProductId($parent->getId())
+                            ->setIsMasterProduct(false)
+                            ->setConsiderStock(true)
+                            ->setIsActive(true)
+                            ->setSku($varCombiAttr[0]['attributes_model'] !== '' ? $varCombiAttr[0]['attributes_model'] : sprintf('%s-%s', $parent->getSku(), $varCombiAttr[0]['options_values_id']));
 
                         $stock = new \jtl\Connector\Model\ProductStockLevel();
                         $stock->setStockLevel($varCombi->getStockLevel());
@@ -144,7 +145,7 @@ class Product extends BaseMapper
                         $variation = new ProductVariation();
                         $variation->setId(new Identity($variationId, null));
                         $variation->setSort($varCombi->getSort());
-                        $variation->setType("select");
+                        $variation->setType('select');
 
                         if (!isset($masterVariations[$variationId])) {
                             $masterVariations[$variationId] = $variation;
@@ -289,7 +290,7 @@ class Product extends BaseMapper
         $sql = 'SELECT count(a.products_attributes_id) as count 
                 FROM products p
                 LEFT JOIN products_attributes a ON p.products_id = a.products_id
-                WHERE CONCAT(a.products_id, \'_\', a.products_attributes_id) NOT IN (SELECT l.endpoint_id FROM jtl_connector_link_product l WHERE LOCATE(\'_\', l.endpoint_id) > 0)';
+                WHERE CONCAT(a.products_id, \'_\', a.options_values_id) NOT IN (SELECT l.endpoint_id FROM jtl_connector_link_product l WHERE LOCATE(\'_\', l.endpoint_id) > 0)';
 
         $combis = $this->db->query($sql, ["return" => "object"]);
 
@@ -528,12 +529,12 @@ class Product extends BaseMapper
 
 
             if (isset(static::$idCache[$data->getId()->getHost()]['valuesId'])) {
-                $variationOptionId = static::$idCache[$data->getId()->getHost()]['valuesId'];
+                $optionsValuesId = static::$idCache[$data->getId()->getHost()]['valuesId'];
             } else {
-                $variationOptionId = (int)$this->db->query(
+                $optionsValuesId = (int)$this->db->query(
                     "SELECT products_options_values_id FROM products_options_values ORDER BY products_options_values_id DESC LIMIT 0,1"
                 )[0]["products_options_values_id"];
-                $variationOptionId = $variationOptionId >= 0 ? ($variationOptionId + 1) : 1;
+                $optionsValuesId = $optionsValuesId >= 0 ? ($optionsValuesId + 1) : 1;
             }
             $variationOptionName = "";
 
@@ -557,21 +558,21 @@ class Product extends BaseMapper
             );
 
             if (count($result) > 0) {
-                $variationOptionId = Product::extractOptionValueId($result[0]['endpoint_id']);
+                $optionsValuesId = Product::extractOptionValueId($result[0]['endpoint_id']);
             } else {
                 $this->db->query(
                     sprintf(
                         "INSERT INTO jtl_connector_link_product (endpoint_id, host_id) VALUES ('%s', %s)",
-                        Product::createProductEndpoint($masterId, $variationOptionId),
+                        Product::createProductEndpoint($masterId, $optionsValuesId),
                         $data->getId()->getHost()
                     )
                 );
-                static::$idCache[$data->getId()->getHost()]['valuesId'] = $variationOptionId;
+                static::$idCache[$data->getId()->getHost()]['valuesId'] = $optionsValuesId;
             }
 
             $variationValue = new \stdClass();
             $variationValue->products_options_values_name = $variationOptionName;
-            $variationValue->products_options_values_id = $variationOptionId;
+            $variationValue->products_options_values_id = $optionsValuesId;
             $variationValue->language_id = $langId;
 
             if (version_compare($this->shopConfig['db']['version'], '2.0.4', '>=')) {
@@ -581,8 +582,8 @@ class Product extends BaseMapper
             $this->db->deleteInsertRow(
                 $variationValue,
                 'products_options_values',
-                ['products_options_values_id', 'langauge_id'],
-                [$variationOptionId, $langId]
+                ['products_options_values_id', 'language_id'],
+                [$optionsValuesId, $langId]
             );
 
             $price = $this->db->query("SELECT products_price FROM products WHERE products_id = " . $masterId);
@@ -602,7 +603,7 @@ class Product extends BaseMapper
             $result2 = $this->db->query(
                 sprintf(
                     "SELECT * FROM products_attributes WHERE options_values_id = %s AND products_id = %s",
-                    $variationOptionId,
+                    $optionsValuesId,
                     $masterId
                 )
             );
@@ -630,7 +631,7 @@ class Product extends BaseMapper
                         empty($ean) ? '' : $ean,
                         $vpe,
                         $vpe,
-                        $variationOptionId,
+                        $optionsValuesId,
                         $masterId
                     )
                 );
@@ -640,7 +641,7 @@ class Product extends BaseMapper
                         "INSERT IGNORE INTO products_attributes (products_id, options_id, options_values_id, options_values_price, price_prefix, attributes_model, attributes_stock, options_values_weight, weight_prefix, sortorder, attributes_ean, attributes_vpe_id, attributes_vpe_value) VALUES (%s, %s, %s, %s, '%s', '%s', %s, %s, '%s', %s, '%s', %s, %s)",
                         $masterId,
                         $id,
-                        $variationOptionId,
+                        $optionsValuesId,
                         (double)$price,
                         $pricePrefix,
                         $sku,
@@ -659,7 +660,7 @@ class Product extends BaseMapper
                 sprintf(
                     "SELECT * FROM products_options_values_to_products_options WHERE products_options_id = %s AND products_options_values_id = %s",
                     $id,
-                    $variationOptionId
+                    $optionsValuesId
                 )
             );
 
@@ -668,7 +669,7 @@ class Product extends BaseMapper
                     sprintf(
                         "INSERT IGNORE INTO products_options_values_to_products_options (products_options_id, products_options_values_id) VALUES (%s, %s)",
                         $id,
-                        $variationOptionId
+                        $optionsValuesId
                     )
                 );
             }
@@ -694,9 +695,9 @@ class Product extends BaseMapper
         return null;
     }
 
-    public static function createProductEndpoint($parentId, $optionValueId)
+    public static function createProductEndpoint($parentId, $optionsValuesId)
     {
-        return $parentId . "_" . $optionValueId;
+        return $parentId . "_" . $optionsValuesId;
     }
 
     public static function extractParentId($endpoint)
