@@ -15,15 +15,20 @@ use jtl\Connector\Modified\Checksum\ChecksumLoader;
 
 class Modified extends BaseConnector
 {
+    public const
+        SESSION_NAMESPACE = 'modified';
+
+    /**
+     * @var SessionHelper|null
+     */
+    protected static $sessionHelper = null;
+
     protected $controller;
     protected $action;
 
     public function initialize()
     {
-        $session = new SessionHelper("modified");
-
-        $this->createFeaturesFile();
-
+        $session = self::getSessionHelper();
         if (!isset($session->shopConfig)) {
             $session->shopConfig = $this->readConfigFile();
         }
@@ -56,57 +61,6 @@ class Modified extends BaseConnector
         $this->setPrimaryKeyMapper(new PrimaryKeyMapper());
         $this->setTokenLoader(new TokenLoader());
         $this->setChecksumLoader(new ChecksumLoader());
-
-        $this->eventDispatcher->addListener(ProductAfterPushEvent::EVENT_NAME, function ($event) use ($db) {
-            $db->query('
-                DELETE FROM products_options_values
-                WHERE products_options_values_id IN (
-                    SELECT * FROM (
-                        SELECT v.products_options_values_id
-                        FROM products_options_values v
-                        LEFT JOIN products_attributes a ON v.products_options_values_id = a.options_values_id
-                        WHERE a.products_attributes_id IS NULL
-                        GROUP BY v.products_options_values_id
-                    ) relations
-                )
-            ');
-
-            $db->query('
-                DELETE FROM products_options
-                WHERE products_options_id IN (
-                    SELECT * FROM (
-                        SELECT o.products_options_id
-                        FROM products_options o
-                        LEFT JOIN products_attributes a ON o.products_options_id = a.options_id
-                        WHERE a.products_attributes_id IS NULL
-                        GROUP BY o.products_options_id
-                    ) relations
-                )
-            ');
-        });
-    }
-
-    /**
-     *
-     * @throws \Exception
-     */
-    protected function createFeaturesFile(): void
-    {
-        $featuresDir = CONNECTOR_DIR . '/config';
-        $featuresFile = sprintf('%s/features.json', $featuresDir);
-        $exampleFeaturesFile = sprintf('%s/features.json.example', $featuresDir);
-
-        if (!file_exists($featuresFile)) {
-            if(!file_exists($exampleFeaturesFile)){
-                throw new \Exception(sprintf('File "features.json.example" doesn\'t exist. Please check file path %s.', $featuresFile));
-            }
-
-            copy($exampleFeaturesFile, $featuresFile);
-
-            if(!file_exists($featuresFile)){
-                throw new \Exception(sprintf('File "features.json" doesn\'t exist. Please check file path %s.', $featuresFile));
-            }
-        }
     }
 
     private function readConfigFile()
@@ -232,5 +186,17 @@ class Modified extends BaseConnector
         } else {
             return $this->controller->{$this->action}($requestpacket->getParams());
         }
+    }
+
+    /**
+     * @return SessionHelper
+     */
+    public static function getSessionHelper(): SessionHelper
+    {
+        $session = self::$sessionHelper;
+        if (self::$sessionHelper === null) {
+            $session = new SessionHelper(self::SESSION_NAMESPACE);
+        }
+        return $session;
     }
 }

@@ -459,7 +459,7 @@
         "customer_order_partially_payable": false,
         "free_field_supported": false,
         "manufacturer_images_supported": true,
-        "needs_finish_call": false,
+        "needs_finish_call": true,
         "product_images_supported": true,
         "product_variation_value_images_supported": false,
         "set_articles_supported": false,

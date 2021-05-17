@@ -138,6 +138,7 @@ class ProductVariation extends BaseMapper
                 }
             }
 
+            $this->sessionHelper->deleteUnusedVariations = true;
             return $parent->getVariations();
         }
     }

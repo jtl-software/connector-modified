@@ -3,6 +3,7 @@ namespace jtl\Connector\Modified\Controller;
 
 use jtl\Connector\Core\Controller\Controller;
 use jtl\Connector\Core\Database\Mysql;
+use jtl\Connector\Modified\Modified;
 use jtl\Connector\Result\Action;
 use jtl\Connector\Core\Rpc\Error;
 use jtl\Connector\Model\Statistic;
@@ -10,14 +11,24 @@ use jtl\Connector\Core\Model\DataModel;
 use jtl\Connector\Core\Model\QueryFilter;
 use jtl\Connector\Core\Logger\Logger;
 use jtl\Connector\Formatter\ExceptionFormatter;
+use jtl\Connector\Session\SessionHelper;
 
 class BaseController extends Controller
 {
+    /**
+     * @var Mysql
+     */
     protected $db;
+
+    /**
+     * @var SessionHelper
+     */
+    protected $sessionHelper;
 
     public function __construct()
     {
         $this->db = Mysql::getInstance();
+        $this->sessionHelper = Modified::getSessionHelper();
     }
 
     public function pull(QueryFilter $queryfilter)

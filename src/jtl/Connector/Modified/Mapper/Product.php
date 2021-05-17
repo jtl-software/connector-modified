@@ -204,6 +204,7 @@ class Product extends BaseMapper
 
         if (count($data->getVariations()) > 0 && !$data->getIsMasterProduct() && $data->getMasterProductId()->getHost() !== 0) {
             $this->addVarCombiAsVariation($data, $masterId);
+            $this->sessionHelper->deleteUnusedVariations = true;
             return $data;
         }
 
