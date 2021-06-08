@@ -33,11 +33,6 @@
                 <include name="index.php"/>
             </fileset>
         </copy>
-        <copy todir="./dist/plugins">
-            <fileset dir="./plugins">
-                <include name=".htaccess"/>
-            </fileset>
-        </copy>
         <copy todir="./dist/tmp">
             <fileset dir="./tmp">
                 <include name=".htaccess"/>
