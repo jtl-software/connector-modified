@@ -1,3 +1,9 @@
+3.7.0
+-----
+- CO-987  Switched to importing payments only for already imported orders
+- CO-1083 Added support for sorting multi dimensional simple product variants
+- CO-1185 Fixed problem with duplicated product variants after renaming
+
 3.6.0
 -----
 - CO-1422 Fixed endpoint column type in checksum table
