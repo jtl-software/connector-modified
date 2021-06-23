@@ -4,6 +4,7 @@ namespace jtl\Connector\Modified;
 use jtl\Connector\Core\Rpc\RequestPacket;
 use jtl\Connector\Core\Utilities\RpcMethod;
 use jtl\Connector\Core\Database\Mysql;
+use jtl\Connector\Event\Product\ProductAfterPushEvent;
 use jtl\Connector\Session\SessionHelper;
 use jtl\Connector\Base\Connector as BaseConnector;
 use jtl\Connector\Core\Rpc\Method;
@@ -14,15 +15,20 @@ use jtl\Connector\Modified\Checksum\ChecksumLoader;
 
 class Modified extends BaseConnector
 {
+    public const
+        SESSION_NAMESPACE = 'modified';
+
+    /**
+     * @var SessionHelper|null
+     */
+    protected static $sessionHelper = null;
+
     protected $controller;
     protected $action;
 
     public function initialize()
     {
-        $session = new SessionHelper("modified");
-
-        $this->createFeaturesFile();
-
+        $session = self::getSessionHelper();
         if (!isset($session->shopConfig)) {
             $session->shopConfig = $this->readConfigFile();
         }
@@ -55,29 +61,6 @@ class Modified extends BaseConnector
         $this->setPrimaryKeyMapper(new PrimaryKeyMapper());
         $this->setTokenLoader(new TokenLoader());
         $this->setChecksumLoader(new ChecksumLoader());
-    }
-
-    /**
-     *
-     * @throws \Exception
-     */
-    protected function createFeaturesFile(): void
-    {
-        $featuresDir = CONNECTOR_DIR . '/config';
-        $featuresFile = sprintf('%s/features.json', $featuresDir);
-        $exampleFeaturesFile = sprintf('%s/features.json.example', $featuresDir);
-
-        if (!file_exists($featuresFile)) {
-            if(!file_exists($exampleFeaturesFile)){
-                throw new \Exception(sprintf('File "features.json.example" doesn\'t exist. Please check file path %s.', $featuresFile));
-            }
-
-            copy($exampleFeaturesFile, $featuresFile);
-
-            if(!file_exists($featuresFile)){
-                throw new \Exception(sprintf('File "features.json" doesn\'t exist. Please check file path %s.', $featuresFile));
-            }
-        }
     }
 
     private function readConfigFile()
@@ -203,5 +186,17 @@ class Modified extends BaseConnector
         } else {
             return $this->controller->{$this->action}($requestpacket->getParams());
         }
+    }
+
+    /**
+     * @return SessionHelper
+     */
+    public static function getSessionHelper(): SessionHelper
+    {
+        $session = self::$sessionHelper;
+        if (self::$sessionHelper === null) {
+            $session = new SessionHelper(self::SESSION_NAMESPACE);
+        }
+        return $session;
     }
 }

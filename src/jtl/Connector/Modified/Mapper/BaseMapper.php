@@ -2,6 +2,7 @@
 namespace jtl\Connector\Modified\Mapper;
 
 use jtl\Connector\Core\Database\Mysql;
+use jtl\Connector\Modified\Modified;
 use jtl\Connector\Session\SessionHelper;
 use jtl\Connector\Core\Utilities\Language;
 use jtl\Connector\Model\Identity;
@@ -15,14 +16,20 @@ class BaseMapper
     protected $type;
     protected $model;
 
+    /**
+     * @var SessionHelper
+     */
+    protected $sessionHelper;
+
     public function __construct()
     {
-        $session = new SessionHelper("modified");
+        $session = Modified::getSessionHelper();
         $reflect = new \ReflectionClass($this);
 
         $this->db = Mysql::getInstance();
         $this->shopConfig = $session->shopConfig;
         $this->connectorConfig = $session->connectorConfig;
+        $this->sessionHelper = $session;
         $this->model = "\\jtl\\Connector\\Model\\".$reflect->getShortName();
         $this->type = null;
     }
