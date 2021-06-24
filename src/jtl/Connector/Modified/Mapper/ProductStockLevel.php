@@ -11,7 +11,7 @@ class ProductStockLevel extends BaseMapper
         $stockLevel->setProductId($this->identity($data['products_id']));
         $stockLevel->setStockLevel(floatval($data['products_quantity']));
 
-        return array($stockLevel);
+        return [$stockLevel];
     }
     
     public function push(ProductStockLevelModel $stockLevel)

@@ -3,7 +3,7 @@ namespace jtl\Connector\Modified\Mapper;
 
 class Category extends \jtl\Connector\Modified\Mapper\BaseMapper
 {
-    protected $mapperConfig = array(
+    protected $mapperConfig = [
         "table" => "categories",
         "statisticsQuery" => "SELECT COUNT(c.categories_id) as total FROM categories c
             LEFT JOIN jtl_connector_link_category l ON c.categories_id = l.endpoint_id
@@ -13,7 +13,7 @@ class Category extends \jtl\Connector\Modified\Mapper\BaseMapper
             WHERE l.host_id IS NULL",
         "where" => "categories_id",
         "identity" => "getId",
-        "mapPull" => array(
+        "mapPull" => [
             "id" => "categories_id",
             "parentCategoryId" => null,
             "sort" => "sort_order",
@@ -21,8 +21,8 @@ class Category extends \jtl\Connector\Modified\Mapper\BaseMapper
             "i18ns" => "CategoryI18n|addI18n",
             "invisibilities" => "CategoryInvisibility|addInvisibility",
             "attributes" => "CategoryAttr|addAttribute",
-        ),
-        "mapPush" => array(
+        ],
+        "mapPush" => [
             "categories_id" => "id",
             "parent_id" => null,
             "categories_image" => null,
@@ -31,11 +31,11 @@ class Category extends \jtl\Connector\Modified\Mapper\BaseMapper
             "CategoryInvisibility|addInvisibility|true" => "invisibilities",
             "CategoryAttr|addAttribute|true" => "attributes",
             "last_modified" => null
-        )
-    );
+        ]
+    ];
 
-    private $tree = array();
-    private static $idCache = array();
+    private $tree = [];
+    private static $idCache = [];
 
     /**
      * @param $data
@@ -44,7 +44,7 @@ class Category extends \jtl\Connector\Modified\Mapper\BaseMapper
      */
     protected function categories_image($data)
     {
-        return $this->getDefaultColumnImageValue($data->getId()->getEndpoint(), $this->mapperConfig['table'], 'categories_image','categories_id');
+        return $this->getDefaultColumnImageValue($data->getId()->getEndpoint(), $this->mapperConfig['table'], 'categories_image', 'categories_id');
     }
 
     protected function last_modified($data)
@@ -66,7 +66,7 @@ class Category extends \jtl\Connector\Modified\Mapper\BaseMapper
 
     public function pull($parent = null, $limit = null)
     {
-        $this->tree = array();
+        $this->tree = [];
 
         $this->getChildren(null, 0, $limit);
 
@@ -75,7 +75,7 @@ class Category extends \jtl\Connector\Modified\Mapper\BaseMapper
         });
 
         $pulledQuery = $this->db->query('SELECT endpoint_id FROM jtl_connector_link_category');
-        $pulled = array();
+        $pulled = [];
 
         foreach ($pulledQuery as $pCat) {
             $pulled[] = $pCat['endpoint_id'];
@@ -132,7 +132,7 @@ class Category extends \jtl\Connector\Modified\Mapper\BaseMapper
             WHERE '.$sql);
 
         if (count($children) > 0) {
-            $ids = array();
+            $ids = [];
 
             foreach ($children as $child) {
                 $ids[] = $child['categories_id'];
@@ -156,8 +156,7 @@ class Category extends \jtl\Connector\Modified\Mapper\BaseMapper
                 $this->db->query('DELETE FROM products_to_categories WHERE categories_id='.$data->getId()->getEndpoint());
 
                 $this->db->query('DELETE FROM jtl_connector_link_category WHERE endpoint_id="'.$data->getId()->getEndpoint().'"');
-            }
-            catch(\Exception $e) {            
+            } catch (\Exception $e) {
             }
         }
 

@@ -4,13 +4,13 @@ namespace jtl\Connector\Modified\Mapper;
 
 class CustomerOrderItem extends BaseMapper
 {
-    protected $mapperConfig = array(
+    protected $mapperConfig = [
         "table" => "orders_products",
         "query" => "SELECT * FROM orders_products WHERE orders_id=[[orders_id]]",
         "where" => "orders_products_id",
         "getMethod" => "getItems",
         "identity" => "getId",
-        "mapPull" => array(
+        "mapPull" => [
             "id" => "orders_products_id",
             "productId" => null,
             "customerOrderId" => "orders_id",
@@ -21,8 +21,8 @@ class CustomerOrderItem extends BaseMapper
             "sku" => null,
             "variations" => "CustomerOrderItemVariation|addVariation",
             "type" => null
-        ),
-        "mapPush" => array(
+        ],
+        "mapPush" => [
             "orders_products_id" => "id",
             "products_id" => "productId",
             "orders_id" => null,
@@ -34,8 +34,8 @@ class CustomerOrderItem extends BaseMapper
             "allow_tax" => null,
             "final_price" => null,
             "CustomerOrderItemVariation|addVariation" => "variations"
-        )
-    );
+        ]
+    ];
 
     public function push($parent, $dbObj = null)
     {
@@ -94,7 +94,7 @@ class CustomerOrderItem extends BaseMapper
 
         foreach ($totals as $total) {
             $total->orders_id = $parent->getId()->getEndpoint();
-            $this->db->deleteInsertRow($total, 'orders_total', array('orders_id', 'class'), array($parent->getId()->getEndpoint(), $total->class));
+            $this->db->deleteInsertRow($total, 'orders_total', ['orders_id', 'class'], [$parent->getId()->getEndpoint(), $total->class]);
         }
 
         return $return;

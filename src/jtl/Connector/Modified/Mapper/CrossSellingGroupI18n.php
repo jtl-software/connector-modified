@@ -3,19 +3,19 @@ namespace jtl\Connector\Modified\Mapper;
 
 class CrossSellingGroupI18n extends BaseMapper
 {
-    protected $mapperConfig = array(
+    protected $mapperConfig = [
         "table" => "products_xsell_grp_name",
         "getMethod" => "getI18ns",
         "query" => "SELECT g.products_xsell_grp_name_id,g.groupname,l.code 
             FROM products_xsell_grp_name g 
             LEFT JOIN languages l ON l.languages_id=g.language_id 
             WHERE g.products_xsell_grp_name_id=[[products_xsell_grp_name_id]] && g.groupname != ''",
-        "mapPull" => array(
+        "mapPull" => [
             "crossSellingGroupId" => "products_xsell_grp_name_id",
             "name" => "groupname",
             "languageISO" => null
-        )
-    );
+        ]
+    ];
 
     public function push($data, $dbObj = null)
     {

@@ -39,7 +39,7 @@ class Connector extends Module
                 <label for="utf8" class="col-xs-2 control-label">UTF8 Konvertierung</label>
                 <div class="col-xs-10">
                     <select class="form-control" name="config[utf8]" id="utf8">
-                        <option value="0"'.($this->config->utf8 !== '0' ?: 'selected' ) .'>Deaktiviert</option>
+                        <option value="0"'.($this->config->utf8 !== '0' ?: 'selected') .'>Deaktiviert</option>
                         <option value="1"'.($this->config->utf8 !== '1' ?: 'selected') .'>Aktiviert</option>
                     </select>
                     <span id="helpBlock" class="help-block">

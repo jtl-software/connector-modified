@@ -6,13 +6,13 @@ $finder = PhpCsFixer\Finder::create()
     ->name('*.php')
 ;
 
-return PhpCsFixer\Config::create()
+return (new \PhpCsFixer\Config())
     ->setRiskyAllowed(true)
     ->setLineEnding("\n")
     ->setUsingCache(false)
     ->setRules([
-        //'@PSR2' => true,
-        //'array_syntax' => ['syntax' => 'short'],
+        '@PSR2' => true,
+        'array_syntax' => ['syntax' => 'short'],
         'encoding' => true,
     ])
     ->setFinder($finder)

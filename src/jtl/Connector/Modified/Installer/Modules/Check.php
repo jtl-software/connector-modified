@@ -10,74 +10,74 @@ class Check extends Module
     private $hasPassed = true;
     private $checkResults = null;
 
-    private static $checks = array(
-        'phpVersion' => array(
+    private static $checks = [
+        'phpVersion' => [
             'title' => 'PHP Version',
             'info' => 'PHP 7.1.3 oder neuer ist für den JTL Connector notwendig.',
             'ok' => 'Ihre version ist: %s',
             'fault' => 'Ihre Version ist: %s',
-        ),
-        'gdlib' => array(
+        ],
+        'gdlib' => [
             'title' => 'GDLib',
             'info' => 'Die PHP GDLib Extension wird benötigt um Thumbnails zu generieren.',
             'ok' => 'GDLib Extension ist verfügbar',
             'fault' => 'GDLib extension ist nicht verfügbar',
-        ),
-        'sqlite' => array(
+        ],
+        'sqlite' => [
             'title' => 'SQLite',
             'info' => 'Die PHP SQLite Extension wird für Session-Daten des Connectors benötigt.',
             'ok' => 'SQLite Extension ist verfügbar',
             'fault' => 'SQLite extension ist nicht verfügbar',
-        ),
-        'configFile' => array(
+        ],
+        'configFile' => [
             'title' => 'Connector Config Datei',
             'info' => 'Das config Verzeichnis oder die datei "%s" müssen beschreibar sein.',
             'ok' => 'Config beschreibbar',
             'fault' => 'Config nicht beschreibbar',
-        ),
-        'dbFile' => array(
+        ],
+        'dbFile' => [
             'title' => 'Connector SQLite Session Datenbank',
             'info' => 'Die Datenbank-Datei "%s" muss beschreibbar sein.',
             'ok' => 'Datenbank ist beschreibbar',
             'fault' => 'Datenbank ist nicht beschreibbar',
-        ),
-        'connectorLog' => array(
+        ],
+        'connectorLog' => [
             'title' => 'Connector Log-Verzeichnis',
             'info' => 'Das Log-Verzeichnis "%s" muss beschreibbar sein.',
             'ok' => 'Log-Verzeichnis ist beschreibbar',
             'fault' => 'Log-Verzeichnis nicht beschreibbar',
-        ),
-        'connectorTable' => array(
+        ],
+        'connectorTable' => [
             'title' => 'Mapping-Tabelle',
             'info' => 'Die Mapping-Tabelle muss in der Shop-Datenbank verfügbar sein.',
             'ok' => 'Tabelle wurde erstellt',
             'fault' => 'Fehler beim erstellen',
-        ),
-        'checksumTable' => array(
+        ],
+        'checksumTable' => [
             'title' => 'Checksum-Tabelle',
             'info' => 'Die Checksum-Tabelle muss in der Shop-Datenbank verfügbar sein.',
             'ok' => 'Tabelle wurde erstellt',
             'fault' => 'Fehler beim erstellen',
-        ),
-        'paymentTable' => array(
+        ],
+        'paymentTable' => [
             'title' => 'Zahlungs-Tabelle',
             'info' => 'Die Zahlungs-Tabelle muss in der Shop-Datenbank verfügbar sein.',
             'ok' => 'Tabelle wurde erstellt',
             'fault' => 'Fehler beim erstellen',
-        ),
-        'additionalImages' => array(
+        ],
+        'additionalImages' => [
             'title' => 'Zusätzliche Produkt-Bilder',
             'info' => 'Um diese Funktion zu nutzen müssen zusätzliche Produkt-Bilder in der <a href="%sadmin/configuration.php?gID=4">modified Konfiguration</a> eingestellt werden.',
             'ok' => '%s zusätzliche Bilder',
             'fault' => 'Zusätzliche Bilder deaktiviert',
-        ),
-        'groups' => array(
+        ],
+        'groups' => [
             'title' => 'Kundengruppen-Sichtbarkeiten',
             'info' => 'Das Zusatz-Modul "Kundengruppencheck" muss in der <a href="%sadmin/configuration.php?gID=17">modified Konfiguration</a> eingestellt sein.',
             'ok' => 'Modul aktiviert',
             'fault' => 'Modul deaktiviert',
-        )
-    );
+        ]
+    ];
 
     public function __construct($db, $config, $shopConfig)
     {
@@ -112,17 +112,17 @@ class Check extends Module
 
     private function phpVersion()
     {
-        return array((version_compare(PHP_VERSION, '7.1.3') >= 0),array(PHP_VERSION));
+        return [(version_compare(PHP_VERSION, '7.1.3') >= 0),[PHP_VERSION]];
     }
 
     private function gdlib()
     {
-        return array((extension_loaded('gd') && function_exists('gd_info')));
+        return [(extension_loaded('gd') && function_exists('gd_info'))];
     }
 
     private function sqlite()
     {
-        return array((extension_loaded('sqlite3')));
+        return [(extension_loaded('sqlite3'))];
     }
 
     private function configFile()
@@ -132,7 +132,7 @@ class Check extends Module
             $path = $path.'/config.json';
         }
 
-        return array(is_writable($path), array($path));
+        return [is_writable($path), [$path]];
     }
 
     private function dbFile()
@@ -146,12 +146,12 @@ class Check extends Module
     {
         $path = CONNECTOR_DIR.'/logs';
 
-        return array(is_writable($path), array($path));
+        return [is_writable($path), [$path]];
     }
 
     private function connectorTable()
     {
-        $types = array(
+        $types = [
             1 => 'category',
             2 => 'customer',
             4 => 'customer_order',
@@ -162,7 +162,7 @@ class Check extends Module
             512 => 'payment',
             1024 => 'crossselling',
             2048 => 'crossselling_group'
-        );
+        ];
 
         $queryInt = 'CREATE TABLE IF NOT EXISTS %s (
           endpoint_id INT(20) NOT NULL,
@@ -178,7 +178,7 @@ class Check extends Module
           INDEX (host_id)          
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci';
 
-        foreach($types as $id => $name) {
+        foreach ($types as $id => $name) {
             if ($id == 16 || $id == 64) {
                 $this->db->query(sprintf($queryChar, 'jtl_connector_link_'.$name));
             } else {
@@ -186,7 +186,7 @@ class Check extends Module
             }
         }
 
-        return array(true);
+        return [true];
     }
 
     private function checksumTable()
@@ -204,13 +204,13 @@ class Check extends Module
             try {
                 $this->db->query($sql);
 
-                return array(true);
+                return [true];
             } catch (\Exception $e) {
-                return array(false);
+                return [false];
             }
         }
 
-        return array(true);
+        return [true];
     }
 
     private function paymentTable()
@@ -232,13 +232,13 @@ class Check extends Module
             try {
                 $this->db->query($sql);
 
-                return array(true);
+                return [true];
             } catch (\Exception $e) {
-                return array(false);
+                return [false];
             }
         }
 
-        return array(true);
+        return [true];
     }
 
     private function additionalImages()
@@ -247,7 +247,7 @@ class Check extends Module
 
         static::$checks['additionalImages']['info'] = sprintf(static::$checks['additionalImages']['info'], $this->shopConfig['shop']['fullUrl']);
 
-        return array(intval($additionalImages[0]['configuration_value']) > 0, $additionalImages[0]['configuration_value']);
+        return [intval($additionalImages[0]['configuration_value']) > 0, $additionalImages[0]['configuration_value']];
     }
 
     private function groups()
@@ -256,7 +256,7 @@ class Check extends Module
 
         static::$checks['groups']['info'] = sprintf(static::$checks['groups']['info'], $this->shopConfig['shop']['fullUrl']);
 
-        return array($groups[0]['configuration_value'] == 'true');
+        return [$groups[0]['configuration_value'] == 'true'];
     }
 
     public function save()

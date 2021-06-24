@@ -97,7 +97,7 @@ class BaseMapper
 
                     if ($type == "DateTime" && !is_null($value)) {
                         $value = new \DateTime($value);
-                        if ((int)$value->format("Y") <= 0){
+                        if ((int)$value->format("Y") <= 0) {
                             $value = null;
                         }
                     } else {
@@ -128,7 +128,7 @@ class BaseMapper
     {
         $return = [];
         if (!is_array($data)) {
-            $data = array($data);
+            $data = [$data];
         }
 
         foreach ($data as $obj) {
@@ -229,12 +229,12 @@ class BaseMapper
                 if (!empty($checkEmpty)) {
                     if (isset($this->mapperConfig['identity'])) {
                         $currentId = $obj->{$this->mapperConfig['identity']}()->getEndpoint();
-                    }                    
+                    }
 
                     if (!empty($currentId)) {
                         $insertResult = $this->db->updateRow($dbObj, $this->mapperConfig['table'], $whereKey, $whereValue);
                         $insertResult->setKey($currentId);
-                    } else {                    
+                    } else {
                         $insertResult = $this->db->deleteInsertRow($dbObj, $this->mapperConfig['table'], $whereKey, $whereValue);
                     }
 
@@ -264,7 +264,7 @@ class BaseMapper
 
                     $values = $subMapper->push($obj);
 
-                    if(!is_null($values) && is_array($values)) {
+                    if (!is_null($values) && is_array($values)) {
                         foreach ($values as $setObj) {
                             $model->$navSetMethod($setObj);
                         }
@@ -313,7 +313,7 @@ class BaseMapper
 
         $dbResult = $this->db->query($query);
 
-        $return = array();
+        $return = [];
 
         foreach ($dbResult as $data) {
             $return[] = $this->generateModel($data);
@@ -365,8 +365,10 @@ class BaseMapper
             $result = $this->db->query($this->mapperConfig['query']);
             return count($result);
         } else {
-            $objs = $this->db->query("SELECT count(*) as count FROM {$this->mapperConfig['table']} LIMIT 1",
-                array("return" => "object"));
+            $objs = $this->db->query(
+                "SELECT count(*) as count FROM {$this->mapperConfig['table']} LIMIT 1",
+                ["return" => "object"]
+            );
         }
 
         return $objs !== null ? intval($objs[0]->count) : 0;

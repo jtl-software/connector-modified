@@ -3,7 +3,7 @@ namespace jtl\Connector\Modified\Mapper;
 
 class Payment extends \jtl\Connector\Modified\Mapper\BaseMapper
 {
-    protected $mapperConfig = array(
+    protected $mapperConfig = [
         "table" => "jtl_connector_payment",
         "query" => "SELECT p.* FROM jtl_connector_payment p
             LEFT JOIN jtl_connector_link_payment l ON p.id = l.endpoint_id
@@ -11,7 +11,7 @@ class Payment extends \jtl\Connector\Modified\Mapper\BaseMapper
             WHERE l.host_id IS NULL AND o.endpoint_id IS NOT NULL",
         "where" => "id",
         "identity" => "getId",
-        "mapPull" => array(
+        "mapPull" => [
             "id" => "id",
             "customerOrderId" => "customerOrderId",
             "billingInfo" => "billingInfo",
@@ -19,6 +19,6 @@ class Payment extends \jtl\Connector\Modified\Mapper\BaseMapper
             "totalSum" => "totalSum",
             "transactionId" => "transactionId",
             "paymentModuleCode" => "paymentModuleCode"
-        )
-    );
+        ]
+    ];
 }

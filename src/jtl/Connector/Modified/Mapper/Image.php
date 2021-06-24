@@ -192,8 +192,12 @@ class Image extends BaseMapper
                             $imgObj->image_name = $imgFileName;
                             $imgObj->image_nr = ($data->getSort() - 1);
 
-                            $newIdQuery = $this->db->deleteInsertRow($imgObj, 'products_images',
-                                ['image_nr', 'products_id'], [$imgObj->image_nr, $imgObj->products_id]);
+                            $newIdQuery = $this->db->deleteInsertRow(
+                                $imgObj,
+                                'products_images',
+                                ['image_nr', 'products_id'],
+                                [$imgObj->image_nr, $imgObj->products_id]
+                            );
                             $newId = $newIdQuery->getKey();
 
                             $this->db->query('DELETE FROM jtl_connector_link_image WHERE host_id=' . $data->getId()->getHost());

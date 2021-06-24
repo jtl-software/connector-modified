@@ -8,24 +8,23 @@ use jtl\Connector\Linker\ChecksumLinker;
 
 class ProductVariation extends BaseMapper
 {
-    protected $mapperConfig = array(
+    protected $mapperConfig = [
         "table" => "products_options",
         "query" => 'SELECT * FROM products_attributes WHERE products_id=[[products_id]] GROUP BY options_id',
         "where" => "options_id",
         "getMethod" => "getVariationCombinations",
-        "mapPull" => array(
+        "mapPull" => [
             "id" => "options_id",
             "productId" => "products_id",
             "sort" => "sort_order",
             "i18ns" => "ProductVariationI18n|addI18n",
             "values" => "ProductVariationValue|addValue"
-        )
-    );
+        ]
+    ];
 
     public function push($parent, $dbObj = null)
     {
         if (count($parent->getVariations()) > 0 && !$parent->getIsMasterProduct() && $parent->getMasterProductId()->getHost() === 0) {
-
             $checksum = ChecksumLinker::find($parent, 1);
 
             if ($checksum === null || $checksum->hasChanged() === true) {
@@ -62,7 +61,7 @@ class ProductVariation extends BaseMapper
                         $varObj->products_options_name = $i18n->getName();
                         $varObj->products_options_sortorder = $variation->getSort();
 
-                        $this->db->deleteInsertRow($varObj, 'products_options', array('products_options_id', 'language_id'), array($variationId, $varObj->language_id));
+                        $this->db->deleteInsertRow($varObj, 'products_options', ['products_options_id', 'language_id'], [$variationId, $varObj->language_id]);
                     }
 
                     // VariationValues
@@ -94,7 +93,7 @@ class ProductVariation extends BaseMapper
                             $valueObj->products_options_values_name = $i18n->getName();
                             $valueObj->products_options_values_sortorder = $value->getSort();
 
-                            $this->db->deleteInsertRow($valueObj, 'products_options_values', array('products_options_values_id', 'language_id'), array($valueId, $valueObj->language_id));
+                            $this->db->deleteInsertRow($valueObj, 'products_options_values', ['products_options_values_id', 'language_id'], [$valueId, $valueObj->language_id]);
                         }
 
                         // insert/update values to variation mapping
@@ -102,8 +101,12 @@ class ProductVariation extends BaseMapper
                         $val2varObj->products_options_id = $variationId;
                         $val2varObj->products_options_values_id = $valueId;
 
-                        $this->db->deleteInsertRow($val2varObj, 'products_options_values_to_products_options', array('products_options_id', 'products_options_values_id'),
-                            array($variationId, $valueId));
+                        $this->db->deleteInsertRow(
+                            $val2varObj,
+                            'products_options_values_to_products_options',
+                            ['products_options_id', 'products_options_values_id'],
+                            [$variationId, $valueId]
+                        );
 
                         // insert/update product variation
                         $pVarObj = new \stdClass();

@@ -7,7 +7,7 @@ class CustomerGroupAttr extends BaseMapper
 {
     public function pull($data = null, $limit = null)
     {
-        $attrs = array();
+        $attrs = [];
 
         if (isset($data['customers_status_min_order']) && !is_null($data['customers_status_min_order'])) {
             $min = new CustomerGroupAttrModel();
