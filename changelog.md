@@ -1,6 +1,7 @@
 3.7.1
 -----
 - Fixed update procedure
+- Fixed product endpoint creation on pull
 
 3.7.0
 -----
