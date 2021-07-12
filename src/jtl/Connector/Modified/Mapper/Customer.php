@@ -5,7 +5,7 @@ use \jtl\Connector\Core\Utilities\Country;
 
 class Customer extends BaseMapper
 {
-    protected $mapperConfig = array(
+    protected $mapperConfig = [
         "table" => "customers",
         "statisticsQuery" => "SELECT COUNT(c.customers_id) as total FROM customers c
             LEFT JOIN address_book a ON c.customers_default_address_id = a.address_book_id
@@ -21,7 +21,7 @@ class Customer extends BaseMapper
             ORDER BY c.customers_date_added",
         "where" => "customers_id",
         "identity" => "getId",
-        "mapPull" => array(
+        "mapPull" => [
             "id" => "customers_id",
             "customerGroupId" => "customers_status",
             "customerNumber" => "customers_cid",
@@ -34,16 +34,17 @@ class Customer extends BaseMapper
             "extraAddressLine" => "entry_suburb",
             "zipCode" => "entry_postcode",
             "city" => "entry_city",
-            "countryIso" => null,
+            "countryIso" => "countries_iso_code_2",
             "languageISO" => null,
             "phone" => "customers_telephone",
             "fax" => "customers_fax",
             "eMail" => "customers_email_address",
             "vatNumber" => "customers_vat_id",
             "hasNewsletterSubscription" => null,
-            "creationDate" => "customers_date_added"
-        ),
-        "mapPush" => array(
+            "creationDate" => "customers_date_added",
+            "hasCustomerAccount" => null
+        ],
+        "mapPush" => [
             "customers_id" => "id",
             "customers_status" => "customerGroupId",
             "customers_cid" => "customerNumber",
@@ -58,9 +59,18 @@ class Customer extends BaseMapper
             "customers_newsletter" => "hasNewsletterSubscription",
             "customers_date_added" => "creationDate",
             "customers_password" => null
-        )
-    );
-    
+        ]
+    ];
+
+    /**
+     * @param $data
+     * @return bool
+     */
+    protected function hasCustomerAccount($data)
+    {
+        return !$data["account_type"];
+    }
+
     protected function salutation($data)
     {
         if ($data['customers_gender'] == 'm') {
@@ -84,11 +94,6 @@ class Customer extends BaseMapper
         if (!empty($data['countries_iso_code_2'])) {
             return $this->fullLocale(strtolower($data['countries_iso_code_2']));
         }
-    }
-
-    protected function countryIso($data)
-    {
-        return Country::map(strtolower($data['countries_iso_code_2']));
     }
 
     protected function hasNewsletterSubscription($data)
@@ -163,10 +168,9 @@ class Customer extends BaseMapper
             $this->db->query('DELETE FROM customers WHERE customers_id='.$data->getId()->getEndpoint());
             $this->db->query('DELETE FROM address_book WHERE customers_id='.$data->getId()->getEndpoint());
             $this->db->query('DELETE FROM customers_info WHERE customers_info_id='.$data->getId()->getEndpoint());
-    		
-    		$this->db->query('DELETE FROM jtl_connector_link_customer WHERE endpoint_id='.$data->getId()->getEndpoint());
-        }
-        catch(\Exception $e) {            
+            
+            $this->db->query('DELETE FROM jtl_connector_link_customer WHERE endpoint_id='.$data->getId()->getEndpoint());
+        } catch (\Exception $e) {
         }
 
         return $data;

@@ -32,13 +32,16 @@ class PrimaryKeyMapper implements IPrimaryKeyMapper
     public function getHostId($endpointId, $type)
     {
         if (isset(static::$types[$type])) {
-            
             $dbResult = $this->db->query("SELECT host_id FROM jtl_connector_link_" . static::$types[$type] . " WHERE endpoint_id = '" . $endpointId . "'");
             
             $host_id = (count($dbResult) > 0) ? $dbResult[0]['host_id'] : null;
             
-            Logger::write(sprintf('Trying to get host_id with endpoint_id (%s) and type (%s) ... host_id: (%s)',
-                $endpointId, $type, $host_id), Logger::DEBUG, 'linker');
+            Logger::write(sprintf(
+                'Trying to get host_id with endpoint_id (%s) and type (%s) ... host_id: (%s)',
+                $endpointId,
+                $type,
+                $host_id
+            ), Logger::DEBUG, 'linker');
             
             return $host_id;
         }
@@ -51,8 +54,12 @@ class PrimaryKeyMapper implements IPrimaryKeyMapper
             
             $endpoint_id = (count($dbResult) > 0) ? $dbResult[0]['endpoint_id'] : null;
             
-            Logger::write(sprintf('Trying to get endpoint_id with host_id (%s) and type (%s) ... endpoint_id: (%s)',
-                $hostId, $type, $endpoint_id), Logger::DEBUG, 'linker');
+            Logger::write(sprintf(
+                'Trying to get endpoint_id with host_id (%s) and type (%s) ... endpoint_id: (%s)',
+                $hostId,
+                $type,
+                $endpoint_id
+            ), Logger::DEBUG, 'linker');
             
             return $endpoint_id;
         }
@@ -61,8 +68,12 @@ class PrimaryKeyMapper implements IPrimaryKeyMapper
     public function save($endpointId, $hostId, $type)
     {
         if (isset(static::$types[$type])) {
-            Logger::write(sprintf('Save link with endpoint_id (%s), host_id (%s) and type (%s)', $endpointId, $hostId,
-                $type), Logger::DEBUG, 'linker');
+            Logger::write(sprintf(
+                'Save link with endpoint_id (%s), host_id (%s) and type (%s)',
+                $endpointId,
+                $hostId,
+                $type
+            ), Logger::DEBUG, 'linker');
             
             $this->db->query("INSERT IGNORE INTO jtl_connector_link_" . static::$types[$type] . " (endpoint_id, host_id) VALUES ('" . $endpointId . "'," . $hostId . ")");
         }

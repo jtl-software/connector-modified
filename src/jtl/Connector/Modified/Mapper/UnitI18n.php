@@ -3,21 +3,21 @@ namespace jtl\Connector\Modified\Mapper;
 
 class UnitI18n extends BaseMapper
 {
-    protected $mapperConfig = array(
+    protected $mapperConfig = [
         "query" => "SELECT products_vpe.*,languages.code FROM products_vpe LEFT JOIN languages ON languages.languages_id=products_vpe.language_id WHERE products_vpe_id=[[products_vpe_id]]",
         "table" => "products_vpe",
         "getMethod" => "getI18ns",
-        "mapPull" => array(
+        "mapPull" => [
             "unitId" => "products_vpe_id",
             "languageISO" => null,
             "name" => null
-        ),
-        "mapPush" => array(
+        ],
+        "mapPush" => [
             "products_vpe_id" => "unitId",
             "language_id" => null,
-            "products_vpe_name" => "name"  
-        )
-    );
+            "products_vpe_name" => "name"
+        ]
+    ];
 
     public function push($data, $dbObj = null)
     {

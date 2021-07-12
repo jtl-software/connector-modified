@@ -6,15 +6,15 @@ use jtl\Connector\Model\Category as CategoryModel;
 
 class CategoryI18n extends BaseMapper
 {
-    protected $mapperConfig = array(
+    protected $mapperConfig = [
         "table" => "categories_description",
         "getMethod" => "getI18ns",
-        "where" => array("categories_id","language_id"),
+        "where" => ["categories_id","language_id"],
         "query" => "SELECT categories_description.*,languages.code
             FROM categories_description
             LEFT JOIN languages ON languages.languages_id=categories_description.language_id
             WHERE categories_description.categories_id=[[categories_id]]",
-        "mapPull" => array(
+        "mapPull" => [
             "languageISO" => null,
             "categoryId" => "categories_id",
             "name" => "categories_name",
@@ -22,8 +22,8 @@ class CategoryI18n extends BaseMapper
             "metaDescription" => "categories_meta_description",
             "metaKeywords" => "categories_meta_keywords",
             "titleTag" => "categories_meta_title"
-        ),
-        "mapPush" => array(
+        ],
+        "mapPush" => [
             "language_id" => null,
             "categories_id" => null,
             "categories_name" => "name",
@@ -32,8 +32,8 @@ class CategoryI18n extends BaseMapper
             "categories_meta_keywords" => "metaKeywords",
             "categories_meta_title" => "titleTag",
             "categories_heading_title" => "name"
-        )
-    );
+        ]
+    ];
 
     protected function languageISO($data)
     {

@@ -13,7 +13,7 @@
 
         <copy todir="./dist/config">
             <fileset dir="./config">
-                <include name="features.json"/>
+                <include name="features.json.example"/>
                 <include name=".htaccess"/>
             </fileset>
         </copy>
@@ -31,11 +31,6 @@
         <copy todir="./dist/install">
             <fileset dir="./install">
                 <include name="index.php"/>
-            </fileset>
-        </copy>
-        <copy todir="./dist/plugins">
-            <fileset dir="./plugins">
-                <include name=".htaccess"/>
             </fileset>
         </copy>
         <copy todir="./dist/tmp">

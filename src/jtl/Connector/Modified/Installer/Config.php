@@ -9,11 +9,10 @@ class Config
 
     public function __construct($file)
     {
-        try{
+        try {
             $this->data = \Noodlehaus\Config::load($file)->all();
         } catch (FileNotFoundException $e) {
             $this->data = [];
-            $this->data['use_var_combi_logic'] = false;
         }
     }
 

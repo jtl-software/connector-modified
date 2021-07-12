@@ -1,10 +1,13 @@
 vendor/**
 composer.lock
 config/config.json
+config/features.json
 logs/**
 build/**
 dist/**
-db/connector.s3db
+plugins/**
+db/connector.s3db*
 db/version
 .idea/**
 jtl-connector-modified-*.zip
+install/logs.zip

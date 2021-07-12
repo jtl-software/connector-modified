@@ -1,10 +1,11 @@
 <?php
-
 namespace jtl\Connector\Modified;
 
 use jtl\Connector\Core\Rpc\RequestPacket;
 use jtl\Connector\Core\Utilities\RpcMethod;
 use jtl\Connector\Core\Database\Mysql;
+use jtl\Connector\Event\Product\ProductAfterPushEvent;
+use jtl\Connector\Session\SessionHelper;
 use jtl\Connector\Base\Connector as BaseConnector;
 use jtl\Connector\Core\Rpc\Method;
 use jtl\Connector\Modified\Mapper\PrimaryKeyMapper;
@@ -14,6 +15,14 @@ use jtl\Connector\Modified\Checksum\ChecksumLoader;
 
 class Modified extends BaseConnector
 {
+    public const
+        SESSION_NAMESPACE = 'modified';
+
+    /**
+     * @var SessionHelper|null
+     */
+    protected static $sessionHelper = null;
+
     protected $controller;
     protected $action;
 
@@ -22,31 +31,33 @@ class Modified extends BaseConnector
 
     public function initialize()
     {
-        if (!isset($this->shopConfig)) {
-            $this->shopConfig = $this->readConfigFile();
+        $session = self::getSessionHelper();
+        if (!isset($session->shopConfig)) {
+            $session->shopConfig = $this->readConfigFile();
         }
-        if (!isset($this->connectorConfig)) {
-            $this->connectorConfig = json_decode(@file_get_contents(CONNECTOR_DIR . '/config/config.json'));
+
+        if (!isset($session->connectorConfig)) {
+            $session->connectorConfig = json_decode(@file_get_contents(CONNECTOR_DIR.'/config/config.json'));
         }
 
         $db = Mysql::getInstance();
 
         if (!$db->isConnected()) {
             $db->connect([
-                "host" => $this->shopConfig['db']["host"],
-                "user" => $this->shopConfig['db']["user"],
-                "password" => $this->shopConfig['db']["pass"],
-                "name" => $this->shopConfig['db']["name"]
+                "host" => $session->shopConfig['db']["host"],
+                "user" => $session->shopConfig['db']["user"],
+                "password" => $session->shopConfig['db']["pass"],
+                "name" => $session->shopConfig['db']["name"]
             ]);
         }
 
-        if (isset($this->connectorConfig->utf8) && $this->connectorConfig->utf8 !== '0') {
+        if (isset($session->connectorConfig->utf8) && $session->connectorConfig->utf8 !== '0') {
             $db->setNames();
             $db->setCharset();
         }
 
-        if (!isset($this->shopConfig['settings'])) {
-            $this->shopConfig += $this->readConfigDb($db);
+        if (!isset($session->shopConfig['settings'])) {
+            $session->shopConfig += $this->readConfigDb($db);
         }
 
         $this->update($db);
@@ -55,7 +66,6 @@ class Modified extends BaseConnector
         $this->setTokenLoader(new TokenLoader());
         $this->setChecksumLoader(new ChecksumLoader());
     }
-
 
     private function readConfigFile()
     {
@@ -93,7 +103,11 @@ class Modified extends BaseConnector
         ];
     }
 
-    private function readConfigDb($db)
+    /**
+     * @param Mysql $db
+     * @return array[]
+     */
+    private function readConfigDb(Mysql $db): array
     {
         $configDb = $db->query("SElECT configuration_key,configuration_value FROM configuration");
 
@@ -108,16 +122,25 @@ class Modified extends BaseConnector
         ];
     }
 
-    private function update($db)
+    /**
+     * @param Mysql $db
+     */
+    private function update(Mysql $db): void
     {
-        if (version_compare(file_get_contents(CONNECTOR_DIR . '/db/version'), CONNECTOR_VERSION) == -1) {
-            foreach (new \DirectoryIterator(CONNECTOR_DIR . '/db/updates') as $updateFile) {
-                if ($updateFile->isDot()) {
-                    continue;
+        if (version_compare(file_get_contents(CONNECTOR_DIR.'/db/version'), CONNECTOR_VERSION) == -1) {
+            $versions = [];
+            foreach (new \DirectoryIterator(CONNECTOR_DIR.'/db/updates') as $item) {
+                if ($item->isFile()) {
+                    $versions[] = $item->getBasename('.php');
                 }
+            }
 
-                if (version_compare(file_get_contents(CONNECTOR_DIR . '/db/version'), $updateFile->getBasename('.php')) == -1) {
-                    include(CONNECTOR_DIR . '/db/updates/' . $updateFile);
+            sort($versions);
+
+            foreach ($versions as $version) {
+                if (version_compare(file_get_contents(CONNECTOR_DIR.'/db/version'), $version) == -1) {
+                    include(CONNECTOR_DIR.'/db/updates/' . $version . '.php');
+                    file_put_contents(CONNECTOR_DIR.'/db/version', $version);
                 }
             }
         }
@@ -159,6 +182,11 @@ class Modified extends BaseConnector
         return false;
     }
 
+    /**
+     * @param RequestPacket $requestpacket
+     * @return Action
+     * @throws \Exception
+     */
     public function handle(RequestPacket $requestpacket)
     {
         $this->controller->setMethod($this->getMethod());
@@ -187,5 +215,17 @@ class Modified extends BaseConnector
         } else {
             return $this->controller->{$this->action}($requestpacket->getParams());
         }
+    }
+
+    /**
+     * @return SessionHelper
+     */
+    public static function getSessionHelper(): SessionHelper
+    {
+        $session = self::$sessionHelper;
+        if (self::$sessionHelper === null) {
+            $session = new SessionHelper(self::SESSION_NAMESPACE);
+        }
+        return $session;
     }
 }

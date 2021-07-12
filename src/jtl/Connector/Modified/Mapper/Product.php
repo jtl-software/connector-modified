@@ -8,11 +8,13 @@ use jtl\Connector\Model\ProductVariationI18n;
 use jtl\Connector\Model\ProductVariation;
 use jtl\Connector\Model\ProductVariationValue;
 use jtl\Connector\Model\ProductVariationValueI18n;
+use jtl\Connector\Model\ProductPrice as ProductPriceModel;
+use jtl\Connector\Model\ProductPriceItem as ProductPriceItemModel;
 
 class Product extends BaseMapper
 {
     private static $idCache = [];
-    
+
     protected $mapperConfig = [
         "table"    => "products",
         "query"    => "SELECT p.* FROM products p
@@ -78,56 +80,58 @@ class Product extends BaseMapper
             "products_price"                           => null,
         ],
     ];
-    
+
     public function pull($data = null, $limit = null)
     {
         $productResult = parent::pull($data, $limit);
-        
+
         foreach ($productResult as $parent) {
-            
+
             /** @var \jtl\Connector\Model\Product $parent */
             if ($parent->getIsMasterProduct()) {
-
                 $masterVariations = [];
 
                 $dbResult = (new \jtl\Connector\Modified\Mapper\ProductVariationValue($this->db, $this->shopConfig, $this->connectorConfig))
                     ->pull(['products_id' => $parent->getId()->getEndpoint()], $limit);
 
                 foreach ($dbResult as $varCombi) {
-    
                     $varCombiAttr = $this->db->query(
-                        sprintf("SELECT * FROM products_attributes WHERE options_values_id = %s AND products_id = %s",
-                            $varCombi->getId()->getEndpoint(), $parent->getId()->getEndpoint()
+                        sprintf(
+                            "SELECT * FROM products_attributes WHERE options_values_id = %s AND products_id = %s",
+                            $varCombi->getId()->getEndpoint(),
+                            $parent->getId()->getEndpoint()
                         )
                     );
-    
+
                     if (isset($varCombiAttr[0])) {
-                    
                         $productVariationI18ns = $this->db->query(
-                            sprintf("SELECT * FROM products_options WHERE products_options_id = %s",
+                            sprintf(
+                                "SELECT * FROM products_options WHERE products_options_id = %s",
                                 $varCombiAttr[0]['options_id']
                             )
                         );
-        
+
                         $productVariationValueI18ns = $this->db->query(
-                            sprintf("SELECT * FROM products_options_values WHERE products_options_values_id = %s",
+                            sprintf(
+                                "SELECT * FROM products_options_values WHERE products_options_values_id = %s",
                                 $varCombiAttr[0]['options_values_id']
                             )
                         );
-                        
+
                         $varCombiProduct = clone $parent;
-                        $varCombiProduct->setId(new Identity($parent->getId()->getEndpoint().'_'.$varCombiAttr[0]['products_attributes_id']));
-                        $varCombiProduct->setMasterProductId($parent->getId());
-                        $varCombiProduct->setIsMasterProduct(false);
-                        $varCombiProduct->setConsiderStock(true);
-                        $varCombiProduct->setIsActive(true);
-                        $varCombiProduct->setSku($varCombiAttr[0]['attributes_model']);
-                        
+                        $varCombiProduct
+                            ->setId(new Identity(Product::createProductEndpoint($parent->getId()->getEndpoint(), $varCombiAttr[0]['options_values_id'])))
+                            ->setMasterProductId($parent->getId())
+                            ->setIsMasterProduct(false)
+                            ->setConsiderStock(true)
+                            ->setIsActive(true)
+                            ->setSku($varCombiAttr[0]['attributes_model'] !== '' ? $varCombiAttr[0]['attributes_model'] : sprintf('%s-%s', $parent->getSku(), $varCombiAttr[0]['options_values_id']));
+
                         $stock = new \jtl\Connector\Model\ProductStockLevel();
                         $stock->setStockLevel($varCombi->getStockLevel());
                         $stock->setProductId($varCombi->getId());
                         $varCombiProduct->setStockLevel($stock);
-                        
+
                         $i18ns = [];
                         foreach ($productVariationValueI18ns as $i18n) {
                             $productI18n = new \jtl\Connector\Model\ProductI18n();
@@ -143,9 +147,9 @@ class Product extends BaseMapper
                         $variation = new ProductVariation();
                         $variation->setId(new Identity($variationId, null));
                         $variation->setSort($varCombi->getSort());
-                        $variation->setType("select");
+                        $variation->setType('select');
 
-                        if(!isset($masterVariations[$variationId])){
+                        if (!isset($masterVariations[$variationId])) {
                             $masterVariations[$variationId] = $variation;
                         }
 
@@ -158,14 +162,14 @@ class Product extends BaseMapper
                             $variationI18ns[] = $productVariationI18n;
                         }
                         $variation->setI18ns($variationI18ns);
-                        
+
                         $value = new ProductVariationValue();
                         $value->setId($varCombi->getId());
                         $value->setExtraWeight($varCombiAttr[0]['weight_prefix'] == "+" ? (float)$varCombiAttr[0]['options_values_weight'] : (float)$varCombiAttr[0]['options_values_weight'] * -1);
                         $value->setSort($varCombi->getSort());
                         $value->setStockLevel($varCombi->getStockLevel());
                         $value->setEan($varCombiAttr[0]['attributes_ean']);
-    
+
                         $i18ns = [];
                         foreach ($productVariationValueI18ns as $i18n) {
                             $productI18n = new ProductVariationValueI18n();
@@ -180,9 +184,9 @@ class Product extends BaseMapper
                         $value->setI18ns($i18ns);
                         $variation->setValues([$value]);
                         $variation->setProductId($varCombiProduct->getId());
-                        
+
                         $varCombiProduct->setVariations([$variation]);
-                        
+
                         $productResult[] = $varCombiProduct;
                     }
                 }
@@ -190,32 +194,26 @@ class Product extends BaseMapper
                 $parent->setVariations($masterVariations);
             }
         }
-        
+
         return $productResult;
     }
-    
+
     public function push($data, $dbObj = null)
     {
-        $useVarKombis = $this->connectorConfig->use_var_combi_logic;
-        
         if (isset(static::$idCache[$data->getMasterProductId()->getHost()]['parentId'])) {
             $data->getMasterProductId()->setEndpoint(static::$idCache[$data->getMasterProductId()->getHost()]['parentId']);
         }
-        
+
         $masterId = $data->getMasterProductId()->getEndpoint();
-        $hostMasterId = $data->getMasterProductId()->getHost();
-        $variations = $data->getVariations();
-        
-        if (!empty($masterId) && $useVarKombis) {
+
+        if (count($data->getVariations()) > 0 && !$data->getIsMasterProduct() && $data->getMasterProductId()->getHost() !== 0) {
             $this->addVarCombiAsVariation($data, $masterId);
-            
+            $this->sessionHelper->deleteUnusedVariations = true;
             return $data;
-        } elseif ( ((!empty($hostMasterId) || $data->getIsMasterProduct()) && !$useVarKombis) || ($useVarKombis && !empty($variations) && !$data->getIsMasterProduct())){
-            return null;
         }
-        
+
         $id = $data->getId()->getEndpoint();
-        
+
         if (!empty($id)) {
             foreach ($this->getCustomerGroups() as $group) {
                 $this->db
@@ -225,24 +223,24 @@ class Product extends BaseMapper
                         . ' WHERE products_id=' . $id
                     );
             }
-            
+
             $this->db->query('DELETE FROM specials WHERE products_id=' . $id);
         }
-        
+
         $savedProduct = parent::push($data, $dbObj);
-    
+
         static::$idCache[$data->getId()->getHost()]['parentId'] = $savedProduct->getId()->getEndpoint();
-        
+
         return $savedProduct;
     }
-    
+
     public function delete($data)
     {
         $id = $data->getId()->getEndpoint();
-        
+
         if (!empty($id) && $id != '') {
             try {
-                if (Product::isVarCombi($id)){
+                if (Product::isVariationChild($id)) {
                     $this->db->query('DELETE FROM products_attributes WHERE options_values_id=' . Product::extractOptionValueId($id));
                     $this->db->query('DELETE FROM products_options_values WHERE products_options_values_id=' . Product::extractOptionValueId($id));
                     $this->db->query('DELETE FROM products_options_values_to_products_options WHERE products_options_values_id=' . Product::extractOptionValueId($id));
@@ -263,68 +261,68 @@ class Product extends BaseMapper
                     $this->db->query('DELETE FROM products_attributes WHERE products_id=' . $id);
                     $this->db->query('DELETE FROM products_xsell WHERE products_id=' . $id . ' OR xsell_id=' . $id);
                     $this->db->query('DELETE FROM specials WHERE products_id=' . $id);
-    
+
                     foreach ($this->getCustomerGroups() as $group) {
                         $this->db->query('DELETE FROM personal_offers_by_customers_status_' . $group['customers_status_id'] . ' WHERE products_id=' . $id);
                     }
-    
+
                     $this->db->query('DELETE FROM jtl_connector_link_product WHERE endpoint_id="' . $id . '"');
                 }
             } catch (\Exception $e) {
             }
         }
-        
+
         return $data;
     }
-    
+
     public function statistic()
     {
-        $objs = $this->db->query("
-          SELECT count(p.products_id) as count
-          FROM products p
-          LEFT JOIN jtl_connector_link_product l ON p.products_id = l.endpoint_id
-          WHERE l.host_id IS NULL LIMIT 1
-        ", ["return" => "object"]);
-        
+        $sql = 'SELECT count(p.products_id) as count 
+                FROM products p 
+                LEFT JOIN jtl_connector_link_product l ON p.products_id = l.endpoint_id 
+                WHERE l.host_id IS NULL LIMIT 1';
+
+        $objs = $this->db->query($sql, ["return" => "object"]);
+
         if (isset($objs[0])) {
             $objs = (int)$objs[0]->count;
         } else {
             Logger::write('No objects were found');
         }
-        
-        $combis = $this->db->query("
-          SELECT count(a.products_attributes_id) as count
-          FROM products_attributes a
-          LEFT JOIN jtl_connector_link_product l ON a.products_attributes_id = l.endpoint_id
-          WHERE l.host_id IS NULL LIMIT 1
-        ", ["return" => "object"]);
-        
+
+        $sql = 'SELECT count(a.products_attributes_id) as count 
+                FROM products p
+                LEFT JOIN products_attributes a ON p.products_id = a.products_id
+                WHERE CONCAT(a.products_id, \'_\', a.options_values_id) NOT IN (SELECT l.endpoint_id FROM jtl_connector_link_product l WHERE LOCATE(\'_\', l.endpoint_id) > 0)';
+
+        $combis = $this->db->query($sql, ["return" => "object"]);
+
         if (isset($combis[0])) {
             $objs += (int)$combis[0]->count;
         } else {
             Logger::write('No varCobis were found');
         }
-        
+
         return $objs;
     }
-    
+
     protected function considerBasePrice($data)
     {
         return $data['products_vpe_status'] == 1 ? true : false;
     }
-    
+
     protected function products_vpe($data)
     {
         $name = $data->getBasePriceUnitCode();
-        if($data->getBasePriceQuantity() !== 1.){
+        if ($data->getBasePriceQuantity() !== 1.) {
             $name = sprintf("%s %s", $data->getBasePriceQuantity(), $data->getBasePriceUnitCode());
         }
-        
+
         if (!empty($name)) {
             foreach ($data->getI18ns() as $i18n) {
                 $language_id = $this->locale2id($i18n->getLanguageISO());
                 $dbResult = $this->db->query('SELECT code FROM languages WHERE languages_id=' . $language_id);
-                
+
                 if ($dbResult[0]['code'] == $this->shopConfig['settings']['DEFAULT_LANGUAGE']) {
                     $sql = $this->db->query('SELECT products_vpe_id FROM products_vpe WHERE language_id=' . $language_id . ' && products_vpe_name="' . $name . '"');
                     if (count($sql) > 0) {
@@ -332,35 +330,39 @@ class Product extends BaseMapper
                     } else {
                         $nextId = $this->db->query('SELECT max(products_vpe_id) + 1 AS nextID FROM products_vpe');
                         $id = is_null($nextId[0]['nextID']) || $nextId[0]['nextID'] === 0 ? 1 : $nextId[0]['nextID'];
-                        
+
                         foreach ($data->getI18ns() as $i18n) {
                             $status = new \stdClass();
                             $status->products_vpe_id = $id;
                             $status->language_id = $this->locale2id($i18n->getLanguageISO());
                             $status->products_vpe_name = $name;
-                            
-                            $this->db->deleteInsertRow($status, 'products_vpe', ['products_vpe_id', 'language_id'],
-                                [$status->product_vpe_id, $status->language_id]);
+
+                            $this->db->deleteInsertRow(
+                                $status,
+                                'products_vpe',
+                                ['products_vpe_id', 'language_id'],
+                                [$status->product_vpe_id, $status->language_id]
+                            );
                         }
-                        
+
                         return $id;
                     }
                 }
             }
         }
-        
+
         return 0;
     }
-    
+
     protected function products_shippingtime($data)
     {
         foreach ($data->getI18ns() as $i18n) {
             $name = $i18n->getDeliveryStatus();
-            
+
             if (!empty($name)) {
                 $language_id = $this->locale2id($i18n->getLanguageISO());
                 $dbResult = $this->db->query('SELECT code FROM languages WHERE languages_id=' . $language_id);
-                
+
                 if ($dbResult[0]['code'] == $this->shopConfig['settings']['DEFAULT_LANGUAGE']) {
                     $sql = $this->db->query('SELECT shipping_status_id FROM shipping_status WHERE language_id=' . $language_id . ' && shipping_status_name="' . $name . '"');
                     if (count($sql) > 0) {
@@ -368,124 +370,126 @@ class Product extends BaseMapper
                     } else {
                         $nextId = $this->db->query('SELECT max(shipping_status_id) + 1 AS nextID FROM shipping_status');
                         $id = is_null($nextId[0]['nextID']) || $nextId[0]['nextID'] === 0 ? 1 : $nextId[0]['nextID'];
-                        
+
                         foreach ($data->getI18ns() as $i18n) {
                             $status = new \stdClass();
                             $status->shipping_status_id = $id;
                             $status->language_id = $this->locale2id($i18n->getLanguageISO());
                             $status->shipping_status_name = $i18n->getDeliveryStatus();
-                            
-                            $this->db->deleteInsertRow($status, 'shipping_status',
+
+                            $this->db->deleteInsertRow(
+                                $status,
+                                'shipping_status',
                                 ['shipping_status_id', 'langauge_id'],
-                                [$status->shipping_status_id, $status->language_id]);
+                                [$status->shipping_status_id, $status->language_id]
+                            );
                         }
-                        
+
                         return $id;
                     }
                 }
             }
         }
-        
+
         return $this->shopConfig['settings']['DEFAULT_SHIPPING_STATUS_ID'];
     }
-    
+
     protected function products_vpe_status($data)
     {
         return $data->getConsiderBasePrice() == true ? 1 : 0;
     }
-    
+
     protected function products_image($data)
     {
         $id = $data->getId()->getEndpoint();
-        
+
         if (!empty($id)) {
             $img = $this->db->query('SELECT products_image FROM products WHERE products_id =' . $id);
             $img = $img[0]['products_image'];
-            
+
             if (isset($img)) {
                 return $img;
             }
         }
-        
+
         return '';
     }
-    
+
     protected function products_price($data)
     {
         return 999999;
     }
-    
+
     protected function manufacturerId($data)
     {
         return $this->replaceZero($data['manufacturers_id']);
     }
-    
+
     protected function unitId($data)
     {
         return $this->replaceZero($data['products_vpe']);
     }
-    
+
     protected function considerStock($data)
     {
         return true;
     }
-    
+
     protected function considerVariationStock($data)
     {
         $check = $this->db->query('SELECT products_id FROM products_attributes WHERE products_id=' . $data['products_id']);
-        
+
         return count($check) > 0 ? true : false;
     }
-    
+
     protected function permitNegativeStock($data)
     {
         return $this->shopConfig['settings']['STOCK_ALLOW_CHECKOUT'];
     }
-    
+
     protected function vat($data)
     {
         $sql = $this->db->query('SELECT r.tax_rate FROM zones_to_geo_zones z LEFT JOIN tax_rates r ON z.geo_zone_id=r.tax_zone_id WHERE z.zone_country_id = ' . $this->shopConfig['settings']['STORE_COUNTRY'] . ' && r.tax_class_id=' . $data['products_tax_class_id']);
-        
+
         if (empty($sql)) {
             $sql = $this->db->query('SELECT tax_rate FROM tax_rates WHERE tax_rates_id=' . $this->connectorConfig->tax_rate);
         }
-        
+
         return floatval($sql[0]['tax_rate']);
     }
-    
+
     protected function products_tax_class_id($data)
     {
         $sql = $this->db->query('SELECT r.tax_class_id FROM zones_to_geo_zones z LEFT JOIN tax_rates r ON z.geo_zone_id=r.tax_zone_id WHERE z.zone_country_id = ' . $this->shopConfig['settings']['STORE_COUNTRY'] . ' && r.tax_rate=' . $data->getVat());
-        
+
         if (empty($sql)) {
             $sql = $this->db->query('SELECT tax_class_id FROM tax_rates WHERE tax_rates_id=' . $this->connectorConfig->tax_rate);
         }
-        
+
         return $sql[0]['tax_class_id'];
     }
-    
+
     protected function products_quantity($data)
     {
         return round($data->getStockLevel()->getStockLevel());
     }
-    
+
     protected function isMasterProduct($data)
     {
         $childCount = $this->db->query("SELECT COUNT(*) AS cnt FROM products_attributes WHERE products_id = " . $data['products_id']);
         return (int)$childCount[0]['cnt'] > 0;
     }
-    
+
     protected function addVarCombiAsVariation($data, $masterId)
     {
-        foreach ($data->getVariations()[0]->getValues()[0]->getI18ns() as $variationI18n){
-            
+        foreach ($data->getVariations()[0]->getValues()[0]->getI18ns() as $variationI18n) {
             $i18nId = array_search($variationI18n, $data->getVariations()[0]->getValues()[0]->getI18ns());
             $langId = parent::locale2id($data->getVariations()[0]->getValues()[0]->getI18ns()[$i18nId]->getLanguageISO());
 
             $variationName = [];
             /** @var ProductVariation $variation */
             foreach ($data->getVariations() as $variation) {
-                foreach($variation->getI18ns() as $variationI18N){
+                foreach ($variation->getI18ns() as $variationI18N) {
                     if ($langId === parent::locale2id($variationI18N->getLanguageISO())) {
                         $variationName[] = $variationI18N->getName();
                     }
@@ -503,14 +507,21 @@ class Product extends BaseMapper
                 $maxId = $this->db->query("SELECT MAX(products_options_id) as maxId FROM products_options");
                 $maxId = isset($maxId[0]['maxId']) ? $maxId[0]['maxId'] + 1 : 1;
                 $this->db->query(
-                    sprintf("INSERT IGNORE INTO products_options (products_options_id, language_id, products_options_name, products_options_sortorder) VALUES (%s, %s, '%s', 0)", $maxId, $langId,
-                        $productsOptionName)
+                    sprintf(
+                        "INSERT IGNORE INTO products_options (products_options_id, language_id, products_options_name, products_options_sortorder) VALUES (%s, %s, '%s', 0)",
+                        $maxId,
+                        $langId,
+                        $productsOptionName
+                    )
                 );
                 $this->db->commit();
 
                 $id = $this->db->query(
-                    sprintf("SELECT products_options_id FROM products_options WHERE language_id = %s AND products_options_name = '%s' ORDER BY products_options_id DESC LIMIT 0,1", $langId,
-                        $productsOptionName)
+                    sprintf(
+                        "SELECT products_options_id FROM products_options WHERE language_id = %s AND products_options_name = '%s' ORDER BY products_options_id DESC LIMIT 0,1",
+                        $langId,
+                        $productsOptionName
+                    )
                 );
                 if (isset($id[0]["products_options_id"])) {
                     $id = ((int)$id[0]["products_options_id"]);
@@ -520,77 +531,86 @@ class Product extends BaseMapper
             }
 
 
-            if(isset(static::$idCache[$data->getId()->getHost()]['valuesId'])) {
-                $variationOptionId = static::$idCache[$data->getId()->getHost()]['valuesId'];
+            if (isset(static::$idCache[$data->getId()->getHost()]['valuesId'])) {
+                $optionsValuesId = static::$idCache[$data->getId()->getHost()]['valuesId'];
             } else {
-                $variationOptionId = (int)$this->db->query(
+                $optionsValuesId = (int)$this->db->query(
                     "SELECT products_options_values_id FROM products_options_values ORDER BY products_options_values_id DESC LIMIT 0,1"
                 )[0]["products_options_values_id"];
-                $variationOptionId = $variationOptionId >= 0 ? ($variationOptionId + 1) : 1;
+                $optionsValuesId = $optionsValuesId >= 0 ? ($optionsValuesId + 1) : 1;
             }
             $variationOptionName = "";
-    
+
             $i = 0;
             foreach ($data->getVariations() as $var) {
-                if(isset($var->getValues()[0]->getI18ns()[$i18nId])) {
+                if (isset($var->getValues()[0]->getI18ns()[$i18nId])) {
                     $variationOptionName .= $var->getValues()[0]->getI18ns()[$i18nId]->getName();
                 }
-                
+
                 if ($i < count($data->getVariations()) - 1 && count($data->getVariations()) > 1) {
                     $variationOptionName .= " | ";
                 }
                 $i++;
             }
-    
+
             $result = $this->db->query(
-                sprintf("SELECT * FROM jtl_connector_link_product WHERE host_id = %s",
+                sprintf(
+                    "SELECT * FROM jtl_connector_link_product WHERE host_id = %s",
                     $data->getId()->getHost()
                 )
             );
-    
+
             if (count($result) > 0) {
-                $variationOptionId = Product::extractOptionValueId($result[0]['endpoint_id']);
+                $optionsValuesId = Product::extractOptionValueId($result[0]['endpoint_id']);
             } else {
                 $this->db->query(
-                    sprintf("INSERT INTO jtl_connector_link_product (endpoint_id, host_id) VALUES ('%s', %s)",
-                        Product::createProductEndpoint($masterId, $variationOptionId), $data->getId()->getHost()
+                    sprintf(
+                        "INSERT INTO jtl_connector_link_product (endpoint_id, host_id) VALUES ('%s', %s)",
+                        Product::createProductEndpoint($masterId, $optionsValuesId),
+                        $data->getId()->getHost()
                     )
                 );
-                static::$idCache[$data->getId()->getHost()]['valuesId'] = $variationOptionId;
+                static::$idCache[$data->getId()->getHost()]['valuesId'] = $optionsValuesId;
             }
-            
+
             $variationValue = new \stdClass();
             $variationValue->products_options_values_name = $variationOptionName;
-            $variationValue->products_options_values_id = $variationOptionId;
+            $variationValue->products_options_values_id = $optionsValuesId;
             $variationValue->language_id = $langId;
-            
-            if (version_compare($this->shopConfig['db']['version'], '2.0.4', '>=')){
+
+            if (version_compare($this->shopConfig['db']['version'], '2.0.4', '>=')) {
                 $variationValue->products_options_values_sortorder = 0;
             }
-            
-            $this->db->deleteInsertRow($variationValue, 'products_options_values',
-                ['products_options_values_id', 'langauge_id'],
-                [$variationOptionId, $langId]);
-    
+
+            $this->db->deleteInsertRow(
+                $variationValue,
+                'products_options_values',
+                ['products_options_values_id', 'language_id'],
+                [$optionsValuesId, $langId]
+            );
+
             $price = $this->db->query("SELECT products_price FROM products WHERE products_id = " . $masterId);
-            if(!end($data->getPrices())->getItems()[0] || !isset($price[0]['products_price'])){
+            $jtlPriceItem = self::getDefaultPriceItem(...$data->getPrices());
+            if (is_null($jtlPriceItem) || !isset($price[0]['products_price'])) {
                 throw new \RuntimeException('The VarCombi price has not been set');
             }
-    
-            $price = (double)end($data->getPrices())->getItems()[0]->getNetPrice() - $price[0]['products_price'];
+
+            $price = $jtlPriceItem->getNetPrice() - (float)$price[0]['products_price'];
             if ($price >= 0) {
                 $pricePrefix = "+";
             } else {
                 $pricePrefix = "-";
                 $price = $price * -1;
             }
-            
+
             $result2 = $this->db->query(
-                sprintf("SELECT * FROM products_attributes WHERE options_values_id = %s AND products_id = %s" ,
-                    $variationOptionId, $masterId
+                sprintf(
+                    "SELECT * FROM products_attributes WHERE options_values_id = %s AND products_id = %s",
+                    $optionsValuesId,
+                    $masterId
                 )
             );
-    
+
             $sku = $data->getSku();
             $stock = $data->getStockLevel()->getStockLevel();
             $weight = $data->getProductWeight();
@@ -601,63 +621,109 @@ class Product extends BaseMapper
 
             if (count($result2) > 0) {
                 $this->db->query(
-                    sprintf("UPDATE products_attributes SET options_id = %s, options_values_price = %s, price_prefix = '%s', attributes_model = '%s', attributes_stock = %s, options_values_weight = %s, weight_prefix = '%s', sortorder = %s, attributes_ean = '%s', attributes_vpe_id = %s, attributes_vpe_value = %s WHERE options_values_id = %s AND products_id = %s",
-                        $id, (double)$price, $pricePrefix, $sku, $stock, $weight, $weightPrefix, $sort, empty($ean) ? '' : $ean, $vpe, $vpe, $variationOptionId, $masterId
+                    sprintf(
+                        "UPDATE products_attributes SET options_id = %s, options_values_price = %s, price_prefix = '%s', attributes_model = '%s', attributes_stock = %s, options_values_weight = %s, weight_prefix = '%s', sortorder = %s, attributes_ean = '%s', attributes_vpe_id = %s, attributes_vpe_value = %s WHERE options_values_id = %s AND products_id = %s",
+                        $id,
+                        (double)$price,
+                        $pricePrefix,
+                        $sku,
+                        $stock,
+                        $weight,
+                        $weightPrefix,
+                        $sort,
+                        empty($ean) ? '' : $ean,
+                        $vpe,
+                        $vpe,
+                        $optionsValuesId,
+                        $masterId
                     )
                 );
-        
             } else {
                 $this->db->query(
-                    sprintf("INSERT IGNORE INTO products_attributes (products_id, options_id, options_values_id, options_values_price, price_prefix, attributes_model, attributes_stock, options_values_weight, weight_prefix, sortorder, attributes_ean, attributes_vpe_id, attributes_vpe_value) VALUES (%s, %s, %s, %s, '%s', '%s', %s, %s, '%s', %s, '%s', %s, %s)",
-                        $masterId, $id, $variationOptionId, (double)$price, $pricePrefix, $sku, $stock, $weight, $weightPrefix, $sort, empty($ean) ? '' : $ean, $vpe, $vpe
+                    sprintf(
+                        "INSERT IGNORE INTO products_attributes (products_id, options_id, options_values_id, options_values_price, price_prefix, attributes_model, attributes_stock, options_values_weight, weight_prefix, sortorder, attributes_ean, attributes_vpe_id, attributes_vpe_value) VALUES (%s, %s, %s, %s, '%s', '%s', %s, %s, '%s', %s, '%s', %s, %s)",
+                        $masterId,
+                        $id,
+                        $optionsValuesId,
+                        (double)$price,
+                        $pricePrefix,
+                        $sku,
+                        $stock,
+                        $weight,
+                        $weightPrefix,
+                        $sort,
+                        empty($ean) ? '' : $ean,
+                        $vpe,
+                        $vpe
                     )
                 );
             }
-    
+
             $pivotTableResult = $this->db->query(
-                sprintf("SELECT * FROM products_options_values_to_products_options WHERE products_options_id = %s AND products_options_values_id = %s" ,
-                    $id, $variationOptionId
+                sprintf(
+                    "SELECT * FROM products_options_values_to_products_options WHERE products_options_id = %s AND products_options_values_id = %s",
+                    $id,
+                    $optionsValuesId
                 )
             );
-    
+
             if (count($pivotTableResult) == 0) {
                 $this->db->query(
-                    sprintf("INSERT IGNORE INTO products_options_values_to_products_options (products_options_id, products_options_values_id) VALUES (%s, %s)",
-                        $id, $variationOptionId
+                    sprintf(
+                        "INSERT IGNORE INTO products_options_values_to_products_options (products_options_id, products_options_values_id) VALUES (%s, %s)",
+                        $id,
+                        $optionsValuesId
                     )
                 );
             }
         }
     }
-    
-    public static function createProductEndpoint($parentId, $optionValueId)
+
+    /**
+     * @param ProductPriceModel ...$prices
+     * @return ProductPriceItemModel
+     */
+    public static function getDefaultPriceItem(ProductPriceModel ...$prices): ?ProductPriceItemModel
     {
-        return $parentId . "_" . $optionValueId;
+        foreach ($prices as $price) {
+            if ($price->getCustomerGroupId()->getHost() === 0 && $price->getCustomerId()->getHost() === 0) {
+                foreach ($price->getItems() as $priceItem) {
+                    if ($priceItem->getQuantity() === 0) {
+                        return $priceItem;
+                    }
+                }
+            }
+        }
+
+        return null;
     }
-    
+
+    public static function createProductEndpoint($parentId, $optionsValuesId)
+    {
+        return $parentId . "_" . $optionsValuesId;
+    }
+
     public static function extractParentId($endpoint)
     {
-        if (self::isVarCombi($endpoint)) {
+        if (self::isVariationChild($endpoint)) {
             $data = explode('_', (string)$endpoint);
             return $data[0];
-        } else
-        {
+        } else {
             return $endpoint;
         }
     }
-    
+
     public static function extractOptionValueId($endpoint)
     {
-        if (self::isVarCombi($endpoint)) {
+        if (self::isVariationChild($endpoint)) {
             $data = explode('_', (string)$endpoint);
             return $data[1];
-        }
-        else {
+        } else {
             throw new \Error($endpoint . ' is not a Valid VarKombi endpoint');
         }
     }
-    
-    public static function isVarCombi($endpoint)
+
+    public static function isVariationChild($endpoint)
     {
         $data = explode('_', (string)$endpoint);
         return isset($data[1]) ? true : false;

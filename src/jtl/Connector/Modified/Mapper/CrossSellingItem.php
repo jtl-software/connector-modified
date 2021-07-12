@@ -11,10 +11,10 @@ class CrossSellingItem extends BaseMapper
         $results = $this->db->query($query);
         
         foreach ($results as $xsell) {
-            $groups[$xsell['products_xsell_grp_name_id']][] = $this->identity($xsell['xsell_id']);    
+            $groups[$xsell['products_xsell_grp_name_id']][] = $this->identity($xsell['xsell_id']);
         }
         
-        $return = array();
+        $return = [];
 
         foreach ($groups as $group => $ids) {
             $item = new CrossSellingItemModel();

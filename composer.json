@@ -26,14 +26,24 @@
     ],
     "require": {
         "php": ">=7.2",
-        "jtl/connector": "^2.4.6",
+        "jtl/connector": "^3.1",
         "symfony/yaml": "^3.4",
         "phing/phing": "^2.16",
-        "jtl/connector-components-xtc": "dev-feature/CO-1308_base_mapper"
+        "jtl/connector-components-xtc": "dev-feature/CO-1308_base_mapper",
+        "nette/utils": "^3.1"
 	},
     "autoload": {
         "psr-0": {
             "jtl\\Connector\\Modified": "src/"
+        }
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^2.18",
+        "phpunit/phpunit": ">=7.0"
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Jtl\\Connector\\Modified\\Tests\\": "tests/src"
         }
     }
 }

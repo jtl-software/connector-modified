@@ -1,10 +1,9 @@
-﻿<?php
+<?php
 include('../index.php');
 
 use jtl\Connector\Modified\Installer\Installer;
 
-$installer = new Installer();
-
+$formData = (new Installer())->runAndGetFormData();
 ?>
 <!DOCTYPE html>
 <html lang="de">
@@ -32,7 +31,7 @@ $installer = new Installer();
         <br>
         <br>
         <?php
-        $errors = array();
+        $errors = [];
 
         if (!is_writable(sys_get_temp_dir())) {
             $errors[] = 'Das temporäre Verzeichnis "'.sys_get_temp_dir().'" ist nicht beschreibbar.';
@@ -43,7 +42,7 @@ $installer = new Installer();
         }
 
         if (extension_loaded('suhosin')) {
-            if (strpos(ini_get('suhosin.executor.include.whitelist'),'phar') === false) {
+            if (strpos(ini_get('suhosin.executor.include.whitelist'), 'phar') === false) {
                 $errors[] = 'Die PHP Extension Suhosin ist installiert, unterbindet jedoch die notwendige Verwendung von PHAR-Archiven.';
             }
         }
@@ -63,9 +62,7 @@ $installer = new Installer();
                 </div>
                 <div class="panel-body">
                     <form class="form-horizontal" role="form" method="post">
-                        <?php
-                            $installer->show();
-                        ?>
+                        <?php echo $formData; ?>
                     </form>
                 </div>
             </div>

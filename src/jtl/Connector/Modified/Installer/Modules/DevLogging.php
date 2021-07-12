@@ -10,8 +10,7 @@ class DevLogging extends Module
     
     public function form()
     {
-        $html = "";
-        $html .= '
+        $html = '
         <div>
         <div class="form-group">
             <label for="logging" class="col-xs-2 control-label">Developer Logging</label>
@@ -30,9 +29,9 @@ class DevLogging extends Module
             <div class="col-xs-6">
             ';
         
-        if (count(scandir($this->config->platform_root . '/jtlconnector/logs')) > 3){
+        if (count(scandir($this->config->platform_root . '/jtlconnector/logs')) > 3) {
             $html .= '<button formmethod="post" formaction="/jtlconnector/install/loggingConfig.php" name="clear" class="btn btn-default btn-sm btn-block">Clear</button>';
-        }else{
+        } else {
             $html .= '<div data-toggle="tooltip" data-placement="top" title="Es wurden keine Logs gefunden!">
                 <button disabled class="btn btn-default btn-sm btn-block">Clear</button>
             </div>';
@@ -44,9 +43,9 @@ class DevLogging extends Module
             <label for="download" class="col-xs-2 control-label">Logs herunterladen</label>
             <div class="col-xs-6">';
         
-        if (count(scandir($this->config->platform_root . '/jtlconnector/logs')) > 3){
+        if (count(scandir($this->config->platform_root . '/jtlconnector/logs')) > 3) {
             $html .='<button formmethod="post" formaction="/jtlconnector/install/loggingConfig.php" name="download" class="btn btn-default btn-sm btn-block">Download</button>';
-        }else{
+        } else {
             $html .= '<div data-toggle="tooltip" data-placement="top" title="Es wurden keine Logs gefunden!">
                 <button disabled class="btn btn-default btn-sm btn-block">Download</button>
             </div>';

@@ -3,18 +3,17 @@ namespace jtl\Connector\Modified\Installer;
 
 use jtl\Connector\Core\Database\Mysql;
 use jtl\Connector\Core\Exception\DatabaseException;
-use jtl\Connector\Modified\Installer\Config;
 
 class Installer
 {
-    private $modules = array(
+    private $modules = [
         'check' => 'Check',
         'connector' => 'Connector',
         'status' => 'Status',
         'thumbs' => 'ThumbMode',
         'tax_rate' => 'TaxRate',
         'dev_logging' => 'DevLogging'
-    );
+    ];
 
     /**
      * Installer constructor.
@@ -33,7 +32,7 @@ class Installer
     /**
      * @throws DatabaseException
      */
-    public function show()
+    public function runAndGetFormData()
     {
         $shopConfig = $this->readConfigFile();
         $connectorConfig = new Config(CONNECTOR_DIR.'/config/config.json');
@@ -41,12 +40,12 @@ class Installer
         $db = Mysql::getInstance();
 
         if (!$db->isConnected()) {
-            $db->connect(array(
+            $db->connect([
                 "host" => $shopConfig['db']["host"],
                 "user" => $shopConfig['db']["user"],
                 "password" => $shopConfig['db']["pass"],
                 "name" => $shopConfig['db']["name"],
-            ));
+            ]);
         }
 
         $db->setNames();
@@ -97,50 +96,50 @@ class Installer
             }
         }
 
+        $html = '';
         if ($moduleInstances['check']->hasPassed()) {
-            echo '<ul class="nav nav-tabs">';
+            $html .= '<ul class="nav nav-tabs">';
 
             foreach ($moduleInstances as $class => $instance) {
                 $active = $class == 'check' ? 'active' : '';
-                echo '<li class="'.$active.'"><a href="#'.$class.'" data-toggle="tab"><b>'.$instance::$name.'</b></a></li>';
+                $html .= '<li class="'.$active.'"><a href="#'.$class.'" data-toggle="tab"><b>'.$instance::$name.'</b></a></li>';
             }
 
-            echo '</ul>
+            $html .= '</ul>
 	        	<br>
 	        	<div class="tab-content">';
 
             foreach ($moduleInstances as $class => $instance) {
                 $active = $class == 'check' ? ' active' : '';
 
-                echo '<div class="tab-pane'.$active.'" id="'.$class.'">';
-                echo $instance->form();
-                echo '</div>';
+                $html .= '<div class="tab-pane'.$active.'" id="'.$class.'">';
+                $html .= $instance->form();
+                $html .= '</div>';
             }
             
-            if (isset($_SESSION['error']))
-            {
-                echo '<div class="alert alert-danger">Fehler beim Schreiben der config.json Datei.</div>';
+            if (isset($_SESSION['error'])) {
+                $html .= '<div class="alert alert-danger">Fehler beim Schreiben der config.json Datei.</div>';
                 unset($_SESSION['error']);
-            } elseif (isset($_SESSION['success']))
-            {
-                echo '<div class="alert alert-success">Connector Konfiguration wurde gespeichert.</div>';
-                echo '<div class="alert alert-danger"><b>ACHTUNG:</b><br/>
+            } elseif (isset($_SESSION['success'])) {
+                $html .= '<div class="alert alert-success">Connector Konfiguration wurde gespeichert.</div>';
+                $html .= '<div class="alert alert-danger"><b>ACHTUNG:</b><br/>
                             Bitte sorgen Sie nach erfolgreicher Installation des Connectors unbedingt dafür, dass dieser Installer
                             sowie die Datei config.json im Verzeichnis config nicht öffentlich les- und ausführbar sind!</div>';
                 unset($_SESSION['success']);
-            }elseif (isset($_SESSION['fail']))
-            {
+            } elseif (isset($_SESSION['fail'])) {
                 echo $_SESSION['fail'];
                 unset($_SESSION['fail']);
             }
-            
-            echo '</div>';
 
-            echo '<button type="submit" name="save" class="btn btn-primary btn-block"><span class="glyphicon glyphicon-save"></span> Connector Konfiguration speichern</button>';
+            $html .= '</div>';
+
+            $html .= '<button type="submit" name="save" class="btn btn-primary btn-block"><span class="glyphicon glyphicon-save"></span> Connector Konfiguration speichern</button>';
         } else {
-            echo '<div class="alert alert-danger">Bitte beheben Sie die angezeigten Fehler bevor Sie mit der Konfiguration fortfahren können.</div>';
-            echo $moduleInstances['check']->form();
+            $html .= '<div class="alert alert-danger">Bitte beheben Sie die angezeigten Fehler bevor Sie mit der Konfiguration fortfahren können.</div>';
+            $html .= $moduleInstances['check']->form();
         }
+
+        return $html;
     }
 
     /**
@@ -148,23 +147,23 @@ class Installer
      */
     private function readConfigFile()
     {
-        require_once realpath(CONNECTOR_DIR.'/../').'/includes/configure.php';
+        require_once dirname(CONNECTOR_DIR).'/includes/configure.php';
 
-        return array(
-            'shop' => array(
+        return [
+            'shop' => [
                 'url' => HTTP_SERVER,
                 'folder' => DIR_WS_CATALOG,
                 'fullUrl' => HTTP_SERVER.DIR_WS_CATALOG,
-            ),
-            'db' => array(
+            ],
+            'db' => [
                 'host' => DB_SERVER,
                 'name' => DB_DATABASE,
                 'user' => DB_SERVER_USERNAME,
                 'pass' => DB_SERVER_PASSWORD,
-            ),
-            'img' => array(
+            ],
+            'img' => [
                 'original' => DIR_WS_ORIGINAL_IMAGES,
-            )
-        );
+            ]
+        ];
     }
 }

@@ -2,17 +2,54 @@
 namespace jtl\Connector\Modified\Controller;
 
 use jtl\Connector\Model\ConnectorServerInfo;
+use jtl\Connector\Modified\Modified;
 use jtl\Connector\Result\Action;
 use jtl\Connector\Model\Statistic;
-use jtl\Connector\Core\Controller\Controller;
 use jtl\Connector\Core\Model\DataModel;
 use jtl\Connector\Core\Model\QueryFilter;
 use jtl\Connector\Model\ConnectorIdentification;
 use jtl\Connector\Session\SessionHelper;
 use Jtl\Connector\XtcComponents\AbstractBaseController;
 
+class Connector extends BaseController
 class Connector extends \jtl\Connector\Modified\Controller
 {
+    public function finish()
+    {
+        if ($this->sessionHelper->deleteUnusedVariations === true) {
+            $this->db->query('
+                DELETE FROM products_options_values
+                WHERE products_options_values_id IN (
+                    SELECT * FROM (
+                        SELECT v.products_options_values_id
+                        FROM products_options_values v
+                        LEFT JOIN products_attributes a ON v.products_options_values_id = a.options_values_id
+                        WHERE a.products_attributes_id IS NULL
+                        GROUP BY v.products_options_values_id
+                    ) relations
+                )
+            ');
+
+            $this->db->query('
+                DELETE FROM products_options
+                WHERE products_options_id IN (
+                    SELECT * FROM (
+                        SELECT o.products_options_id
+                        FROM products_options o
+                        LEFT JOIN products_attributes a ON o.products_options_id = a.options_id
+                        WHERE a.products_attributes_id IS NULL
+                        GROUP BY o.products_options_id
+                    ) relations
+                )
+            ');
+            $this->sessionHelper->deleteUnusedVariations = false;
+        }
+
+        return (new Action())
+            ->setHandled(true)
+            ->setResult(true);
+    }
+
     public function statistic(QueryFilter $filter)
     {
         $action = new Action();
@@ -20,7 +57,7 @@ class Connector extends \jtl\Connector\Modified\Controller
 
         $return = [];
 
-        $mainControllers = array(
+        $mainControllers = [
             'Category',
             'Customer',
             'CustomerOrder',
@@ -28,7 +65,7 @@ class Connector extends \jtl\Connector\Modified\Controller
             'Product',
             'Manufacturer',
             'CrossSelling'
-        );
+        ];
 
         foreach ($mainControllers as $controller) {
             $class = "\\jtl\\Connector\\Modified\\Mapper\\{$controller}";
@@ -74,7 +111,8 @@ class Connector extends \jtl\Connector\Modified\Controller
         $action = new Action();
         $action->setHandled(true);
 
-        $config = $this->connectorConfig;
+        $session = Modified::getSessionHelper();
+        $config = $session->connectorConfig;
 
         define('_VALID_XTC', true);
 
@@ -85,7 +123,7 @@ class Connector extends \jtl\Connector\Modified\Controller
             }
         }
 
-        $returnMegaBytes = function($value) {
+        $returnMegaBytes = function ($value) {
             $value = trim($value);
             $unit = strtolower($value[strlen($value) - 1]);
             switch ($unit) {

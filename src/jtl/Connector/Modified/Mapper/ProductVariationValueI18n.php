@@ -4,16 +4,16 @@ namespace jtl\Connector\Modified\Mapper;
 
 class ProductVariationValueI18n extends BaseMapper
 {
-    protected $mapperConfig = array(
+    protected $mapperConfig = [
         "table" => "products_options_values",
         "query" => 'SELECT * FROM products_options_values WHERE products_options_values_id=[[options_values_id]]',
         "getMethod" => "getI18ns",
-        "mapPull" => array(
+        "mapPull" => [
             "productVariationValueId"   => "products_options_values_id",
             "name"                      => "products_options_values_name",
             "languageISO"               => null
-        )
-    );
+        ]
+    ];
     
     protected function extraWeight($data)
     {

@@ -3,27 +3,27 @@ namespace jtl\Connector\Modified\Mapper;
 
 class ProductSpecialPrice extends BaseMapper
 {
-    protected $mapperConfig = array(
+    protected $mapperConfig = [
         "table" => "specials",
         "query" => "SELECT * FROM specials WHERE products_id=[[products_id]]",
         "getMethod" => "getSpecialPrices",
         "where" => "specials_id",
-        "mapPull" => array(
+        "mapPull" => [
             "id" => "specials_id",
             "productId" => "products_id",
             "isActive" => "status",
             "activeUntilDate" => null,
             "considerDateLimit" => null,
             "items" => "ProductSpecialPriceItem|addItem"
-        ),
-        "mapPush" => array(
+        ],
+        "mapPush" => [
             "specials_id" => "id",
             "products_id" => "productId",
             "status" => "isActive",
             "expires_date" => "activeUntilDate",
             "ProductSpecialPriceItem|addItem|true" => "items"
-        )
-    );
+        ]
+    ];
 
     protected function considerDateLimit($data)
     {

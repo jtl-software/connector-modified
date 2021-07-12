@@ -6,7 +6,7 @@ use jtl\Connector\Model\CustomerOrderItem;
 
 class CustomerOrder extends BaseMapper
 {
-    protected $mapperConfig = array(
+    protected $mapperConfig = [
         "table" => "orders",
         "statisticsQuery" => "SELECT COUNT(o.orders_id) as total FROM orders o
             LEFT JOIN jtl_connector_link_customer_order l ON o.orders_id = l.endpoint_id
@@ -16,7 +16,7 @@ class CustomerOrder extends BaseMapper
             WHERE l.host_id IS NULL",
         "where" => "orders_id",
         "identity" => "getId",
-        "mapPull" => array(
+        "mapPull" => [
             "id" => "orders_id",
             "orderNumber" => "orders_id",
             "customerId" => "customers_id",
@@ -30,9 +30,10 @@ class CustomerOrder extends BaseMapper
             "shippingMethodName" => "shipping_method",
             "items" => "CustomerOrderItem|addItem",
             "status" => null,
-            "paymentStatus" => null
-        ),
-        "mapPush" => array(
+            "paymentStatus" => null,
+            "paymentInfo" => 'CustomerOrderPaymentInfo|setPaymentInfo'
+        ],
+        "mapPush" => [
             "orders_id" => "id",
             "customers_id" => "customerId",
             "date_purchased" => "creationDate",
@@ -49,10 +50,10 @@ class CustomerOrder extends BaseMapper
             "shipping_class" => "shippingMethodId",
             "shipping_method" => "shippingMethodName",
             "CustomerOrderItem|addItem" => "items"
-        )
-    );
+        ]
+    ];
 
-    private $paymentMapping = array(
+    private $paymentMapping = [
         'cash' => 'pm_cash',
         'klarna_SpecCamp' => 'pm_klarna',
         'klarna_invoice' => 'pm_klarna',
@@ -74,14 +75,15 @@ class CustomerOrder extends BaseMapper
         'invoice' => 'pm_invoice',
         'pn_sofortueberweisung' => 'pm_sofort',
         'worldpay' => 'pm_worldpay'
-    );
+    ];
 
     public function __construct($db, $shopConfig, $connectorConfig)
     {
         parent::__construct($db, $shopConfig, $connectorConfig);
 
         if (!empty($this->connectorConfig->from_date)) {
-            $this->mapperConfig['query'] .= ' && date_purchased >= "' . $this->connectorConfig->from_date . '"';
+            $this->mapperConfig['query'] .= ' AND date_purchased >= "' . $this->connectorConfig->from_date . '"';
+            $this->mapperConfig['statisticsQuery'] .= ' AND date_purchased >= "' . $this->connectorConfig->from_date . '"';
         }
     }
 
@@ -215,12 +217,12 @@ class CustomerOrder extends BaseMapper
 
     public function clear($orderId)
     {
-        $queries = array(
+        $queries = [
             'DELETE FROM orders_total WHERE orders_id=' . $orderId,
             'DELETE FROM orders_products_attributes WHERE orders_id=' . $orderId,
             'DELETE FROM orders_products WHERE orders_id=' . $orderId,
             'DELETE FROM orders WHERE orders_id=' . $orderId
-        );
+        ];
 
         foreach ($queries as $query) {
             $this->db->query($query);
@@ -257,8 +259,9 @@ class CustomerOrder extends BaseMapper
                     $model->addItem($this->createShippingItem($total, $data));
                     $model->setShippingMethodName($total['title']);
                     break;
-                case 'ot_coupon':
+                case 'ot_grad_discount':
                 case 'ot_discount':
+                case 'ot_coupon':
                 case 'ot_gv':
                     $model->addItem($this->createOrderItem(CustomerOrderItem::TYPE_COUPON, $total, $data, 1, $defaultTaxRate));
                     break;

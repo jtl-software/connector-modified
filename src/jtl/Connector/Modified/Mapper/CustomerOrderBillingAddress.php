@@ -5,9 +5,9 @@ use jtl\Connector\Core\Utilities\Country;
 
 class CustomerOrderBillingAddress extends BaseMapper
 {
-    protected $mapperConfig = array(
+    protected $mapperConfig = [
         "getMethod" => "getBillingAddress",
-        "mapPull" => array(
+        "mapPull" => [
             "id" => null,
             "customerId" => "customers_id",
             "firstName" => "billing_firstname",
@@ -18,12 +18,12 @@ class CustomerOrderBillingAddress extends BaseMapper
             "zipCode" => "billing_postcode",
             "city" => "billing_city",
             "state" => "billing_state",
-            "countryIso" => null,
+            "countryIso" => "billing_country_iso_code_2",
             "eMail" => "customers_email_address",
             "phone" => "customers_telephone",
-			"vatNumber" => "customers_vat_id"
-        ),
-        "mapPush" => array(
+            "vatNumber" => "customers_vat_id"
+        ],
+        "mapPush" => [
             "customers_name" => null,
             "customers_lastname" => "lastName",
             "customers_firstname" => "firstName",
@@ -44,18 +44,13 @@ class CustomerOrderBillingAddress extends BaseMapper
             "billing_state" => "state",
             "billing_country_iso_code_2" => "countryIso",
             "customers_email_address" => "eMail",
-			"customers_vat_id" => "vatNumber"
-        )
-    );
-
-    protected function countryIso($data)
-    {
-        return Country::map(strtolower($data['billing_country_iso_code_2']));
-    }
+            "customers_vat_id" => "vatNumber"
+        ]
+    ];
 
     public function pull($data = null, $limit = null)
     {
-        return array($this->generateModel($data));
+        return [$this->generateModel($data)];
     }
 
     protected function id($data)

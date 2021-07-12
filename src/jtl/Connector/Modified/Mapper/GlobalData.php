@@ -3,8 +3,8 @@ namespace jtl\Connector\Modified\Mapper;
 
 class GlobalData extends \jtl\Connector\Modified\Mapper\BaseMapper
 {
-    protected $mapperConfig = array(
-        "mapPull" => array(
+    protected $mapperConfig = [
+        "mapPull" => [
             "languages" => "Language|addLanguage",
             "customerGroups" => "CustomerGroup|addCustomerGroup",
             "taxRates" => "TaxRate|addTaxRate",
@@ -12,14 +12,14 @@ class GlobalData extends \jtl\Connector\Modified\Mapper\BaseMapper
             "units" => "Unit|addUnit",
             "crossSellingGroups" => "CrossSellingGroup|addCrossSellingGroup",
             "shippingMethods" => "ShippingMethod|addShippingMethod"
-        ),
-        "mapPush" => array(
+        ],
+        "mapPush" => [
             "Currency|addCurrency" => "currencies",
             "Unit|addUnit" => "units",
             "CrossSellingGroup|addCrossSellingGroup" => "crossSellingGroups",
             "CustomerGroup|addCustomerGroup" => "customerGroups"
-        )
-    );
+        ]
+    ];
 
     public function pull($parentData = null, $limit = null)
     {

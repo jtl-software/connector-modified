@@ -1,3 +1,35 @@
+3.7.1
+-----
+- Fixed update procedure
+- Fixed product endpoint creation on pull
+- Fixed category push
+
+3.7.0
+-----
+- CO-987  Switched to importing payments only for already imported orders
+- CO-1083 Added support for sorting multi dimensional simple product variants
+- CO-1185 Fixed problem with duplicated product variants after renaming
+
+3.6.0
+-----
+- CO-1422 Fixed endpoint column type in checksum table
+- CO-1453 Added variation names to customer order item during pull
+- CO-1502 Added not overriding features.json on every updated
+- CO-1503 Fixed product image push
+
+3.5.0
+-----
+- CO-1369 Fixed country code in customer order
+- CO-1392 Added support for grad discount (ot_grad_discount) module
+- Fixed and improved installation/config procedure
+
+3.4.0
+-----
+- CO-1153 Added importing customers bank details in customer orders paid by direct debit
+- CO-1280 Added has customer account flag to customer import
+- CO-1300 Removed use_varcombi_logic flag. Connector can differentiate by its own if it is a simple or complex product variant
+- CO-1307 Fixed customer order statistics
+
 3.3.0
 -----
 - CO-1212 Fixed using variation names for variations

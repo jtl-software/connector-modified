@@ -4,15 +4,15 @@ namespace jtl\Connector\Modified\Mapper;
 
 class ProductVariationI18n extends BaseMapper
 {
-    protected $mapperConfig = array (
+    protected $mapperConfig = [
         "table"     => "products_options",
         "query"     => 'SELECT * FROM products_options WHERE products_options_id=[[options_id]]',
-        "mapPull"   => array (
+        "mapPull"   => [
             "productVariationId"    => "products_options_id",
             "name"                  => "products_options_name",
             "languageISO"           => null
-        )
-    );
+        ]
+    ];
     
     protected function languageISO($data)
     {

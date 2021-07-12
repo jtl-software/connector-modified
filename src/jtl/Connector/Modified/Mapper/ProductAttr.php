@@ -6,15 +6,16 @@ use jtl\Connector\Model\ProductAttrI18n as ProductAttrI18nModel;
 
 class ProductAttr extends BaseMapper
 {
-    private $additions = array(
+    private $additions = [
         'products_status' => 'Aktiv',
         'products_fsk18' => 'FSK 18',
         'product_template' => 'Produkt Vorlage',
         'options_template' => 'Optionen Vorlage'
-    );
+    ];
 
-    public function pull($data = null, $limit = null) {
-        $attrs = array();
+    public function pull($data = null, $limit = null)
+    {
+        $attrs = [];
 
         foreach ($this->additions as $field => $name) {
             $attrs[] = $this->createAttr($field, $name, $data[$field], $data);
@@ -23,7 +24,8 @@ class ProductAttr extends BaseMapper
         return $attrs;
     }
 
-    public function push($data, $dbObj = null) {
+    public function push($data, $dbObj = null)
+    {
         $dbObj->products_status = 1;
         $tableColumns = [];
         
@@ -35,14 +37,13 @@ class ProductAttr extends BaseMapper
         foreach ($data->getAttributes() as $attr) {
             $i18ns = $attr->getI18ns();
             $i18n = reset($i18ns);
-                $field = array_search($i18n->getName(), $this->additions);
-                if ($field) {
-                    $dbObj->$field = $i18n->getValue();
-                }
-                elseif(in_array($i18n->getName(), $tableColumns)){
-                    $fieldName = $i18n->getName();
-                    $dbObj->$fieldName = $i18n->getValue();
-                }
+            $field = array_search($i18n->getName(), $this->additions);
+            if ($field) {
+                $dbObj->$field = $i18n->getValue();
+            } elseif (in_array($i18n->getName(), $tableColumns)) {
+                $fieldName = $i18n->getName();
+                $dbObj->$fieldName = $i18n->getValue();
+            }
         }
 
         return $data->getAttributes();
