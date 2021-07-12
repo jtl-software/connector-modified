@@ -6,7 +6,7 @@ logs/**
 build/**
 dist/**
 plugins/**
-db/connector.s3db
+db/connector.s3db*
 db/version
 .idea/**
 jtl-connector-modified-*.zip
