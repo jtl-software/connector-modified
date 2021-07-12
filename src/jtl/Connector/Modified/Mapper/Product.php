@@ -473,7 +473,7 @@ class Product extends BaseMapper
             }
             if (count($product->getTaxRates()) > 0 && !is_null($product->getTaxClassId())) {
                 $taxClassId = $this->findTaxClassId(...$product->getTaxRates()) ?? $taxClassId[0]['tax_class_id'];
-                $model->getTaxClassId()->setEndpoint($taxClassId)->setHost($product->getTaxClassId()->getHost());
+//                $model->getTaxClassId()->setEndpoint($taxClassId)->setHost($product->getTaxClassId()->getHost());
             }
         }
 
