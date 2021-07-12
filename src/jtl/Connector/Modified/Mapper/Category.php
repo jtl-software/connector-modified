@@ -26,6 +26,8 @@ class Category extends \jtl\Connector\Modified\Mapper\BaseMapper
             "categories_id" => "id",
             "parent_id" => null,
             "categories_image" => null,
+            "categories_image_mobile" => null,
+            "categories_image_list" => null,
             "sort_order" => "sort",
             "CategoryI18n|addI18n" => "i18ns",
             "CategoryInvisibility|addInvisibility|true" => "invisibilities",
@@ -45,6 +47,26 @@ class Category extends \jtl\Connector\Modified\Mapper\BaseMapper
     protected function categories_image($data)
     {
         return $this->getDefaultColumnImageValue($data->getId()->getEndpoint(), $this->mapperConfig['table'], 'categories_image', 'categories_id');
+    }
+
+    /**
+     * @param $data
+     * @return string
+     * @throws \Exception
+     */
+    protected function categories_image_mobile($data)
+    {
+        return $this->categories_image($data);
+    }
+
+    /**
+     * @param $data
+     * @return string
+     * @throws \Exception
+     */
+    protected function categories_image_list($data)
+    {
+        return '';
     }
 
     protected function last_modified($data)

@@ -2,6 +2,7 @@
 -----
 - Fixed update procedure
 - Fixed product endpoint creation on pull
+- Fixed category push
 
 3.7.0
 -----
