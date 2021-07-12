@@ -42,6 +42,7 @@ class Product extends BaseMapper
             "considerStock"          => null,
             "considerVariationStock" => null,
             "permitNegativeStock"    => null,
+            "taxClassId"             => null,
             "i18ns"                  => "ProductI18n|addI18n",
             "categories"             => "Product2Category|addCategory",
             "prices"                 => "ProductPrice|addPrice",
@@ -456,7 +457,12 @@ class Product extends BaseMapper
         return floatval($sql[0]['tax_rate']);
     }
 
-    protected function products_tax_class_id(\jtl\Connector\Model\Product $product)
+    protected function taxClassId($data)
+    {
+        return $data['products_tax_class_id'];
+    }
+
+    protected function products_tax_class_id(\jtl\Connector\Model\Product $product, \jtl\Connector\Model\Product $model)
     {
         if (!is_null($product->getTaxClassId()) && !empty($product->getTaxClassId()->getEndpoint())) {
             $taxClassId = $product->getTaxClassId()->getEndpoint();
@@ -467,7 +473,7 @@ class Product extends BaseMapper
             }
             if (count($product->getTaxRates()) > 0 && !is_null($product->getTaxClassId())) {
                 $taxClassId = $this->findTaxClassId(...$product->getTaxRates()) ?? $taxClassId[0]['tax_class_id'];
-                $product->getTaxClassId()->setEndpoint($taxClassId);
+                $model->getTaxClassId()->setEndpoint($taxClassId)->setHost($product->getTaxClassId()->getHost());
             }
         }
 
