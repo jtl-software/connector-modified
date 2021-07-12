@@ -24,6 +24,7 @@ class Modified extends BaseConnector
     protected static $sessionHelper = null;
 
     protected $controller;
+
     protected $action;
 
     public function initialize()
@@ -32,6 +33,7 @@ class Modified extends BaseConnector
         if (!isset($session->shopConfig)) {
             $session->shopConfig = $this->readConfigFile();
         }
+        
         if (!isset($session->connectorConfig)) {
             $session->connectorConfig = json_decode(@file_get_contents(CONNECTOR_DIR.'/config/config.json'));
         }

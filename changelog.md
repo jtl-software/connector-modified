@@ -1,3 +1,7 @@
+3.7.1
+-----
+- Fixed update procedure
+
 3.7.0
 -----
 - CO-987  Switched to importing payments only for already imported orders
