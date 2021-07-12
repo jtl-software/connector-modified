@@ -3,10 +3,9 @@ $finder = PhpCsFixer\Finder::create()
     ->exclude(__DIR__ . '/vendor')
     ->in(__DIR__ . '/src')
     ->in(__DIR__ . '/install')
-    ->name('*.php')
-;
+    ->name('*.php');
 
-return (new \PhpCsFixer\Config())
+return (new PhpCsFixer\Config())
     ->setRiskyAllowed(true)
     ->setLineEnding("\n")
     ->setUsingCache(false)
@@ -15,5 +14,4 @@ return (new \PhpCsFixer\Config())
         'array_syntax' => ['syntax' => 'short'],
         'encoding' => true,
     ])
-    ->setFinder($finder)
-;
+    ->setFinder($finder);
