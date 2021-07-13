@@ -1,6 +1,7 @@
 <?php
 namespace jtl\Connector\Modified;
 
+use jtl\Connector\Core\Exception\DatabaseException;
 use jtl\Connector\Core\Rpc\RequestPacket;
 use jtl\Connector\Core\Utilities\RpcMethod;
 use jtl\Connector\Core\Database\Mysql;
@@ -23,44 +24,51 @@ class Modified extends BaseConnector
      */
     protected static $sessionHelper = null;
 
-    protected $controller;
-    protected $action;
+    /**
+     * @var null
+     */
+    protected $controller = null;
 
-    protected $shopConfig;
+    /**
+     * @var null
+     */
+    protected $action = null;
+
+    /**
+     * @var array
+     */
+    protected $shopConfig = [];
+
+    /**
+     * @var \stdClass
+     */
     protected $connectorConfig;
 
+    /**
+     * @throws DatabaseException
+     */
     public function initialize()
     {
-        $session = self::getSessionHelper();
-        if (!isset($session->shopConfig)) {
-            $session->shopConfig = $this->readConfigFile();
-        }
-
-        if (!isset($session->connectorConfig)) {
-            $session->connectorConfig = json_decode(@file_get_contents(CONNECTOR_DIR.'/config/config.json'));
-        }
-
-        $this->connectorConfig = $session->connectorConfig;
-        $this->shopConfig = $session->shopConfig;
+        $this->shopConfig = $this->readConfigFile();
+        $this->connectorConfig = json_decode(@file_get_contents(CONNECTOR_DIR.'/config/config.json'));
 
         $db = Mysql::getInstance();
-
         if (!$db->isConnected()) {
             $db->connect([
-                "host" => $session->shopConfig['db']["host"],
-                "user" => $session->shopConfig['db']["user"],
-                "password" => $session->shopConfig['db']["pass"],
-                "name" => $session->shopConfig['db']["name"]
+                "host" => $this->shopConfig['db']["host"],
+                "user" => $this->shopConfig['db']["user"],
+                "password" => $this->shopConfig['db']["pass"],
+                "name" => $this->shopConfig['db']["name"]
             ]);
         }
 
-        if (isset($session->connectorConfig->utf8) && $session->connectorConfig->utf8 !== '0') {
+        if (isset($this->connectorConfig->utf8) && $this->connectorConfig->utf8 !== '0') {
             $db->setNames();
             $db->setCharset();
         }
 
-        if (!isset($session->shopConfig['settings'])) {
-            $session->shopConfig += $this->readConfigDb($db);
+        if (!isset($this->shopConfig['settings'])) {
+            $this->shopConfig += $this->readConfigDb($db);
         }
 
         $this->update($db);
@@ -149,6 +157,10 @@ class Modified extends BaseConnector
         }
     }
 
+    /**
+     * @return bool
+     * @throws \Exception
+     */
     public function canHandle()
     {
         $controllers = [
@@ -167,10 +179,10 @@ class Modified extends BaseConnector
         ];
 
         $controllerName = RpcMethod::buildController($this->getMethod()->getController());
+        $db = Mysql::getInstance();
 
         $controllerClass = sprintf('jtl\\Connector\\Modified\\Controller\\%s', $controllerName);
-        $db = Mysql::getInstance();
-        $this->controller = null;
+
         if (class_exists($controllerClass)) {
             $this->controller = new $controllerClass($db, $this->shopConfig, $this->connectorConfig);
         } elseif (in_array($controllerName, $controllers, true)) {
@@ -201,20 +213,17 @@ class Modified extends BaseConnector
                 throw new \Exception('data is not an array');
             }
 
-            $action = new Action();
             $results = [];
-            $errors = [];
 
             foreach ($requestpacket->getParams() as $param) {
                 $result = $this->controller->{$this->action}($param);
                 $results[] = $result->getResult();
             }
 
-            $action->setHandled(true)
+            return (new Action())->setHandled(true)
                 ->setResult($results)
                 ->setError($result->getError());
 
-            return $action;
         } else {
             return $this->controller->{$this->action}($requestpacket->getParams());
         }
