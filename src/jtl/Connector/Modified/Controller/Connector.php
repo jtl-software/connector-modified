@@ -1,17 +1,20 @@
 <?php
 namespace jtl\Connector\Modified\Controller;
 
-use jtl\Connector\Core\Rpc\Error;
 use jtl\Connector\Model\ConnectorServerInfo;
 use jtl\Connector\Modified\Modified;
 use jtl\Connector\Result\Action;
-use jtl\Connector\Model\Statistic;
-use jtl\Connector\Core\Model\DataModel;
-use jtl\Connector\Core\Model\QueryFilter;
 use jtl\Connector\Model\ConnectorIdentification;
 
+/**
+ * Class Connector
+ * @package jtl\Connector\Modified\Controller
+ */
 class Connector extends AbstractController
 {
+    /**
+     * @return Action
+     */
     public function finish()
     {
         $sessionHelper = Modified::getSessionHelper();
@@ -49,62 +52,9 @@ class Connector extends AbstractController
             ->setResult(true);
     }
 
-    public function statistic(QueryFilter $filter)
-    {
-        $action = new Action();
-        $action->setHandled(true);
-
-        $return = [];
-
-        $mainControllers = [
-            'Category',
-            'Customer',
-            'CustomerOrder',
-            'Image',
-            'Product',
-            'Manufacturer',
-            'CrossSelling'
-        ];
-
-        foreach ($mainControllers as $controller) {
-            $class = "\\jtl\\Connector\\Modified\\Mapper\\{$controller}";
-
-            if (class_exists($class)) {
-                try {
-                    $mapper = new $class();
-
-                    $statModel = new Statistic();
-
-                    $statModel->setAvailable($mapper->statistic());
-                    $statModel->setControllerName(lcfirst($controller));
-
-                    $return[] = $statModel;
-                } catch (\Exception $exc) {
-                    $err = new Error();
-                    $err->setCode($exc->getCode());
-                    $err->setMessage($exc->getMessage());
-                    $action->setError($err);
-                }
-            }
-        }
-
-        $action->setResult($return);
-
-        return $action;
-    }
-
-    public function pull(QueryFilter $queryfilter)
-    {
-    }
-
-    public function push(DataModel $model)
-    {
-    }
-
-    public function delete(DataModel $model)
-    {
-    }
-
+    /**
+     * @return Action
+     */
     public function identify()
     {
         $action = new Action();
