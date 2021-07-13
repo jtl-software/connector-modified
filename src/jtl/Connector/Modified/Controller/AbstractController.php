@@ -1,12 +1,10 @@
 <?php
 
-
-namespace jtl\Connector\Modified;
-
+namespace jtl\Connector\Modified\Controller;
 
 use Jtl\Connector\XtcComponents\AbstractBaseController;
 
-class Controller extends AbstractBaseController
+abstract class AbstractController extends AbstractBaseController
 {
     /**
      * @return string

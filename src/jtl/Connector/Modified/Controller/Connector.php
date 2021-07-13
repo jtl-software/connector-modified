@@ -1,6 +1,7 @@
 <?php
 namespace jtl\Connector\Modified\Controller;
 
+use jtl\Connector\Core\Rpc\Error;
 use jtl\Connector\Model\ConnectorServerInfo;
 use jtl\Connector\Modified\Modified;
 use jtl\Connector\Result\Action;
@@ -8,15 +9,13 @@ use jtl\Connector\Model\Statistic;
 use jtl\Connector\Core\Model\DataModel;
 use jtl\Connector\Core\Model\QueryFilter;
 use jtl\Connector\Model\ConnectorIdentification;
-use jtl\Connector\Session\SessionHelper;
-use Jtl\Connector\XtcComponents\AbstractBaseController;
 
-class Connector extends BaseController
-class Connector extends \jtl\Connector\Modified\Controller
+class Connector extends AbstractController
 {
     public function finish()
     {
-        if ($this->sessionHelper->deleteUnusedVariations === true) {
+        $sessionHelper = Modified::getSessionHelper();
+        if ($sessionHelper->deleteUnusedVariations === true) {
             $this->db->query('
                 DELETE FROM products_options_values
                 WHERE products_options_values_id IN (
@@ -42,7 +41,7 @@ class Connector extends \jtl\Connector\Modified\Controller
                     ) relations
                 )
             ');
-            $this->sessionHelper->deleteUnusedVariations = false;
+            $sessionHelper->deleteUnusedVariations = false;
         }
 
         return (new Action())
@@ -111,14 +110,13 @@ class Connector extends \jtl\Connector\Modified\Controller
         $action = new Action();
         $action->setHandled(true);
 
-        $session = Modified::getSessionHelper();
-        $config = $session->connectorConfig;
+        $config = $this->connectorConfig;
 
         define('_VALID_XTC', true);
 
-        foreach (new \DirectoryIterator($config->platform_root) as $shoproot) {
-            if (!$shoproot->isDot() && $shoproot->isDir() && is_file($config->platform_root.'/'.$shoproot->getFilename().'/check_update.php')) {
-                include($config->platform_root.'/'.$shoproot->getFilename().'/includes/version.php');
+        foreach (new \DirectoryIterator($config->platform_root) as $shopRoot) {
+            if (!$shopRoot->isDot() && $shopRoot->isDir() && is_file($config->platform_root.'/'.$shopRoot->getFilename().'/check_update.php')) {
+                include($config->platform_root.'/'.$shopRoot->getFilename().'/includes/version.php');
                 break;
             }
         }

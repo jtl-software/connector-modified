@@ -5,6 +5,7 @@ namespace jtl\Connector\Modified\Mapper;
 use jtl\Connector\Core\Logger\Logger;
 use jtl\Connector\Formatter\ExceptionFormatter;
 use jtl\Connector\Linker\ChecksumLinker;
+use jtl\Connector\Modified\Modified;
 
 class ProductVariation extends BaseMapper
 {
@@ -142,7 +143,7 @@ class ProductVariation extends BaseMapper
                 }
             }
 
-            $this->sessionHelper->deleteUnusedVariations = true;
+            Modified::getSessionHelper()->deleteUnusedVariations = true;
             return $parent->getVariations();
         }
     }

@@ -4,7 +4,7 @@ namespace jtl\Connector\Modified;
 use jtl\Connector\Core\Rpc\RequestPacket;
 use jtl\Connector\Core\Utilities\RpcMethod;
 use jtl\Connector\Core\Database\Mysql;
-use jtl\Connector\Event\Product\ProductAfterPushEvent;
+use jtl\Connector\Modified\Controller\SharedController;
 use jtl\Connector\Session\SessionHelper;
 use jtl\Connector\Base\Connector as BaseConnector;
 use jtl\Connector\Core\Rpc\Method;
@@ -39,6 +39,9 @@ class Modified extends BaseConnector
         if (!isset($session->connectorConfig)) {
             $session->connectorConfig = json_decode(@file_get_contents(CONNECTOR_DIR.'/config/config.json'));
         }
+
+        $this->connectorConfig = $session->connectorConfig;
+        $this->shopConfig = $session->shopConfig;
 
         $db = Mysql::getInstance();
 
@@ -171,7 +174,7 @@ class Modified extends BaseConnector
         if (class_exists($controllerClass)) {
             $this->controller = new $controllerClass($db, $this->shopConfig, $this->connectorConfig);
         } elseif (in_array($controllerName, $controllers, true)) {
-            $this->controller = new Controller($db, $this->shopConfig, $this->connectorConfig, $controllerName);
+            $this->controller = new SharedController($db, $this->shopConfig, $this->connectorConfig, $controllerName);
         }
 
         if (!is_null($this->controller)) {

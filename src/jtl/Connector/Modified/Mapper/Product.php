@@ -10,6 +10,7 @@ use jtl\Connector\Model\ProductVariationValue;
 use jtl\Connector\Model\ProductVariationValueI18n;
 use jtl\Connector\Model\ProductPrice as ProductPriceModel;
 use jtl\Connector\Model\ProductPriceItem as ProductPriceItemModel;
+use jtl\Connector\Modified\Modified;
 
 class Product extends BaseMapper
 {
@@ -208,7 +209,7 @@ class Product extends BaseMapper
 
         if (count($data->getVariations()) > 0 && !$data->getIsMasterProduct() && $data->getMasterProductId()->getHost() !== 0) {
             $this->addVarCombiAsVariation($data, $masterId);
-            $this->sessionHelper->deleteUnusedVariations = true;
+            Modified::getSessionHelper()->deleteUnusedVariations = true;
             return $data;
         }
 
