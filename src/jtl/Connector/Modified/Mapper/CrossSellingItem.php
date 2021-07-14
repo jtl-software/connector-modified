@@ -3,7 +3,7 @@ namespace jtl\Connector\Modified\Mapper;
 
 use jtl\Connector\Model\CrossSellingItem as CrossSellingItemModel;
 
-class CrossSellingItem extends BaseMapper
+class CrossSellingItem extends AbstractMapper
 {
     public function pull($data)
     {

@@ -4,7 +4,7 @@ namespace jtl\Connector\Modified\Mapper;
 use jtl\Connector\Model\CategoryAttr as CategoryAttrModel;
 use jtl\Connector\Model\CategoryAttrI18n as CategoryAttrI18nModel;
 
-class CategoryAttr extends BaseMapper
+class CategoryAttr extends AbstractMapper
 {
     public function pull($data = null, $limit = null)
     {

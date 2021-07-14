@@ -12,7 +12,7 @@ use jtl\Connector\Model\ProductPrice as ProductPriceModel;
 use jtl\Connector\Model\ProductPriceItem as ProductPriceItemModel;
 use jtl\Connector\Modified\Modified;
 
-class Product extends BaseMapper
+class Product extends AbstractMapper
 {
     private static $idCache = [];
 

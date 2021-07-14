@@ -1,7 +1,7 @@
 <?php
 namespace jtl\Connector\Modified\Mapper;
 
-class TaxRate extends BaseMapper
+class TaxRate extends AbstractMapper
 {
     protected $mapperConfig = [
         "table" => "tax_rates",

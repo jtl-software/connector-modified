@@ -6,7 +6,7 @@ use jtl\Connector\Drawing\ImageRelationType;
 use \jtl\Connector\Model\Image as ImageModel;
 use Nette\Utils\Strings;
 
-class Image extends BaseMapper
+class Image extends AbstractMapper
 {
     protected $mapperConfig = [
         "table" => "products_images",

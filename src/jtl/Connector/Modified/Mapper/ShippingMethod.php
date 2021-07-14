@@ -4,7 +4,7 @@ namespace jtl\Connector\Modified\Mapper;
 use jtl\Connector\Model\Identity;
 use jtl\Connector\Model\ShippingMethod as ShippingMethodModel;
 
-class ShippingMethod extends BaseMapper
+class ShippingMethod extends AbstractMapper
 {
     protected $mapperConfig = [
         "identity" => "getId",

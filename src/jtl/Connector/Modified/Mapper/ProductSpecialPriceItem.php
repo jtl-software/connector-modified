@@ -1,7 +1,7 @@
 <?php
 namespace jtl\Connector\Modified\Mapper;
 
-class ProductSpecialPriceItem extends BaseMapper
+class ProductSpecialPriceItem extends AbstractMapper
 {
     protected $mapperConfig = [
         "mapPull" => [

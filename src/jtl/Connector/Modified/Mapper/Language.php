@@ -1,7 +1,7 @@
 <?php
 namespace jtl\Connector\Modified\Mapper;
 
-class Language extends BaseMapper
+class Language extends AbstractMapper
 {
     protected $mapperConfig = [
         "table" => "languages",

@@ -6,7 +6,7 @@ namespace jtl\Connector\Modified\Mapper;
  * Class CustomerOrderPaymentInfo
  * @package jtl\Connector\Modified\Mapper
  */
-class CustomerOrderPaymentInfo extends BaseMapper
+class CustomerOrderPaymentInfo extends AbstractMapper
 {
     /**
      * @var array

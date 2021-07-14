@@ -4,7 +4,7 @@ namespace jtl\Connector\Modified\Mapper;
 use jtl\Connector\Model\CustomerOrder as CustomerOrderModel;
 use jtl\Connector\Model\CustomerOrderItem;
 
-class CustomerOrder extends BaseMapper
+class CustomerOrder extends AbstractMapper
 {
     protected $mapperConfig = [
         "table" => "orders",

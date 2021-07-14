@@ -3,7 +3,7 @@ namespace jtl\Connector\Modified\Mapper;
 
 use \jtl\Connector\Model\CustomerGroupAttr as CustomerGroupAttrModel;
 
-class CustomerGroupAttr extends BaseMapper
+class CustomerGroupAttr extends AbstractMapper
 {
     public function pull($data = null, $limit = null)
     {

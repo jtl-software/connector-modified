@@ -1,7 +1,7 @@
 <?php
 namespace jtl\Connector\Modified\Mapper;
 
-class ProductPriceItem extends BaseMapper
+class ProductPriceItem extends AbstractMapper
 {
     protected $mapperConfig = [
         "getMethod" => "getItems",

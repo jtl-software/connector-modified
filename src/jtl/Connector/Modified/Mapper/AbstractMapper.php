@@ -5,10 +5,10 @@ namespace jtl\Connector\Modified\Mapper;
 use Jtl\Connector\XtcComponents\AbstractBaseMapper;
 
 /**
- * Class BaseMapper
+ * Class AbstractMapper
  * @package jtl\Connector\Modified\Mapper
  */
-class BaseMapper extends AbstractBaseMapper
+abstract class AbstractMapper extends AbstractBaseMapper
 {
     /**
      * @return string

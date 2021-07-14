@@ -1,7 +1,7 @@
 <?php
 namespace jtl\Connector\Modified\Mapper;
 
-class Currency extends BaseMapper
+class Currency extends AbstractMapper
 {
     protected $mapperConfig = [
         "table" => "currencies",

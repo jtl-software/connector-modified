@@ -3,7 +3,7 @@ namespace jtl\Connector\Modified\Mapper;
 
 use jtl\Connector\Core\Utilities\Country;
 
-class CustomerOrderShippingAddress extends BaseMapper
+class CustomerOrderShippingAddress extends AbstractMapper
 {
     protected $mapperConfig = [
         "table" => "customer_orders",

@@ -4,7 +4,7 @@ namespace jtl\Connector\Modified\Mapper;
 use jtl\Connector\Model\CategoryI18n as CategoryI18nModel;
 use jtl\Connector\Model\Category as CategoryModel;
 
-class CategoryI18n extends BaseMapper
+class CategoryI18n extends AbstractMapper
 {
     protected $mapperConfig = [
         "table" => "categories_description",

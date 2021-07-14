@@ -4,7 +4,7 @@ namespace jtl\Connector\Modified\Mapper;
 use jtl\Connector\Model\ProductAttr as ProductAttrModel;
 use jtl\Connector\Model\ProductAttrI18n as ProductAttrI18nModel;
 
-class ProductAttr extends BaseMapper
+class ProductAttr extends AbstractMapper
 {
     private $additions = [
         'products_status' => 'Aktiv',

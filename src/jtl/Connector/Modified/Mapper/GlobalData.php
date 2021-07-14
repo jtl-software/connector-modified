@@ -1,7 +1,7 @@
 <?php
 namespace jtl\Connector\Modified\Mapper;
 
-class GlobalData extends \jtl\Connector\Modified\Mapper\BaseMapper
+class GlobalData extends \jtl\Connector\Modified\Mapper\AbstractMapper
 {
     protected $mapperConfig = [
         "mapPull" => [

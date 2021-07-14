@@ -1,7 +1,7 @@
 <?php
 namespace jtl\Connector\Modified\Mapper;
 
-class CrossSelling extends BaseMapper
+class CrossSelling extends AbstractMapper
 {
     protected $mapperConfig = [
         "table" => "products_xsell",

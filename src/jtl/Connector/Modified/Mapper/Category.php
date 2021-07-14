@@ -1,7 +1,7 @@
 <?php
 namespace jtl\Connector\Modified\Mapper;
 
-class Category extends \jtl\Connector\Modified\Mapper\BaseMapper
+class Category extends \jtl\Connector\Modified\Mapper\AbstractMapper
 {
     protected $mapperConfig = [
         "table" => "categories",

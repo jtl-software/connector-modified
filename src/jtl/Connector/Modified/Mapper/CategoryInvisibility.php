@@ -4,7 +4,7 @@ namespace jtl\Connector\Modified\Mapper;
 use jtl\Connector\Model\CategoryInvisibility as CategoryInvisibilityModel;
 use jtl\Connector\Model\Identity;
 
-class CategoryInvisibility extends \jtl\Connector\Modified\Mapper\BaseMapper
+class CategoryInvisibility extends \jtl\Connector\Modified\Mapper\AbstractMapper
 {
     public function pull($data = null, $limit = null)
     {

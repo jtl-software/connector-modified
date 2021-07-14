@@ -4,7 +4,7 @@ namespace jtl\Connector\Modified\Mapper;
 use jtl\Connector\Model\ProductPrice as ProductPriceModel;
 use jtl\Connector\Model\ProductPriceItem as ProductPriceItemModel;
 
-class ProductPrice extends BaseMapper
+class ProductPrice extends AbstractMapper
 {
     protected $mapperConfig = [
         "getMethod" => "getPrices",

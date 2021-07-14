@@ -1,7 +1,7 @@
 <?php
 namespace jtl\Connector\Modified\Mapper;
 
-class Product2Category extends BaseMapper
+class Product2Category extends AbstractMapper
 {
     protected $mapperConfig = [
         "table" => "products_to_categories",

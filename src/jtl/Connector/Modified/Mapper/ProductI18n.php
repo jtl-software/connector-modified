@@ -1,7 +1,7 @@
 <?php
 namespace jtl\Connector\Modified\Mapper;
 
-class ProductI18n extends BaseMapper
+class ProductI18n extends AbstractMapper
 {
     protected $mapperConfig = [
         "table" => "products_description",

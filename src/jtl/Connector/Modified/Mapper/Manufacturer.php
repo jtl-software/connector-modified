@@ -2,7 +2,7 @@
 
 namespace jtl\Connector\Modified\Mapper;
 
-class Manufacturer extends BaseMapper
+class Manufacturer extends AbstractMapper
 {
     protected $mapperConfig = [
         "table" => "manufacturers",

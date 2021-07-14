@@ -1,7 +1,7 @@
 <?php
 namespace jtl\Connector\Modified\Mapper;
 
-class CustomerGroupI18n extends BaseMapper
+class CustomerGroupI18n extends AbstractMapper
 {
     protected $mapperConfig = [
         "table" => "customers_status",

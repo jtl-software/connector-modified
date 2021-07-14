@@ -1,7 +1,7 @@
 <?php
 namespace jtl\Connector\Modified\Mapper;
 
-class Payment extends \jtl\Connector\Modified\Mapper\BaseMapper
+class Payment extends \jtl\Connector\Modified\Mapper\AbstractMapper
 {
     protected $mapperConfig = [
         "table" => "jtl_connector_payment",

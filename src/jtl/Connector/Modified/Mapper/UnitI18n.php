@@ -1,7 +1,7 @@
 <?php
 namespace jtl\Connector\Modified\Mapper;
 
-class UnitI18n extends BaseMapper
+class UnitI18n extends AbstractMapper
 {
     protected $mapperConfig = [
         "query" => "SELECT products_vpe.*,languages.code FROM products_vpe LEFT JOIN languages ON languages.languages_id=products_vpe.language_id WHERE products_vpe_id=[[products_vpe_id]]",

@@ -3,7 +3,7 @@ namespace jtl\Connector\Modified\Mapper;
 
 use jtl\Connector\Core\Utilities\Country;
 
-class CustomerOrderBillingAddress extends BaseMapper
+class CustomerOrderBillingAddress extends AbstractMapper
 {
     protected $mapperConfig = [
         "getMethod" => "getBillingAddress",

@@ -4,7 +4,7 @@
 namespace jtl\Connector\Modified\Mapper;
 
 
-class Connector extends BaseMapper
+class Connector extends AbstractMapper
 {
 
 }

@@ -1,7 +1,7 @@
 <?php
 namespace jtl\Connector\Modified\Mapper;
 
-class Unit extends BaseMapper
+class Unit extends AbstractMapper
 {
     protected $mapperConfig = [
         "query" => "SELECT products_vpe_id FROM products_vpe GROUP BY products_vpe_id",

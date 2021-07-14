@@ -3,7 +3,7 @@ namespace jtl\Connector\Modified\Mapper;
 
 use jtl\Connector\Model\ProductStockLevel as ProductStockLevelModel;
 
-class ProductStockLevel extends BaseMapper
+class ProductStockLevel extends AbstractMapper
 {
     public function pull($data = null, $limit = null)
     {

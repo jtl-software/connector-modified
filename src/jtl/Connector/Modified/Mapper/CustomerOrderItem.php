@@ -2,7 +2,7 @@
 
 namespace jtl\Connector\Modified\Mapper;
 
-class CustomerOrderItem extends BaseMapper
+class CustomerOrderItem extends AbstractMapper
 {
     protected $mapperConfig = [
         "table" => "orders_products",

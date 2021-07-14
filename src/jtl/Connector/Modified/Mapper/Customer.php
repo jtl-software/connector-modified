@@ -3,7 +3,7 @@ namespace jtl\Connector\Modified\Mapper;
 
 use \jtl\Connector\Core\Utilities\Country;
 
-class Customer extends BaseMapper
+class Customer extends AbstractMapper
 {
     protected $mapperConfig = [
         "table" => "customers",

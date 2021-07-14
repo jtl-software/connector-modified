@@ -2,7 +2,7 @@
 
 namespace jtl\Connector\Modified\Mapper;
 
-class ProductVariationValue extends BaseMapper
+class ProductVariationValue extends AbstractMapper
 {
     protected $mapperConfig = [
         "table" => "products_attributes",
