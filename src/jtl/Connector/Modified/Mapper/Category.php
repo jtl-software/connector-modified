@@ -86,7 +86,7 @@ class Category extends \jtl\Connector\Modified\Mapper\AbstractMapper
         return empty($endpoint) ? 0 : $endpoint;
     }
 
-    public function pull($parent = null, $limit = null)
+    public function pull($parent = null, $limit = null): array
     {
         $this->tree = [];
 

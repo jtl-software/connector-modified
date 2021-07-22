@@ -6,7 +6,7 @@ use jtl\Connector\Model\Identity;
 
 class ProductInvisibility extends \jtl\Connector\Modified\Mapper\AbstractMapper
 {
-    public function pull($data = null, $limit = null)
+    public function pull($data = null, $limit = null): array
     {
         $return = [];
 

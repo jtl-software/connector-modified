@@ -11,7 +11,7 @@ class ShippingMethod extends AbstractMapper
         "getMethod" => "getShippingMethods"
     ];
 
-    public function pull($data = null, $limit = null)
+    public function pull($data = null, $limit = null): array
     {
         $moduleStr = $this->db->query('SELECT configuration_value FROM configuration WHERE configuration_key ="MODULE_SHIPPING_INSTALLED"');
 

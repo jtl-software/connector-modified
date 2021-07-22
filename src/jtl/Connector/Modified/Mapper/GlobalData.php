@@ -21,7 +21,7 @@ class GlobalData extends \jtl\Connector\Modified\Mapper\AbstractMapper
         ]
     ];
 
-    public function pull($parentData = null, $limit = null)
+    public function pull($parentData = null, $limit = null): array
     {
         $globalData = $this->generateModel([]);
 

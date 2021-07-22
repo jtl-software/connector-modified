@@ -13,7 +13,7 @@ class ProductAttr extends AbstractMapper
         'options_template' => 'Optionen Vorlage'
     ];
 
-    public function pull($data = null, $limit = null)
+    public function pull($data = null, $limit = null): array
     {
         $attrs = [];
 

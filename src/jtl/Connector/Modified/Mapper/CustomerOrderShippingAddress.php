@@ -37,7 +37,7 @@ class CustomerOrderShippingAddress extends AbstractMapper
         ]
     ];
 
-    public function pull($data = null, $limit = null)
+    public function pull($data = null, $limit = null): array
     {
         return [$this->generateModel($data)];
     }

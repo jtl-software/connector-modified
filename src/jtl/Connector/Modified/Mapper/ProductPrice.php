@@ -19,7 +19,7 @@ class ProductPrice extends AbstractMapper
         ]
     ];
 
-    public function pull($data = null, $limit = null)
+    public function pull($data = null, $limit = null): array
     {
         $customerGroups = $this->getCustomerGroups();
 

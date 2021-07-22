@@ -82,7 +82,7 @@ class Product extends AbstractMapper
         ],
     ];
 
-    public function pull($data = null, $limit = null)
+    public function pull($data = null, $limit = null): array
     {
         $productResult = parent::pull($data, $limit);
 
@@ -276,7 +276,7 @@ class Product extends AbstractMapper
         return $data;
     }
 
-    public function statistic()
+    public function statistic(): int
     {
         $sql = 'SELECT count(p.products_id) as count 
                 FROM products p 

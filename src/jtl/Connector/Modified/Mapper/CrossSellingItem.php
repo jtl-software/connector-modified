@@ -5,7 +5,7 @@ use jtl\Connector\Model\CrossSellingItem as CrossSellingItemModel;
 
 class CrossSellingItem extends AbstractMapper
 {
-    public function pull($data)
+    public function pull($data = null, $limit = null): array
     {
         $query = 'SELECT x.* FROM products_xsell x WHERE x.products_id ='.$data['products_id'];
         $results = $this->db->query($query);

@@ -6,7 +6,7 @@ use jtl\Connector\Model\CategoryAttrI18n as CategoryAttrI18nModel;
 
 class CategoryAttr extends AbstractMapper
 {
-    public function pull($data = null, $limit = null)
+    public function pull($data = null, $limit = null): array
     {
         $attr = new CategoryAttrModel();
         $attr->setId($this->identity(1));

@@ -24,7 +24,7 @@ class Unit extends AbstractMapper
      * @param null $limit
      * @return array
      */
-    public function pull($parentData = null, $limit = null)
+    public function pull($parentData = null, $limit = null): array
     {
         return [];
     }

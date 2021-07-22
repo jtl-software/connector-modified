@@ -42,7 +42,7 @@ class Image extends AbstractMapper
         ];
     }
 
-    public function pull($data = null, $limit = null)
+    public function pull($data = null, $limit = null): array
     {
         $result = [];
 
@@ -315,7 +315,7 @@ class Image extends AbstractMapper
         }
     }
 
-    public function statistic()
+    public function statistic(): int
     {
         $totalImages = 0;
 
