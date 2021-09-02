@@ -42,7 +42,7 @@ class Product extends BaseMapper
             "considerStock"          => null,
             "considerVariationStock" => null,
             "permitNegativeStock"    => null,
-            "taxClassId"             => null,
+            "taxClassId"             => 'products_tax_class_id',
             "i18ns"                  => "ProductI18n|addI18n",
             "categories"             => "Product2Category|addCategory",
             "prices"                 => "ProductPrice|addPrice",
@@ -448,32 +448,33 @@ class Product extends BaseMapper
 
     protected function vat($data)
     {
-        $sql = $this->db->query('SELECT r.tax_rate FROM zones_to_geo_zones z LEFT JOIN tax_rates r ON z.geo_zone_id=r.tax_zone_id WHERE z.zone_country_id = ' . $this->shopConfig['settings']['STORE_COUNTRY'] . ' && r.tax_class_id=' . $data['products_tax_class_id']);
-
+        $sql = $this->db->query(sprintf('SELECT r.tax_rate FROM zones_to_geo_zones z LEFT JOIN tax_rates r ON z.geo_zone_id = r.tax_zone_id WHERE z.zone_country_id = %s AND r.tax_class_id = %s', $this->shopConfig['settings']['STORE_COUNTRY'], $data['products_tax_class_id']));
         if (empty($sql)) {
-            $sql = $this->db->query('SELECT tax_rate FROM tax_rates WHERE tax_rates_id=' . $this->connectorConfig->tax_rate);
+            $sql = $this->db->query(sprintf('SELECT tax_rate FROM tax_rates WHERE tax_rates_id = %s', $this->connectorConfig->tax_rate));
         }
 
         return floatval($sql[0]['tax_rate']);
     }
 
-    protected function taxClassId($data)
-    {
-        return $data['products_tax_class_id'];
-    }
-
+    /**
+     * @param \jtl\Connector\Model\Product $product
+     * @param \jtl\Connector\Model\Product $model
+     * @return mixed|string
+     */
     protected function products_tax_class_id(\jtl\Connector\Model\Product $product, \jtl\Connector\Model\Product $model)
     {
         if (!is_null($product->getTaxClassId()) && !empty($product->getTaxClassId()->getEndpoint())) {
             $taxClassId = $product->getTaxClassId()->getEndpoint();
         } else {
-            $taxClassId = $this->db->query('SELECT r.tax_class_id FROM zones_to_geo_zones z LEFT JOIN tax_rates r ON z.geo_zone_id=r.tax_zone_id WHERE z.zone_country_id = ' . $this->shopConfig['settings']['STORE_COUNTRY'] . ' && r.tax_rate=' . $product->getVat());
-            if (empty($taxClassId)) {
-                $taxClassId = $this->db->query('SELECT tax_class_id FROM tax_rates WHERE tax_rates_id=' . $this->connectorConfig->tax_rate);
+            $taxClasses = $this->db->query(sprintf('SELECT r.tax_class_id FROM zones_to_geo_zones z LEFT JOIN tax_rates r ON z.geo_zone_id = r.tax_zone_id WHERE z.zone_country_id = %s AND r.tax_rate = %s', $this->shopConfig['settings']['STORE_COUNTRY'], $product->getVat()));
+            if (empty($taxClasses)) {
+                $taxClasses = $this->db->query(sprintf('SELECT tax_class_id FROM tax_rates WHERE tax_rates_id = %s', $this->connectorConfig->tax_rate));
             }
+
+            $taxClassId = $taxClasses[0]['tax_class_id'] ?? '1';
             if (count($product->getTaxRates()) > 0 && !is_null($product->getTaxClassId())) {
-                $taxClassId = $this->findTaxClassId(...$product->getTaxRates()) ?? $taxClassId[0]['tax_class_id'];
-//                $model->getTaxClassId()->setEndpoint($taxClassId)->setHost($product->getTaxClassId()->getHost());
+                $taxClassId = $this->findTaxClassId(...$product->getTaxRates()) ?? $taxClassId;
+                //$model->getTaxClassId()->setEndpoint($taxClassId)->setHost($product->getTaxClassId()->getHost());
             }
         }
 
@@ -506,6 +507,7 @@ class Product extends BaseMapper
                     }
                 }
             }
+
             $productsOptionName = 'Variation';
             if (!empty($variationName)) {
                 $productsOptionName = join(' / ', $variationName);
@@ -747,18 +749,18 @@ class Product extends BaseMapper
     protected function findTaxClassId(\jtl\Connector\Model\TaxRate ...$taxRates): ?string
     {
         $conditions = [];
-        foreach($taxRates as $taxRate){
-            $conditions[] = sprintf("(c.countries_iso_code_2 = '%s' AND tr.tax_rate='%s')", $taxRate->getCountryIso(), number_format($taxRate->getRate(), 4));
+        foreach ($taxRates as $taxRate) {
+            $conditions[] = sprintf("(c.countries_iso_code_2 = '%s' AND tr.tax_rate = '%s')", $taxRate->getCountryIso(), number_format($taxRate->getRate(), 4));
         }
 
-        $taxClassId = $this->db->query(sprintf('SELECT tax_class_id, COUNT(tax_class_id) as hits
+        $taxClasses = $this->db->query(sprintf('SELECT tax_class_id, COUNT(tax_class_id) as hits
                 FROM tax_rates tr
                 LEFT JOIN zones_to_geo_zones ztgz ON tr.tax_zone_id = ztgz.geo_zone_id
                 LEFT JOIN countries c ON ztgz.zone_country_id = c.countries_id
                 WHERE %s
                 GROUP BY tax_class_id
-                ORDER BY hits DESC',join(' OR ',$conditions)));
+                ORDER BY hits DESC', join(' OR ', $conditions)));
 
-        return $taxClassId[0]['tax_class_id'] ?? null;
+        return $taxClasses[0]['tax_class_id'] ?? null;
     }
 }
