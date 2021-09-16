@@ -511,12 +511,8 @@ class Product extends BaseMapper
     {
         $mainLanguageIso = $this->fullLocale($this->shopConfig['settings']['DEFAULT_LANGUAGE']);
         $mainLanguageProductsOptionsName = $this->createProductsOptionName(($mainLanguageIso), ...$data->getVariations());
-        $productsOptionsIdResult = $this->db->query(sprintf("SELECT products_options_id FROM products_options WHERE language_id = %s AND products_options_name = '%s'", parent::locale2id($mainLanguageIso), $mainLanguageProductsOptionsName));
-        $productsOptionsId = $productsOptionsIdResult[0]['products_options_id'] ?? null;
-        if ($productsOptionsId === null) {
-            $productsOptionsIdResult = $this->db->query("SELECT MAX(products_options_id) + 1 as maxId FROM products_options");
-            $productsOptionsId = $productsOptionsIdResult[0]['maxId'] ?? 1;
-        }
+        $productsOptionsIdResult = $this->db->query(sprintf("SELECT IFNULL((SELECT products_options_id FROM products_options WHERE language_id = %s AND products_options_name = '%s'), (SELECT MAX(products_options_id) + 1 FROM products_options)) as products_options_id", parent::locale2id($mainLanguageIso), $mainLanguageProductsOptionsName));
+        $productsOptionsId = $productsOptionsIdResult[0]['products_options_id'] ?? 1;
 
         foreach ($data->getVariations()[0]->getValues()[0]->getI18ns() as $i18nId => $variationI18n) {
             $languageIso = $variationI18n->getLanguageISO();
