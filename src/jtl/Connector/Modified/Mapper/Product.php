@@ -10,6 +10,7 @@ use jtl\Connector\Model\ProductVariationValue;
 use jtl\Connector\Model\ProductVariationValueI18n;
 use jtl\Connector\Model\ProductPrice as ProductPriceModel;
 use jtl\Connector\Model\ProductPriceItem as ProductPriceItemModel;
+use jtl\Connector\Model\Product as ProductModel;
 
 class Product extends BaseMapper
 {
@@ -485,7 +486,7 @@ class Product extends BaseMapper
      * @param ProductVariation ...$moreVariations
      * @return string
      */
-    protected function createProductsOptionName($languageIso, ProductVariation $variation, ProductVariation ...$moreVariations)
+    protected function createProductsOptionsName(string $languageIso, ProductVariation $variation, ProductVariation ...$moreVariations) : string
     {
         $variations = array_merge([$variation], $moreVariations);
 
@@ -507,10 +508,14 @@ class Product extends BaseMapper
         return $productsOptionName;
     }
 
-    protected function addVarCombiAsVariation($data, $masterId)
+    /**
+     * @param ProductModel $data
+     * @param string $masterId
+     */
+    protected function addVarCombiAsVariation(ProductModel $data, string $masterId) : void
     {
         $mainLanguageIso = $this->fullLocale($this->shopConfig['settings']['DEFAULT_LANGUAGE']);
-        $mainLanguageProductsOptionsName = $this->createProductsOptionName(($mainLanguageIso), ...$data->getVariations());
+        $mainLanguageProductsOptionsName = $this->createProductsOptionsName($mainLanguageIso, ...$data->getVariations());
         $productsOptionsIdResult = $this->db->query(sprintf("SELECT IFNULL((SELECT products_options_id FROM products_options WHERE language_id = %s AND products_options_name = '%s'), (SELECT MAX(products_options_id) + 1 FROM products_options)) as products_options_id", parent::locale2id($mainLanguageIso), $mainLanguageProductsOptionsName));
         $productsOptionsId = $productsOptionsIdResult[0]['products_options_id'] ?? 1;
 
@@ -518,7 +523,7 @@ class Product extends BaseMapper
             $languageIso = $variationI18n->getLanguageISO();
             $languageId = parent::locale2id($languageIso);
 
-            $productsOptionsName = $this->createProductsOptionName($languageIso, ...$data->getVariations());
+            $productsOptionsName = $this->createProductsOptionsName($languageIso, ...$data->getVariations());
 
             $this->db->query(
                 sprintf(
@@ -539,16 +544,16 @@ class Product extends BaseMapper
                 $optionsValuesId = $optionsValuesId >= 0 ? ($optionsValuesId + 1) : 1;
             }
 
-            $productsOptionsValuesName = "";
+            $productsOptionsValuesName = [];
 
             $i = 0;
             foreach ($data->getVariations() as $var) {
                 if (isset($var->getValues()[0]->getI18ns()[$i18nId])) {
-                    $productsOptionsValuesName .= $var->getValues()[0]->getI18ns()[$i18nId]->getName();
+                    $productsOptionsValuesName[] = $var->getValues()[0]->getI18ns()[$i18nId]->getName();
                 }
 
                 if ($i < count($data->getVariations()) - 1 && count($data->getVariations()) > 1) {
-                    $productsOptionsValuesName .= " | ";
+                    $productsOptionsValuesName[] = " | ";
                 }
                 $i++;
             }
@@ -574,7 +579,7 @@ class Product extends BaseMapper
             }
 
             $variationValue = new \stdClass();
-            $variationValue->products_options_values_name = $productsOptionsValuesName;
+            $variationValue->products_options_values_name = implode('', $productsOptionsValuesName);
             $variationValue->products_options_values_id = $optionsValuesId;
             $variationValue->language_id = $languageId;
 
