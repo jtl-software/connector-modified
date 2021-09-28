@@ -1,10 +1,12 @@
 <?php
 namespace jtl\Connector\Modified;
 
+use jtl\Connector\Core\Rpc\Error;
 use jtl\Connector\Core\Rpc\RequestPacket;
 use jtl\Connector\Core\Utilities\RpcMethod;
 use jtl\Connector\Core\Database\Mysql;
-use jtl\Connector\Event\Product\ProductAfterPushEvent;
+use jtl\Connector\Model\DataModel;
+use jtl\Connector\Model\Image;
 use jtl\Connector\Session\SessionHelper;
 use jtl\Connector\Base\Connector as BaseConnector;
 use jtl\Connector\Core\Rpc\Method;
@@ -170,13 +172,21 @@ class Modified extends BaseConnector
 
         if ($this->action === Method::ACTION_PUSH || $this->action === Method::ACTION_DELETE) {
             if (!is_array($requestpacket->getParams())) {
-                throw new \Exception('data is not an array');
+                throw new \Exception('Data is not an array');
             }
 
             $action = new Action();
             $results = [];
-            foreach ($requestpacket->getParams() as $param) {
-                $result = $this->controller->{$this->action}($param);
+
+            /** @var DataModel $model */
+            foreach ($requestpacket->getParams() as $model) {
+                $result = $this->controller->{$this->action}($model);
+
+                if ($result->getError()) {
+                    $this->extendErrorMessage($model, $result->getError());
+                    throw new \Exception($result->getError()->getMessage());
+                }
+
                 $results[] = $result->getResult();
             }
 
@@ -187,6 +197,42 @@ class Modified extends BaseConnector
             return $action;
         } else {
             return $this->controller->{$this->action}($requestpacket->getParams());
+        }
+    }
+
+    /**
+     * @param DataModel $model
+     * @param Error $error
+     */
+    protected function extendErrorMessage(DataModel $model, Error $error)
+    {
+        $controllerToIdentityGetter = [
+            'ProductPrice' => 'getProductId',
+            'ProductStockLevel' => 'getProductId',
+            'StatusChange' => 'getCustomerOrderId',
+            'DeliveryNote' => 'getCustomerOrderId',
+            'Image' => 'getForeignKey',
+        ];
+
+        $controllerName = (new \ReflectionClass($this->controller))->getShortName();
+
+        $identityGetter = $controllerToIdentityGetter[$controllerName] ?? 'getId';
+        $identity = null;
+        if (method_exists($model, $identityGetter)) {
+            $identity = $model->{$identityGetter}();
+        }
+
+        if ($identity !== null) {
+            $messageParts = [$controllerName];
+
+            if ($model instanceof Image) {
+                $messageParts[] = sprintf('Related type %s (hostId = %d)', ucfirst($model->getRelationType()), $identity->getHost());
+            } else {
+                $messageParts[] = sprintf('hostId = %d', $identity->getHost());
+            }
+
+            $messageParts[] = $error->getMessage();
+            $error->setMessage(implode(' | ', $messageParts));
         }
     }
 
