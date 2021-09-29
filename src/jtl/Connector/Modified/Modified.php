@@ -5,6 +5,8 @@ use jtl\Connector\Core\Rpc\Error;
 use jtl\Connector\Core\Rpc\RequestPacket;
 use jtl\Connector\Core\Utilities\RpcMethod;
 use jtl\Connector\Core\Database\Mysql;
+use jtl\Connector\Event\Product\ProductAfterPushEvent;
+use jtl\Connector\Modified\Util\ShopVersion;
 use jtl\Connector\Model\DataModel;
 use jtl\Connector\Model\Image;
 use jtl\Connector\Session\SessionHelper;
@@ -35,7 +37,9 @@ class Modified extends BaseConnector
         if (!isset($session->shopConfig)) {
             $session->shopConfig = $this->readConfigFile();
         }
-        
+
+        ShopVersion::setShopVersion($session->shopConfig['shop']['version']);
+
         if (!isset($session->connectorConfig)) {
             $session->connectorConfig = json_decode(@file_get_contents(CONNECTOR_DIR.'/config/config.json'));
         }
@@ -83,7 +87,8 @@ class Modified extends BaseConnector
                 'url' => HTTP_SERVER,
                 'folder' => DIR_WS_CATALOG,
                 'path' => DIR_FS_DOCUMENT_ROOT,
-                'fullUrl' => HTTP_SERVER.DIR_WS_CATALOG
+                'fullUrl' => HTTP_SERVER . DIR_WS_CATALOG,
+                'version' => sprintf('%s.%s', PROJECT_MAJOR_VERSION, PROJECT_MINOR_VERSION)
             ],
             'db' => [
                 'host' => DB_SERVER,
