@@ -138,7 +138,7 @@ class Modified extends BaseConnector
                 }
             }
 
-            usort($versions, 'version_compare');
+            sort($versions);
 
             foreach ($versions as $version) {
                 if (version_compare(file_get_contents(CONNECTOR_DIR.'/db/version'), $version) == -1) {
