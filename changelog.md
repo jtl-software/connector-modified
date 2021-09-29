@@ -1,3 +1,10 @@
+3.8.0
+-----
+- CO-1464 - Added product tax class guessing on product push
+- CO-1015 - Added extended error info messages
+- CO-1567 - Fixed invalid variation product id in customer order
+- CO-1788 - Fixed modified version 2.0.5.0 compatibility
+
 3.7.1
 -----
 - Fixed update procedure
