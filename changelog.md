@@ -1,3 +1,7 @@
+3.9.0
+-----
+- CO-1779 - Fixed multilingual var combi item not selectable in the shop
+
 3.8.0
 -----
 - CO-1464 - Added product tax class guessing on product push
