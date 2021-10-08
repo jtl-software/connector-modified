@@ -10,7 +10,7 @@ use jtl\Connector\Model\ConnectorIdentification;
  * Class Connector
  * @package jtl\Connector\Modified\Controller
  */
-class Connector extends AbstractController
+class Connector extends DefaultController
 {
     /**
      * @return Action

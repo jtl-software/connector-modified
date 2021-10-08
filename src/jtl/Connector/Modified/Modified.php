@@ -5,7 +5,7 @@ use jtl\Connector\Core\Exception\DatabaseException;
 use jtl\Connector\Core\Rpc\RequestPacket;
 use jtl\Connector\Core\Utilities\RpcMethod;
 use jtl\Connector\Core\Database\Mysql;
-use jtl\Connector\Modified\Controller\SharedController;
+use jtl\Connector\Modified\Controller\DefaultController;
 use jtl\Connector\Session\SessionHelper;
 use jtl\Connector\Base\Connector as BaseConnector;
 use jtl\Connector\Core\Rpc\Method;
@@ -186,7 +186,7 @@ class Modified extends BaseConnector
         if (class_exists($controllerClass)) {
             $this->controller = new $controllerClass($db, $this->shopConfig, $this->connectorConfig);
         } elseif (in_array($controllerName, $controllers, true)) {
-            $this->controller = new SharedController($db, $this->shopConfig, $this->connectorConfig, $controllerName);
+            $this->controller = (new DefaultController($db, $this->shopConfig, $this->connectorConfig))->setControllerName($controllerName);
         }
 
         if (!is_null($this->controller)) {

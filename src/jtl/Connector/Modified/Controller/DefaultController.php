@@ -2,11 +2,13 @@
 
 namespace jtl\Connector\Modified\Controller;
 
+use Jtl\Connector\XtcComponents\AbstractController;
+
 /**
  * Class AbstractController
  * @package jtl\Connector\Modified\Controller
  */
-abstract class AbstractController extends \Jtl\Connector\XtcComponents\AbstractController
+class DefaultController extends AbstractController
 {
     /**
      * @return string
