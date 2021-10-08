@@ -1,7 +1,10 @@
 <?php
 namespace jtl\Connector\Modified\Mapper;
 
-class Category extends \jtl\Connector\Modified\Mapper\AbstractMapper
+use jtl\Connector\Core\Database\IDatabase;
+use jtl\Connector\Modified\Util\ShopVersion;
+
+class Category extends AbstractMapper
 {
     protected $mapperConfig = [
         "table" => "categories",
@@ -26,8 +29,6 @@ class Category extends \jtl\Connector\Modified\Mapper\AbstractMapper
             "categories_id" => "id",
             "parent_id" => null,
             "categories_image" => null,
-            "categories_image_mobile" => null,
-            "categories_image_list" => null,
             "sort_order" => "sort",
             "CategoryI18n|addI18n" => "i18ns",
             "CategoryInvisibility|addInvisibility|true" => "invisibilities",
@@ -38,6 +39,21 @@ class Category extends \jtl\Connector\Modified\Mapper\AbstractMapper
 
     private $tree = [];
     private static $idCache = [];
+
+    /**
+     * @param IDatabase $db
+     * @param array $shopConfig
+     * @param \stdClass $connectorConfig
+     */
+    public function __construct(IDatabase $db, array $shopConfig, \stdClass $connectorConfig)
+    {
+        parent::__construct($db, $shopConfig, $connectorConfig);
+
+        if (ShopVersion::isGreaterOrEqual('2.0.6.0')) {
+            $this->mapperConfig['mapPush']['categories_image_mobile'] = null;
+            $this->mapperConfig['mapPush']['categories_image_list'] = null;
+        }
+    }
 
     /**
      * @param $data

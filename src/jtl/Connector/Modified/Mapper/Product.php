@@ -11,74 +11,76 @@ use jtl\Connector\Model\ProductVariationValueI18n;
 use jtl\Connector\Model\ProductPrice as ProductPriceModel;
 use jtl\Connector\Model\ProductPriceItem as ProductPriceItemModel;
 use jtl\Connector\Modified\Modified;
+use jtl\Connector\Model\Product as ProductModel;
 
 class Product extends AbstractMapper
 {
     private static $idCache = [];
 
     protected $mapperConfig = [
-        "table"    => "products",
-        "query"    => "SELECT p.* FROM products p
+        "table" => "products",
+        "query" => "SELECT p.* FROM products p
             LEFT JOIN jtl_connector_link_product l ON p.products_id = l.endpoint_id
             WHERE l.host_id IS NULL",
-        "where"    => "products_id",
+        "where" => "products_id",
         "identity" => "getId",
-        "mapPull"  => [
-            "id"                     => "products_id",
-            "ean"                    => "products_ean",
-            "stockLevel"             => "ProductStockLevel|setStockLevel",
-            "sku"                    => "products_model",
-            "sort"                   => "products_sort",
-            "creationDate"           => "products_date_added",
-            "availableFrom"          => "products_date_available",
-            "productWeight"          => "products_weight",
-            "manufacturerId"         => null,
-            "manufacturerNumber"     => "products_manufacturers_model",
-            "unitId"                 => null,
-            "basePriceDivisor"       => "products_vpe_value",
-            "considerBasePrice"      => null,
-            "isActive"               => "products_status",
-            "isTopProduct"           => "products_startpage",
-            "isMasterProduct"        => null,
-            "considerStock"          => null,
+        "mapPull" => [
+            "id" => "products_id",
+            "ean" => "products_ean",
+            "stockLevel" => "ProductStockLevel|setStockLevel",
+            "sku" => "products_model",
+            "sort" => "products_sort",
+            "creationDate" => "products_date_added",
+            "availableFrom" => "products_date_available",
+            "productWeight" => "products_weight",
+            "manufacturerId" => null,
+            "manufacturerNumber" => "products_manufacturers_model",
+            "unitId" => null,
+            "basePriceDivisor" => "products_vpe_value",
+            "considerBasePrice" => null,
+            "isActive" => "products_status",
+            "isTopProduct" => "products_startpage",
+            "isMasterProduct" => null,
+            "considerStock" => null,
             "considerVariationStock" => null,
-            "permitNegativeStock"    => null,
-            "i18ns"                  => "ProductI18n|addI18n",
-            "categories"             => "Product2Category|addCategory",
-            "prices"                 => "ProductPrice|addPrice",
-            "specialPrices"          => "ProductSpecialPrice|addSpecialPrice",
-            "variations"             => "ProductVariation|addVariation",
-            "invisibilities"         => "ProductInvisibility|addInvisibility",
-            "attributes"             => "ProductAttr|addAttribute",
-            "vat"                    => null,
+            "permitNegativeStock" => null,
+            "taxClassId" => 'products_tax_class_id',
+            "i18ns" => "ProductI18n|addI18n",
+            "categories" => "Product2Category|addCategory",
+            "prices" => "ProductPrice|addPrice",
+            "specialPrices" => "ProductSpecialPrice|addSpecialPrice",
+            "variations" => "ProductVariation|addVariation",
+            "invisibilities" => "ProductInvisibility|addInvisibility",
+            "attributes" => "ProductAttr|addAttribute",
+            "vat" => null,
         ],
-        "mapPush"  => [
-            "products_id"                              => "id",
-            "products_ean"                             => "ean",
-            "products_quantity"                        => null,
-            "products_model"                           => "sku",
-            "products_sort"                            => "sort",
-            "products_date_added"                      => "creationDate",
-            "products_date_available"                  => "availableFrom",
-            "products_weight"                          => "productWeight",
-            "manufacturers_id"                         => "manufacturerId",
-            "products_manufacturers_model"             => "manufacturerNumber",
-            "products_vpe"                             => null,
-            "products_vpe_value"                       => "basePriceDivisor",
-            "products_vpe_status"                      => null,
-            "products_status"                          => "isActive",
-            "products_startpage"                       => "isTopProduct",
-            "products_tax_class_id"                    => null,
-            "ProductI18n|addI18n"                      => "i18ns",
-            "Product2Category|addCategory"             => "categories",
-            "ProductPrice|addPrice"                    => "prices",
-            "ProductSpecialPrice|addSpecialPrice"      => "specialPrices",
+        "mapPush" => [
+            "products_id" => "id",
+            "products_ean" => "ean",
+            "products_quantity" => null,
+            "products_model" => "sku",
+            "products_sort" => "sort",
+            "products_date_added" => "creationDate",
+            "products_date_available" => "availableFrom",
+            "products_weight" => "productWeight",
+            "manufacturers_id" => "manufacturerId",
+            "products_manufacturers_model" => "manufacturerNumber",
+            "products_vpe" => null,
+            "products_vpe_value" => "basePriceDivisor",
+            "products_vpe_status" => null,
+            "products_status" => "isActive",
+            "products_startpage" => "isTopProduct",
+            "products_tax_class_id" => null,
+            "ProductI18n|addI18n" => "i18ns",
+            "Product2Category|addCategory" => "categories",
+            "ProductPrice|addPrice" => "prices",
+            "ProductSpecialPrice|addSpecialPrice" => "specialPrices",
             "ProductInvisibility|addInvisibility|true" => "invisibilities",
-            "ProductVariation|addVariation"            => "variations",
-            "ProductAttr|addAttribute|true"            => "attributes",
-            "products_image"                           => null,
-            "products_shippingtime"                    => null,
-            "products_price"                           => null,
+            "ProductVariation|addVariation" => "variations",
+            "ProductAttr|addAttribute|true" => "attributes",
+            "products_image" => null,
+            "products_shippingtime" => null,
+            "products_price" => null,
         ],
     ];
 
@@ -88,7 +90,7 @@ class Product extends AbstractMapper
 
         foreach ($productResult as $parent) {
 
-            /** @var \jtl\Connector\Model\Product $parent */
+            /** @var ProductModel $parent */
             if ($parent->getIsMasterProduct()) {
                 $masterVariations = [];
 
@@ -273,6 +275,7 @@ class Product extends AbstractMapper
             }
         }
 
+        $this->sessionHelper->deleteUnusedVariations = true;
         return $data;
     }
 
@@ -450,24 +453,37 @@ class Product extends AbstractMapper
 
     protected function vat($data)
     {
-        $sql = $this->db->query('SELECT r.tax_rate FROM zones_to_geo_zones z LEFT JOIN tax_rates r ON z.geo_zone_id=r.tax_zone_id WHERE z.zone_country_id = ' . $this->shopConfig['settings']['STORE_COUNTRY'] . ' && r.tax_class_id=' . $data['products_tax_class_id']);
-
+        $sql = $this->db->query(sprintf('SELECT r.tax_rate FROM zones_to_geo_zones z LEFT JOIN tax_rates r ON z.geo_zone_id = r.tax_zone_id WHERE z.zone_country_id = %s AND r.tax_class_id = %s', $this->shopConfig['settings']['STORE_COUNTRY'], $data['products_tax_class_id']));
         if (empty($sql)) {
-            $sql = $this->db->query('SELECT tax_rate FROM tax_rates WHERE tax_rates_id=' . $this->connectorConfig->tax_rate);
+            $sql = $this->db->query(sprintf('SELECT tax_rate FROM tax_rates WHERE tax_rates_id = %s', $this->connectorConfig->tax_rate));
         }
 
         return floatval($sql[0]['tax_rate']);
     }
 
-    protected function products_tax_class_id($data)
+    /**
+     * @param ProductModel $product
+     * @param ProductModel|null $model
+     * @return mixed|string
+     */
+    protected function products_tax_class_id(ProductModel $product, ProductModel $model = null)
     {
-        $sql = $this->db->query('SELECT r.tax_class_id FROM zones_to_geo_zones z LEFT JOIN tax_rates r ON z.geo_zone_id=r.tax_zone_id WHERE z.zone_country_id = ' . $this->shopConfig['settings']['STORE_COUNTRY'] . ' && r.tax_rate=' . $data->getVat());
+        if (!is_null($product->getTaxClassId()) && !empty($product->getTaxClassId()->getEndpoint())) {
+            $taxClassId = $product->getTaxClassId()->getEndpoint();
+        } else {
+            $taxClasses = $this->db->query(sprintf('SELECT r.tax_class_id FROM zones_to_geo_zones z LEFT JOIN tax_rates r ON z.geo_zone_id = r.tax_zone_id WHERE z.zone_country_id = %s AND r.tax_rate = %s', $this->shopConfig['settings']['STORE_COUNTRY'], $product->getVat()));
+            if (empty($taxClasses)) {
+                $taxClasses = $this->db->query(sprintf('SELECT tax_class_id FROM tax_rates WHERE tax_rates_id = %s', $this->connectorConfig->tax_rate));
+            }
 
-        if (empty($sql)) {
-            $sql = $this->db->query('SELECT tax_class_id FROM tax_rates WHERE tax_rates_id=' . $this->connectorConfig->tax_rate);
+            $taxClassId = $taxClasses[0]['tax_class_id'] ?? '1';
+            if (count($product->getTaxRates()) > 0 && !is_null($product->getTaxClassId())) {
+                $taxClassId = $this->findTaxClassId(...$product->getTaxRates()) ?? $taxClassId;
+                //$model->getTaxClassId()->setEndpoint($taxClassId)->setHost($product->getTaxClassId()->getHost());
+            }
         }
 
-        return $sql[0]['tax_class_id'];
+        return $taxClassId;
     }
 
     protected function products_quantity($data)
@@ -481,56 +497,60 @@ class Product extends AbstractMapper
         return (int)$childCount[0]['cnt'] > 0;
     }
 
-    protected function addVarCombiAsVariation($data, $masterId)
+    /**
+     * @param $languageIso
+     * @param ProductVariation $variation
+     * @param ProductVariation ...$moreVariations
+     * @return string
+     */
+    protected function createProductsOptionsName(string $languageIso, ProductVariation $variation, ProductVariation ...$moreVariations) : string
     {
-        foreach ($data->getVariations()[0]->getValues()[0]->getI18ns() as $variationI18n) {
-            $i18nId = array_search($variationI18n, $data->getVariations()[0]->getValues()[0]->getI18ns());
-            $langId = parent::locale2id($data->getVariations()[0]->getValues()[0]->getI18ns()[$i18nId]->getLanguageISO());
+        $variations = array_merge([$variation], $moreVariations);
 
-            $variationName = [];
-            /** @var ProductVariation $variation */
-            foreach ($data->getVariations() as $variation) {
-                foreach ($variation->getI18ns() as $variationI18N) {
-                    if ($langId === parent::locale2id($variationI18N->getLanguageISO())) {
-                        $variationName[] = $variationI18N->getName();
-                    }
+        $nameParts = [];
+        /** @var ProductVariation $variation */
+        foreach ($variations as $variation) {
+            foreach ($variation->getI18ns() as $i18n) {
+                if ($languageIso === $i18n->getLanguageISO()) {
+                    $nameParts[] = $i18n->getName();
                 }
             }
-            $productsOptionName = 'Variation';
-            if (!empty($variationName)) {
-                $productsOptionName = join(' / ', $variationName);
-            }
+        }
 
-            $variationId = $this->db->query(sprintf("SELECT * FROM products_options WHERE language_id = %s AND products_options_name = '%s'", $langId, $productsOptionName));
+        $productsOptionName = 'Variation';
+        if (!empty($nameParts)) {
+            $productsOptionName = implode(' / ', $nameParts);
+        }
 
-            if (count($variationId) == 0) {
-                $this->db->DB()->begin_transaction();
-                $maxId = $this->db->query("SELECT MAX(products_options_id) as maxId FROM products_options");
-                $maxId = isset($maxId[0]['maxId']) ? $maxId[0]['maxId'] + 1 : 1;
-                $this->db->query(
-                    sprintf(
-                        "INSERT IGNORE INTO products_options (products_options_id, language_id, products_options_name, products_options_sortorder) VALUES (%s, %s, '%s', 0)",
-                        $maxId,
-                        $langId,
-                        $productsOptionName
-                    )
-                );
-                $this->db->commit();
+        return $productsOptionName;
+    }
 
-                $id = $this->db->query(
-                    sprintf(
-                        "SELECT products_options_id FROM products_options WHERE language_id = %s AND products_options_name = '%s' ORDER BY products_options_id DESC LIMIT 0,1",
-                        $langId,
-                        $productsOptionName
-                    )
-                );
-                if (isset($id[0]["products_options_id"])) {
-                    $id = ((int)$id[0]["products_options_id"]);
-                }
-            } else {
-                $id = $variationId[0]['products_options_id'];
-            }
+    /**
+     * @param ProductModel $data
+     * @param string $masterId
+     */
+    protected function addVarCombiAsVariation(ProductModel $data, string $masterId) : void
+    {
+        $mainLanguageIso = $this->fullLocale($this->shopConfig['settings']['DEFAULT_LANGUAGE']);
+        $mainLanguageProductsOptionsName = $this->createProductsOptionsName($mainLanguageIso, ...$data->getVariations());
+        $productsOptionsIdResult = $this->db->query(sprintf("SELECT IFNULL((SELECT products_options_id FROM products_options WHERE language_id = %s AND products_options_name = '%s'), (SELECT MAX(products_options_id) + 1 FROM products_options)) as products_options_id", parent::locale2id($mainLanguageIso), $mainLanguageProductsOptionsName));
+        $productsOptionsId = $productsOptionsIdResult[0]['products_options_id'] ?? 1;
 
+        foreach ($data->getVariations()[0]->getValues()[0]->getI18ns() as $i18nId => $variationI18n) {
+            $languageIso = $variationI18n->getLanguageISO();
+            $languageId = parent::locale2id($languageIso);
+
+            $productsOptionsName = $this->createProductsOptionsName($languageIso, ...$data->getVariations());
+
+            $this->db->query(
+                sprintf(
+                    "INSERT INTO products_options (products_options_id, language_id, products_options_name, products_options_sortorder) VALUES (%s, %s, '%s', 0) ON DUPLICATE KEY UPDATE products_options_name = '%s'",
+                    $productsOptionsId,
+                    $languageId,
+                    $productsOptionsName,
+                    $productsOptionsName
+                )
+            );
 
             if (isset(static::$idCache[$data->getId()->getHost()]['valuesId'])) {
                 $optionsValuesId = static::$idCache[$data->getId()->getHost()]['valuesId'];
@@ -540,16 +560,17 @@ class Product extends AbstractMapper
                 )[0]["products_options_values_id"];
                 $optionsValuesId = $optionsValuesId >= 0 ? ($optionsValuesId + 1) : 1;
             }
-            $variationOptionName = "";
+
+            $productsOptionsValuesName = [];
 
             $i = 0;
             foreach ($data->getVariations() as $var) {
                 if (isset($var->getValues()[0]->getI18ns()[$i18nId])) {
-                    $variationOptionName .= $var->getValues()[0]->getI18ns()[$i18nId]->getName();
+                    $productsOptionsValuesName[] = $var->getValues()[0]->getI18ns()[$i18nId]->getName();
                 }
 
                 if ($i < count($data->getVariations()) - 1 && count($data->getVariations()) > 1) {
-                    $variationOptionName .= " | ";
+                    $productsOptionsValuesName[] = " | ";
                 }
                 $i++;
             }
@@ -575,9 +596,9 @@ class Product extends AbstractMapper
             }
 
             $variationValue = new \stdClass();
-            $variationValue->products_options_values_name = $variationOptionName;
+            $variationValue->products_options_values_name = implode('', $productsOptionsValuesName);
             $variationValue->products_options_values_id = $optionsValuesId;
-            $variationValue->language_id = $langId;
+            $variationValue->language_id = $languageId;
 
             if (version_compare($this->shopConfig['db']['version'], '2.0.4', '>=')) {
                 $variationValue->products_options_values_sortorder = 0;
@@ -587,7 +608,7 @@ class Product extends AbstractMapper
                 $variationValue,
                 'products_options_values',
                 ['products_options_values_id', 'language_id'],
-                [$optionsValuesId, $langId]
+                [$optionsValuesId, $languageId]
             );
 
             $price = $this->db->query("SELECT products_price FROM products WHERE products_id = " . $masterId);
@@ -624,7 +645,7 @@ class Product extends AbstractMapper
                 $this->db->query(
                     sprintf(
                         "UPDATE products_attributes SET options_id = %s, options_values_price = %s, price_prefix = '%s', attributes_model = '%s', attributes_stock = %s, options_values_weight = %s, weight_prefix = '%s', sortorder = %s, attributes_ean = '%s', attributes_vpe_id = %s, attributes_vpe_value = %s WHERE options_values_id = %s AND products_id = %s",
-                        $id,
+                        $productsOptionsId,
                         (double)$price,
                         $pricePrefix,
                         $sku,
@@ -644,7 +665,7 @@ class Product extends AbstractMapper
                     sprintf(
                         "INSERT IGNORE INTO products_attributes (products_id, options_id, options_values_id, options_values_price, price_prefix, attributes_model, attributes_stock, options_values_weight, weight_prefix, sortorder, attributes_ean, attributes_vpe_id, attributes_vpe_value) VALUES (%s, %s, %s, %s, '%s', '%s', %s, %s, '%s', %s, '%s', %s, %s)",
                         $masterId,
-                        $id,
+                        $productsOptionsId,
                         $optionsValuesId,
                         (double)$price,
                         $pricePrefix,
@@ -663,7 +684,7 @@ class Product extends AbstractMapper
             $pivotTableResult = $this->db->query(
                 sprintf(
                     "SELECT * FROM products_options_values_to_products_options WHERE products_options_id = %s AND products_options_values_id = %s",
-                    $id,
+                    $productsOptionsId,
                     $optionsValuesId
                 )
             );
@@ -672,7 +693,7 @@ class Product extends AbstractMapper
                 $this->db->query(
                     sprintf(
                         "INSERT IGNORE INTO products_options_values_to_products_options (products_options_id, products_options_values_id) VALUES (%s, %s)",
-                        $id,
+                        $productsOptionsId,
                         $optionsValuesId
                     )
                 );
@@ -728,5 +749,27 @@ class Product extends AbstractMapper
     {
         $data = explode('_', (string)$endpoint);
         return isset($data[1]) ? true : false;
+    }
+
+    /**
+     * @param \jtl\Connector\Model\TaxRate ...$taxRates
+     * @return string|null
+     */
+    protected function findTaxClassId(\jtl\Connector\Model\TaxRate ...$taxRates): ?string
+    {
+        $conditions = [];
+        foreach ($taxRates as $taxRate) {
+            $conditions[] = sprintf("(c.countries_iso_code_2 = '%s' AND tr.tax_rate = '%s')", $taxRate->getCountryIso(), number_format($taxRate->getRate(), 4));
+        }
+
+        $taxClasses = $this->db->query(sprintf('SELECT tax_class_id, COUNT(tax_class_id) as hits
+                FROM tax_rates tr
+                LEFT JOIN zones_to_geo_zones ztgz ON tr.tax_zone_id = ztgz.geo_zone_id
+                LEFT JOIN countries c ON ztgz.zone_country_id = c.countries_id
+                WHERE %s
+                GROUP BY tax_class_id
+                ORDER BY hits DESC', join(' OR ', $conditions)));
+
+        return $taxClasses[0]['tax_class_id'] ?? null;
     }
 }

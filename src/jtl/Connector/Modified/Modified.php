@@ -1,11 +1,15 @@
 <?php
 namespace jtl\Connector\Modified;
 
-use jtl\Connector\Core\Exception\DatabaseException;
+use jtl\Connector\Core\Rpc\Error;
 use jtl\Connector\Core\Rpc\RequestPacket;
 use jtl\Connector\Core\Utilities\RpcMethod;
 use jtl\Connector\Core\Database\Mysql;
+use jtl\Connector\Event\Product\ProductAfterPushEvent;
 use jtl\Connector\Modified\Controller\DefaultController;
+use jtl\Connector\Modified\Util\ShopVersion;
+use jtl\Connector\Model\DataModel;
+use jtl\Connector\Model\Image;
 use jtl\Connector\Session\SessionHelper;
 use jtl\Connector\Base\Connector as BaseConnector;
 use jtl\Connector\Core\Rpc\Method;
@@ -24,51 +28,41 @@ class Modified extends BaseConnector
      */
     protected static $sessionHelper = null;
 
-    /**
-     * @var null
-     */
-    protected $controller = null;
+    protected $controller;
 
-    /**
-     * @var null
-     */
-    protected $action = null;
+    protected $action;
 
-    /**
-     * @var array
-     */
-    protected $shopConfig = [];
-
-    /**
-     * @var \stdClass
-     */
-    protected $connectorConfig;
-
-    /**
-     * @throws DatabaseException
-     */
     public function initialize()
     {
-        $this->shopConfig = $this->readConfigFile();
-        $this->connectorConfig = json_decode(@file_get_contents(CONNECTOR_DIR.'/config/config.json'));
+        $session = self::getSessionHelper();
+        if (!isset($session->shopConfig)) {
+            $session->shopConfig = $this->readConfigFile();
+        }
+
+        ShopVersion::setShopVersion($session->shopConfig['shop']['version']);
+
+        if (!isset($session->connectorConfig)) {
+            $session->connectorConfig = json_decode(@file_get_contents(CONNECTOR_DIR.'/config/config.json'));
+        }
 
         $db = Mysql::getInstance();
+
         if (!$db->isConnected()) {
             $db->connect([
-                "host" => $this->shopConfig['db']["host"],
-                "user" => $this->shopConfig['db']["user"],
-                "password" => $this->shopConfig['db']["pass"],
-                "name" => $this->shopConfig['db']["name"]
+                "host" => $session->shopConfig['db']["host"],
+                "user" => $session->shopConfig['db']["user"],
+                "password" => $session->shopConfig['db']["pass"],
+                "name" => $session->shopConfig['db']["name"]
             ]);
         }
 
-        if (isset($this->connectorConfig->utf8) && $this->connectorConfig->utf8 !== '0') {
+        if (isset($session->connectorConfig->utf8) && $session->connectorConfig->utf8 !== '0') {
             $db->setNames();
             $db->setCharset();
         }
 
-        if (!isset($this->shopConfig['settings'])) {
-            $this->shopConfig += $this->readConfigDb($db);
+        if (!isset($session->shopConfig['settings'])) {
+            $session->shopConfig += $this->readConfigDb($db);
         }
 
         $this->update($db);
@@ -80,23 +74,22 @@ class Modified extends BaseConnector
 
     private function readConfigFile()
     {
-
-        require_once(CONNECTOR_DIR . '/../includes/configure.php');
-        require_once(CONNECTOR_DIR . '/../inc/set_admin_directory.inc.php');
+        require_once(CONNECTOR_DIR.'/../includes/configure.php');
+        require_once(CONNECTOR_DIR.'/../inc/set_admin_directory.inc.php');
 
         if (defined('DIR_ADMIN')) {
-            require_once(CONNECTOR_DIR . '/../' . DIR_ADMIN . '/includes/version.php');
+            require_once(CONNECTOR_DIR.'/../' . DIR_ADMIN . '/includes/version.php');
         } else {
-            require_once(CONNECTOR_DIR . '/../admin/includes/version.php');
+            require_once(CONNECTOR_DIR.'/../admin/includes/version.php');
         }
-
 
         return [
             'shop' => [
                 'url' => HTTP_SERVER,
                 'folder' => DIR_WS_CATALOG,
                 'path' => DIR_FS_DOCUMENT_ROOT,
-                'fullUrl' => HTTP_SERVER . DIR_WS_CATALOG
+                'fullUrl' => HTTP_SERVER . DIR_WS_CATALOG,
+                'version' => sprintf('%s.%s', PROJECT_MAJOR_VERSION, PROJECT_MINOR_VERSION)
             ],
             'db' => [
                 'host' => DB_SERVER,
@@ -120,7 +113,7 @@ class Modified extends BaseConnector
      */
     private function readConfigDb(Mysql $db): array
     {
-        $configDb = $db->query("SElECT configuration_key,configuration_value FROM configuration");
+        $configDb = $db->query("SElECT configuration_key, configuration_value FROM configuration");
 
         $return = [];
 
@@ -183,10 +176,12 @@ class Modified extends BaseConnector
 
         $controllerClass = sprintf('jtl\\Connector\\Modified\\Controller\\%s', $controllerName);
 
+        $session = self::getSessionHelper();
+
         if (class_exists($controllerClass)) {
-            $this->controller = new $controllerClass($db, $this->shopConfig, $this->connectorConfig);
+            $this->controller = new $controllerClass($db, $session->shopConfig, $session->connectorConfig);
         } elseif (in_array($controllerName, $controllers, true)) {
-            $this->controller = (new DefaultController($db, $this->shopConfig, $this->connectorConfig))->setControllerName($controllerName);
+            $this->controller = (new DefaultController($db, $session->shopConfig, $session->connectorConfig))->setControllerName($controllerName);
         }
 
         if (!is_null($this->controller)) {
@@ -210,22 +205,67 @@ class Modified extends BaseConnector
 
         if ($this->action === Method::ACTION_PUSH || $this->action === Method::ACTION_DELETE) {
             if (!is_array($requestpacket->getParams())) {
-                throw new \Exception('data is not an array');
+                throw new \Exception('Data is not an array');
             }
 
+            $action = new Action();
             $results = [];
 
-            foreach ($requestpacket->getParams() as $param) {
-                $result = $this->controller->{$this->action}($param);
+            /** @var DataModel $model */
+            foreach ($requestpacket->getParams() as $model) {
+                $result = $this->controller->{$this->action}($model);
+
+                if ($result->getError()) {
+                    $this->extendErrorMessage($model, $result->getError());
+                    throw new \Exception($result->getError()->getMessage());
+                }
+
                 $results[] = $result->getResult();
             }
 
-            return (new Action())->setHandled(true)
+            $action->setHandled(true)
                 ->setResult($results)
                 ->setError($result->getError());
 
+            return $action;
         } else {
             return $this->controller->{$this->action}($requestpacket->getParams());
+        }
+    }
+
+    /**
+     * @param DataModel $model
+     * @param Error $error
+     */
+    protected function extendErrorMessage(DataModel $model, Error $error)
+    {
+        $controllerToIdentityGetter = [
+            'ProductPrice' => 'getProductId',
+            'ProductStockLevel' => 'getProductId',
+            'StatusChange' => 'getCustomerOrderId',
+            'DeliveryNote' => 'getCustomerOrderId',
+            'Image' => 'getForeignKey',
+        ];
+
+        $controllerName = (new \ReflectionClass($this->controller))->getShortName();
+
+        $identityGetter = $controllerToIdentityGetter[$controllerName] ?? 'getId';
+        $identity = null;
+        if (method_exists($model, $identityGetter)) {
+            $identity = $model->{$identityGetter}();
+        }
+
+        if ($identity !== null) {
+            $messageParts = [$controllerName];
+
+            if ($model instanceof Image) {
+                $messageParts[] = sprintf('Related type %s (hostId = %d)', ucfirst($model->getRelationType()), $identity->getHost());
+            } else {
+                $messageParts[] = sprintf('hostId = %d', $identity->getHost());
+            }
+
+            $messageParts[] = $error->getMessage();
+            $error->setMessage(implode(' | ', $messageParts));
         }
     }
 
@@ -234,10 +274,10 @@ class Modified extends BaseConnector
      */
     public static function getSessionHelper(): SessionHelper
     {
-        $session = self::$sessionHelper;
         if (self::$sessionHelper === null) {
-            $session = new SessionHelper(self::SESSION_NAMESPACE);
+            self::$sessionHelper = new SessionHelper(self::SESSION_NAMESPACE);
         }
-        return $session;
+
+        return self::$sessionHelper;
     }
 }

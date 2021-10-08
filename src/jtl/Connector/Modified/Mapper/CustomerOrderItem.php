@@ -158,9 +158,11 @@ class CustomerOrderItem extends AbstractMapper
     {
         $productId = $data['products_id'];
 
-        $combiId = $this->db->query(sprintf('SELECT products_attributes_id FROM products_attributes WHERE attributes_model = \'%s\'', $data['attributes_model']));
+        $sql = sprintf("SELECT orders_products_options_values_id FROM orders_products_attributes WHERE orders_id = '%s' AND orders_products_id = '%s'", $data['orders_id'], $data['orders_products_id']);
+        $combiId = $this->db->query($sql);
+
         if (is_array($combiId) && count($combiId) === 1) {
-            return Product::createProductEndpoint($productId, $combiId[0]['products_attributes_id']);
+            $productId = Product::createProductEndpoint($productId, $combiId[0]['orders_products_options_values_id']);
         }
 
         return $productId;
