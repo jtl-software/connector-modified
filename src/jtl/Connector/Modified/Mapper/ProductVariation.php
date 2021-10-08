@@ -5,7 +5,7 @@ namespace jtl\Connector\Modified\Mapper;
 use jtl\Connector\Core\Logger\Logger;
 use jtl\Connector\Formatter\ExceptionFormatter;
 use jtl\Connector\Linker\ChecksumLinker;
-use jtl\Connector\Modified\Modified;
+use jtl\Connector\Modified\Connector;
 
 class ProductVariation extends AbstractMapper
 {
@@ -143,7 +143,7 @@ class ProductVariation extends AbstractMapper
                 }
             }
 
-            Modified::getSessionHelper()->deleteUnusedVariations = true;
+            Connector::getSessionHelper()->deleteUnusedVariations = true;
             return $parent->getVariations();
         }
     }

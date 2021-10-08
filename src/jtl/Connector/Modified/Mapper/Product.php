@@ -10,7 +10,7 @@ use jtl\Connector\Model\ProductVariationValue;
 use jtl\Connector\Model\ProductVariationValueI18n;
 use jtl\Connector\Model\ProductPrice as ProductPriceModel;
 use jtl\Connector\Model\ProductPriceItem as ProductPriceItemModel;
-use jtl\Connector\Modified\Modified;
+use jtl\Connector\Modified\Connector;
 use jtl\Connector\Model\Product as ProductModel;
 
 class Product extends AbstractMapper
@@ -211,7 +211,7 @@ class Product extends AbstractMapper
 
         if (count($data->getVariations()) > 0 && !$data->getIsMasterProduct() && $data->getMasterProductId()->getHost() !== 0) {
             $this->addVarCombiAsVariation($data, $masterId);
-            Modified::getSessionHelper()->deleteUnusedVariations = true;
+            Connector::getSessionHelper()->deleteUnusedVariations = true;
             return $data;
         }
 

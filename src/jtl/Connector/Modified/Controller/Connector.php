@@ -2,7 +2,7 @@
 namespace jtl\Connector\Modified\Controller;
 
 use jtl\Connector\Model\ConnectorServerInfo;
-use jtl\Connector\Modified\Modified;
+use jtl\Connector\Modified\Connector as BaseConnector;
 use jtl\Connector\Result\Action;
 use jtl\Connector\Model\ConnectorIdentification;
 
@@ -17,7 +17,7 @@ class Connector extends DefaultController
      */
     public function finish()
     {
-        $sessionHelper = Modified::getSessionHelper();
+        $sessionHelper = BaseConnector::getSessionHelper();
         if ($sessionHelper->deleteUnusedVariations === true) {
             $this->db->query('
                 DELETE FROM products_options_values

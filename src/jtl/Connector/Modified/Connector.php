@@ -18,7 +18,7 @@ use jtl\Connector\Result\Action;
 use jtl\Connector\Modified\Auth\TokenLoader;
 use jtl\Connector\Modified\Checksum\ChecksumLoader;
 
-class Modified extends BaseConnector
+class Connector extends BaseConnector
 {
     public const
         SESSION_NAMESPACE = 'modified';

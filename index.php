@@ -1,6 +1,6 @@
 <?php
 use \jtl\Connector\Application\Application;
-use \jtl\Connector\Modified\Modified;
+use \jtl\Connector\Modified\Connector;
 use Symfony\Component\Yaml\Yaml;
 
 defined('CONNECTOR_DIR') || define("CONNECTOR_DIR", __DIR__);
@@ -11,7 +11,7 @@ $loader->add('', CONNECTOR_DIR . '/plugins');
 $config = Yaml::parseFile(__DIR__ . '/build-config.yaml');
 defined('CONNECTOR_VERSION') || define('CONNECTOR_VERSION', $config['version']);
 if (!strpos($_SERVER['REQUEST_URI'], 'install')) {
-    $connector = Modified::getInstance();
+    $connector = Connector::getInstance();
     /** @var Application $application */
     $application = Application::getInstance();
     $application->createFeaturesFileIfNecessary(sprintf('%s/config/features.json.example', CONNECTOR_DIR));
