@@ -5,7 +5,6 @@ use jtl\Connector\Core\Rpc\Error;
 use jtl\Connector\Core\Rpc\RequestPacket;
 use jtl\Connector\Core\Utilities\RpcMethod;
 use jtl\Connector\Core\Database\Mysql;
-use jtl\Connector\Event\Product\ProductAfterPushEvent;
 use jtl\Connector\Modified\Controller\DefaultController;
 use jtl\Connector\Modified\Util\ShopVersion;
 use jtl\Connector\Model\DataModel;

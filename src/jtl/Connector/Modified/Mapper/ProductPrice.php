@@ -38,7 +38,7 @@ class ProductPrice extends AbstractMapper
         $default = new ProductPriceModel();
         $default->setId($this->identity($data['products_id'].'_default'));
         $default->setProductId($this->identity($data['products_id']));
-        $default->setCustomerGroupId($this->identity(null));
+        $default->setCustomerGroupId($this->identity(''));
 
         $defaultItem = new ProductPriceItemModel();
         $defaultItem->setProductPriceId($default->getId());
@@ -61,9 +61,9 @@ class ProductPrice extends AbstractMapper
             }
         } else {
             $customerGrp = $parent->getCustomerGroupId()->getEndpoint();
-
-            if (!is_null($customerGrp) && $customerGrp != '') {
-                $this->db->query('DELETE FROM personal_offers_by_customers_status_'.$customerGrp.' WHERE products_id='.$parent->getProductId()->getEndpoint());
+            $endpoint = $parent->getProductId()->getEndpoint();
+            if (!is_null($customerGrp) && $customerGrp != '' && strpos($endpoint, '_') === false) {
+                $this->db->query(sprintf('DELETE FROM personal_offers_by_customers_status_%d WHERE products_id = %d', $customerGrp, $endpoint));
             }
 
             unset($this->mapperConfig['getMethod']);

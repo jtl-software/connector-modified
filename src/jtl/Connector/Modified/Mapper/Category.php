@@ -119,6 +119,7 @@ class Category extends AbstractMapper
             $pulled[] = $pCat['endpoint_id'];
         }
 
+        $result = [];
         $resultCount = 0;
 
         foreach ($this->tree as $category) {
