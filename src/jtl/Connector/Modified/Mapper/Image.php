@@ -131,7 +131,7 @@ class Image extends AbstractMapper
                         $prevImage = null;
                         $imgId = $data->getId()->getEndpoint();
                         if (!empty($imgId)) {
-                            $prevImgQuery = $this->db->query('SELECT image_name FROM products_images WHERE image_id = "' . $imgId . '"');
+                            $prevImgQuery = $this->db->query(sprintf('SELECT image_name FROM products_images WHERE image_id = %s', $imgId));
                             if (count($prevImgQuery) > 0) {
                                 $prevImage = $prevImgQuery[0]['image_name'];
                             }
@@ -150,16 +150,16 @@ class Image extends AbstractMapper
                                 }
                             }
 
-                            $this->db->query('DELETE FROM products_images WHERE image_id="' . $imgId . '"');
+                            $this->db->query(sprintf('DELETE FROM products_images WHERE image_id = %s', $imgId));
                         }
 
                         if ($data->getSort() == 1) {
-                            $oldImageResult = $this->db->query('SELECT products_image FROM products WHERE products_id = "' . $data->getForeignKey()->getEndpoint() . '"');
+                            $oldImageResult = $this->db->query(sprintf('SELECT products_image FROM products WHERE products_id = %s', $data->getForeignKey()->getEndpoint()));
                         } else {
-                            $oldImageResult = $this->db->query('SELECT image_name FROM products_images WHERE products_id = "' . $data->getForeignKey()->getEndpoint() . '" && image_nr=' . ($data->getSort() - 1));
+                            $oldImageResult = $this->db->query(sprintf('SELECT image_name products_image FROM products_images WHERE products_id = %s AND image_nr = %d' . $data->getForeignKey()->getEndpoint(), ($data->getSort() - 1)));
                         }
 
-                        if (isset($oldImageResult[0])) {
+                        if (isset($oldImageResult[0]['products_image'])) {
                             $oldImage = $oldImageResult[0]['products_image'];
                             $oldImageFilePath = $this->createImageFilePath($oldImage, $data->getRelationType());
                             if (is_file($oldImageFilePath)) {
@@ -182,9 +182,9 @@ class Image extends AbstractMapper
                             $this->db->updateRow($productsObj, 'products', 'products_id', $data->getForeignKey()->getEndpoint());
                             $data->getId()->setEndpoint('pID_' . $data->getForeignKey()->getEndpoint());
 
-                            $this->db->query('DELETE FROM jtl_connector_link_image WHERE endpoint_id="' . $data->getId()->getEndpoint() . '"');
-                            $this->db->query('DELETE FROM jtl_connector_link_image WHERE host_id=' . $data->getId()->getHost());
-                            $this->db->query('INSERT INTO jtl_connector_link_image SET host_id="' . $data->getId()->getHost() . '", endpoint_id="' . $data->getId()->getEndpoint() . '"');
+                            $this->db->query(sprintf('DELETE FROM jtl_connector_link_image WHERE endpoint_id = "%s"', $data->getId()->getEndpoint()));
+                            $this->db->query(sprintf('DELETE FROM jtl_connector_link_image WHERE host_id = %d', $data->getId()->getHost()));
+                            $this->db->query(sprintf('INSERT INTO jtl_connector_link_image SET host_id = %d, endpoint_id = "%s"', $data->getId()->getHost(), $data->getId()->getEndpoint()));
                         } else {
                             $imgObj = new \stdClass();
                             $imgObj->image_id = (int)$data->getId()->getEndpoint();
@@ -200,8 +200,8 @@ class Image extends AbstractMapper
                             );
                             $newId = $newIdQuery->getKey();
 
-                            $this->db->query('DELETE FROM jtl_connector_link_image WHERE host_id=' . $data->getId()->getHost());
-                            $this->db->query('INSERT INTO jtl_connector_link_image SET host_id="' . $data->getId()->getHost() . '", endpoint_id="' . $newId . '"');
+                            $this->db->query(sprintf('DELETE FROM jtl_connector_link_image WHERE host_id = %d', $data->getId()->getHost()));
+                            $this->db->query(sprintf('INSERT INTO jtl_connector_link_image SET host_id = %d, endpoint_id = "%s"', $data->getId()->getHost(), $newId));
 
                             $data->getId()->setEndpoint($newId);
                         }
