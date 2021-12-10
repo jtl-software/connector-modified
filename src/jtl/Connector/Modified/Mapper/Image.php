@@ -131,7 +131,7 @@ class Image extends AbstractMapper
                         $prevImage = null;
                         $imgId = $data->getId()->getEndpoint();
                         if (!empty($imgId)) {
-                            $prevImgQuery = $this->db->query(sprintf('SELECT image_name FROM products_images WHERE image_id = %s', $imgId));
+                            $prevImgQuery = $this->db->query(sprintf('SELECT image_name FROM products_images WHERE image_id = "%s"', $imgId));
                             if (count($prevImgQuery) > 0) {
                                 $prevImage = $prevImgQuery[0]['image_name'];
                             }
@@ -150,13 +150,13 @@ class Image extends AbstractMapper
                                 }
                             }
 
-                            $this->db->query(sprintf('DELETE FROM products_images WHERE image_id = %s', $imgId));
+                            $this->db->query(sprintf('DELETE FROM products_images WHERE image_id = "%s"', $imgId));
                         }
 
                         if ($data->getSort() == 1) {
                             $oldImageResult = $this->db->query(sprintf('SELECT products_image FROM products WHERE products_id = %s', $data->getForeignKey()->getEndpoint()));
                         } else {
-                            $oldImageResult = $this->db->query(sprintf('SELECT image_name products_image FROM products_images WHERE products_id = %s AND image_nr = %d' . $data->getForeignKey()->getEndpoint(), ($data->getSort() - 1)));
+                            $oldImageResult = $this->db->query(sprintf('SELECT image_name products_image FROM products_images WHERE products_id = %s AND image_nr = %d' , $data->getForeignKey()->getEndpoint(), ($data->getSort() - 1)));
                         }
 
                         if (isset($oldImageResult[0]['products_image'])) {
