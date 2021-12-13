@@ -426,7 +426,7 @@ class Product extends AbstractMapper
 
     protected function manufacturerId($data)
     {
-        return $this->replaceZero($data['manufacturers_id']);
+        return $this->replaceZero((string)$data['manufacturers_id']);
     }
 
     protected function unitId($data)
@@ -740,15 +740,15 @@ class Product extends AbstractMapper
         if (self::isVariationChild($endpoint)) {
             $data = explode('_', (string)$endpoint);
             return $data[1];
-        } else {
-            throw new \Error($endpoint . ' is not a Valid VarKombi endpoint');
         }
+
+        throw new \Error($endpoint . ' is not a Valid VarKombi endpoint');
     }
 
     public static function isVariationChild($endpoint)
     {
         $data = explode('_', (string)$endpoint);
-        return isset($data[1]) ? true : false;
+        return isset($data[1]);
     }
 
     /**

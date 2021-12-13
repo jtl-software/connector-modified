@@ -1,3 +1,8 @@
+3.10.0
+------
+- CO-1863 - Fixed problem with createImageFilePath and other minor bugs
+- Switched to connector components xtc library
+
 3.9.0
 -----
 - CO-1779 - Fixed multilingual var combi item not selectable in the shop

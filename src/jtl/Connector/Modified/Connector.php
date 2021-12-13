@@ -73,13 +73,13 @@ class Connector extends BaseConnector
 
     private function readConfigFile()
     {
-        require_once(CONNECTOR_DIR.'/../includes/configure.php');
-        require_once(CONNECTOR_DIR.'/../inc/set_admin_directory.inc.php');
+        require_once(dirname(CONNECTOR_DIR) . '/includes/configure.php');
+        require_once(dirname(CONNECTOR_DIR) . '/inc/set_admin_directory.inc.php');
 
         if (defined('DIR_ADMIN')) {
-            require_once(CONNECTOR_DIR.'/../' . DIR_ADMIN . '/includes/version.php');
+            require_once(dirname(CONNECTOR_DIR) . '/' . DIR_ADMIN . '/includes/version.php');
         } else {
-            require_once(CONNECTOR_DIR.'/../admin/includes/version.php');
+            require_once(dirname(CONNECTOR_DIR) . '/admin/includes/version.php');
         }
 
         return [
