@@ -19,8 +19,9 @@ class Product extends AbstractMapper
 
     protected $mapperConfig = [
         "table" => "products",
-        "query" => "SELECT p.* FROM products p
+        "query" => "SELECT p.*, v.products_vpe_name FROM products p
             LEFT JOIN jtl_connector_link_product l ON p.products_id = l.endpoint_id
+            INNER JOIN products_vpe v ON p.products_vpe = v.products_vpe_id
             WHERE l.host_id IS NULL",
         "where" => "products_id",
         "identity" => "getId",
@@ -36,6 +37,10 @@ class Product extends AbstractMapper
             "manufacturerId" => null,
             "manufacturerNumber" => "products_manufacturers_model",
             "unitId" => null,
+            "measurementQuantity" => "products_vpe_value",
+            "measurementUnitCode" => "products_vpe_name",
+            "basePriceUnitCode" => "products_vpe_name",
+            "basePriceQuantity" => null,
             "basePriceDivisor" => "products_vpe_value",
             "considerBasePrice" => null,
             "isActive" => "products_status",
@@ -318,9 +323,6 @@ class Product extends AbstractMapper
     protected function products_vpe($data)
     {
         $name = $data->getBasePriceUnitCode();
-        if ($data->getBasePriceQuantity() !== 1.) {
-            $name = sprintf("%s %s", $data->getBasePriceQuantity(), $data->getBasePriceUnitCode());
-        }
 
         if (!empty($name)) {
             foreach ($data->getI18ns() as $i18n) {
@@ -495,6 +497,11 @@ class Product extends AbstractMapper
     {
         $childCount = $this->db->query("SELECT COUNT(*) AS cnt FROM products_attributes WHERE products_id = " . $data['products_id']);
         return (int)$childCount[0]['cnt'] > 0;
+    }
+
+    protected function basePriceQuantity()
+    {
+        return 1;
     }
 
     /**
