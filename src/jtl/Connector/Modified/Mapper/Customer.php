@@ -141,7 +141,7 @@ class Customer extends AbstractMapper
         $entry->entry_postcode = $data->getZipCode();
         $entry->entry_city = $data->getCity();
         $entry->entry_state = $data->getState();
-        $entry->entry_country_id = ($countryResult) ? $countryResult[0]['countries_id'] : '81';
+        $entry->entry_country_id = isset($countryResult[0]['countries_id']) ? $countryResult[0]['countries_id'] : '81';
 
         $address = $this->db->insertRow($entry, 'address_book');
 

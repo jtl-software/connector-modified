@@ -13,12 +13,12 @@ class ShippingMethod extends AbstractMapper
 
     public function pull($data = null, $limit = null): array
     {
-        $moduleStr = $this->db->query('SELECT configuration_value FROM configuration WHERE configuration_key ="MODULE_SHIPPING_INSTALLED"');
+        $return = [];
 
+        $moduleStr = $this->db->query('SELECT configuration_value FROM configuration WHERE configuration_key ="MODULE_SHIPPING_INSTALLED"');
         if (count($moduleStr) > 0) {
             $modules = explode(';', $moduleStr[0]['configuration_value']);
             if (count($modules) > 0) {
-                $return = [];
 
                 foreach ($modules as $moduleFile) {
                     if (!empty($moduleFile)) {
@@ -39,8 +39,8 @@ class ShippingMethod extends AbstractMapper
                     }
                 }
 
-                return $return;
             }
         }
+        return $return;
     }
 }

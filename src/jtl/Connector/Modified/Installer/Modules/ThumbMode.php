@@ -9,6 +9,7 @@ class ThumbMode extends Module
 
     public function form()
     {
+        $data = [];
         $data['thumbs'] .= '<div class="form-group">
             <label for="thumbs" class="col-xs-2 control-label">Thumbnail-Modus</label>
                 <div class="col-xs-6">

@@ -1,6 +1,7 @@
 <?php
 namespace jtl\Connector\Modified\Mapper;
 
+use jtl\Connector\Model\DataModel;
 use jtl\Connector\Model\ProductStockLevel as ProductStockLevelModel;
 
 class ProductStockLevel extends AbstractMapper
@@ -13,20 +14,25 @@ class ProductStockLevel extends AbstractMapper
 
         return [$stockLevel];
     }
-    
-    public function push(ProductStockLevelModel $stockLevel)
+
+    /**
+     * @param ProductStockLevelModel $model
+     * @param \stdClass|null $dbObj
+     * @return false|DataModel
+     */
+    public function push(DataModel $model, \stdClass $dbObj = null)
     {
-        $productId = $stockLevel->getProductId()->getEndpoint();
+        $productId = $model->getProductId()->getEndpoint();
         $isVarCombi = Product::isVariationChild($productId);
         
         if (!empty($productId) && $isVarCombi == false) {
-            $this->db->query('UPDATE products SET products_quantity='.round($stockLevel->getStockLevel()).' WHERE products_id='.$productId);
+            $this->db->query('UPDATE products SET products_quantity='.round($model->getStockLevel()).' WHERE products_id='.$productId);
             
-            return $stockLevel;
+            return $model;
         } elseif (!empty($productId) && $isVarCombi == true) {
-            $this->db->query('UPDATE products_attributes SET attributes_stock ='. round($stockLevel->getStockLevel()) .' WHERE options_values_id =' . Product::extractOptionValueId($productId));
+            $this->db->query('UPDATE products_attributes SET attributes_stock ='. round($model->getStockLevel()) .' WHERE options_values_id =' . Product::extractOptionValueId($productId));
             
-            return $stockLevel;
+            return $model;
         }
         
         return false;

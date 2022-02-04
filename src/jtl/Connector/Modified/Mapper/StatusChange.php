@@ -1,19 +1,25 @@
 <?php
 namespace jtl\Connector\Modified\Mapper;
 
+use jtl\Connector\Model\DataModel;
 use jtl\Connector\Model\StatusChange as StatusChangeModel;
 use jtl\Connector\Model\CustomerOrder;
 
 class StatusChange extends AbstractMapper
 {
-    public function push(StatusChangeModel $status)
+    /**
+     * @param StatusChangeModel $model
+     * @param \stdClass|null $dbObj
+     * @return DataModel
+     */
+    public function push(DataModel $model, \stdClass $dbObj = null)
     {
-        $customerOrderId = (int) $status->getCustomerOrderId()->getEndpoint();
+        $customerOrderId = (int) $model->getCustomerOrderId()->getEndpoint();
 
         if ($customerOrderId > 0) {
             $mapping = (array) $this->connectorConfig->mapping;
             
-            $newStatus = $mapping[$this->getStatus($status)];
+            $newStatus = $mapping[$this->getStatus($model)];
 
             if (!is_null($newStatus)) {
                 $this->db->query('UPDATE orders SET orders_status='.$newStatus.' WHERE orders_id='.$customerOrderId);
@@ -27,7 +33,7 @@ class StatusChange extends AbstractMapper
             }
         }
 
-        return $status;
+        return $model;
     }
 
     private function getStatus(StatusChangeModel $status)

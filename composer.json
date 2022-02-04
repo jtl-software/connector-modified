@@ -37,7 +37,8 @@
         "phpunit/phpunit": ">=7.0",
         "friendsofphp/php-cs-fixer": "^3.1",
         "phpcompatibility/php-compatibility": "dev-develop",
-        "dealerdirect/phpcodesniffer-composer-installer": "^0.7.1"
+        "dealerdirect/phpcodesniffer-composer-installer": "^0.7.1",
+        "phpstan/phpstan": "^1.4"
     },
     "autoload-dev": {
         "psr-4": {
@@ -48,6 +49,7 @@
         "build": [
             "@composer update",
             "./vendor/bin/phpcs src/ --extensions=php -p --standard=phpcs.xml.dist",
+            "./vendor/bin/phpstan analyse",
             "@composer update --no-dev",
             "./vendor/bin/phing release",
             "@composer update"

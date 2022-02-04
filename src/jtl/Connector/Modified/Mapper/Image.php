@@ -302,7 +302,7 @@ class Image extends AbstractMapper
             }
 
             foreach ($this->thumbConfig as $folder => $sizes) {
-                if (!is_null($oldImage)) {
+                if (isset($oldImage) && !is_null($oldImage)) {
                     unlink($this->shopConfig['shop']['path'] . $this->shopConfig['img'][$folder] . $oldImage);
                 }
             }
@@ -380,6 +380,7 @@ class Image extends AbstractMapper
     /**
      * @param $fileName
      * @param null $oldImage
+     * @throws \Exception
      */
     private function generateThumbs($fileName, $oldImage = null)
     {
@@ -395,6 +396,8 @@ class Image extends AbstractMapper
             case 3:
                 $image = imagecreatefrompng($this->shopConfig['shop']['path'] . $this->shopConfig['img']['original'] . $fileName);
                 break;
+            default:
+                throw new \Exception(sprintf('Unknown image type %s. Supported image types: gif, jpg, png.', $imgInfo[2]));
         }
 
         $width = imagesx($image);
@@ -402,7 +405,7 @@ class Image extends AbstractMapper
         $original_aspect = $width / $height;
 
         foreach ($this->thumbConfig as $folder => $sizes) {
-            if (!empty($oldImage)) {
+            if (!is_null($oldImage) && !empty($oldImage)) {
                 unlink($this->shopConfig['shop']['path'] . $this->shopConfig['img'][$folder] . $oldImage);
             }
 

@@ -11,6 +11,9 @@ class TaxRate extends Module
     {
         $rates = $this->db->query('SELECT r.tax_rates_id,r.tax_rate,r.tax_class_id,r.tax_description,c.tax_class_title FROM tax_rates r LEFT JOIN tax_class c ON r.tax_class_id=c.tax_class_id WHERE r.tax_rate > 0');
 
+        $options = '';
+        $data = [];
+
         foreach ($rates as $taxRate) {
             $selected = $taxRate['tax_rates_id'] == $this->config->tax_rate ? ' selected="selected"' : '';
             $options .= '<option value="'.$taxRate['tax_rates_id'].'"'.$selected.'>'.$taxRate['tax_description'].' - '.$taxRate['tax_class_title'].'</option>';

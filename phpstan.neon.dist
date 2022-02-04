@@ -1,0 +1,16 @@
+parameters:
+	level: 1
+	phpVersion: 80100
+	ignoreErrors:
+	    -
+	        message: '#Constant [a-zA-Z_]+ not found.#'
+	        paths:
+	            - src/jtl/Connector/Modified/Connector.php
+	            - src/jtl/Connector/Modified/Installer/Installer.php
+	            - src/jtl/Connector/Modified/Controller/Connector.php
+	scanFiles:
+	    - index.php
+	    - vendor/jtl/connector/src/bootstrap.php
+	paths:
+		- src
+		- install

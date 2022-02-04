@@ -275,7 +275,7 @@ class Product extends AbstractMapper
             }
         }
 
-        $this->sessionHelper->deleteUnusedVariations = true;
+        Connector::getSessionHelper()->deleteUnusedVariations = true;
         return $data;
     }
 

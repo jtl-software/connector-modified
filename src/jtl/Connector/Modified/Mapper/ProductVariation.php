@@ -37,9 +37,11 @@ class ProductVariation extends AbstractMapper
                 /** @var \jtl\Connector\Model\ProductVariation $variation */
                 foreach ($parent->getVariations() as $variation) {
                     // get variation name in default language
+                    $varName = '';
                     foreach ($variation->getI18ns() as $i18n) {
                         if ($i18n->getLanguageISO() == $this->fullLocale($this->shopConfig['settings']['DEFAULT_LANGUAGE'])) {
                             $varName = $i18n->getName();
+                            break;
                         }
                     }
 
@@ -68,6 +70,7 @@ class ProductVariation extends AbstractMapper
                     // VariationValues
                     foreach ($variation->getValues() as $value) {
                         // get value name in default language
+                        $valueName = '';
                         foreach ($value->getI18ns() as $i18n) {
                             if ($i18n->getLanguageISO() == $this->fullLocale($this->shopConfig['settings']['DEFAULT_LANGUAGE'])) {
                                 $valueName = $i18n->getName();

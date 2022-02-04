@@ -27,7 +27,8 @@ class CrossSellingGroup extends AbstractMapper
                 $this->db->query('DELETE FROM products_xsell_grp_name WHERE products_xsell_grp_name_id='.$id);
             }
             $group->getId()->setEndpoint($id);
-    
+
+            $i18ns = [];
             /** @var \jtl\Connector\Model\CrossSellingGroupI18n $i18n */
             foreach ($group->getI18ns() as $i18n) {
                 $i18n->setCrossSellingGroupId($group->getId());
