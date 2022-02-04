@@ -80,7 +80,7 @@ class PrimaryKeyMapper implements IPrimaryKeyMapper
         }
     }
 
-    public function delete($endpointId = null, $hostId = null, $type)
+    public function delete($endpointId, $hostId, $type)
     {
         if (isset(static::$types[$type])) {
             Logger::write(sprintf('Delete link with endpoint_id (%s), host_id (%s) and type (%s)', $endpointId, $hostId, $type), Logger::DEBUG, 'linker');

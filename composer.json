@@ -18,6 +18,8 @@
             "php": "7.1.3"
         }
     },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "require": {
         "php": ">=7.1",
         "jtl/connector": "^3.1",
@@ -33,11 +35,22 @@
     },
     "require-dev": {
         "phpunit/phpunit": ">=7.0",
-        "friendsofphp/php-cs-fixer": "^3.1"
+        "friendsofphp/php-cs-fixer": "^3.1",
+        "phpcompatibility/php-compatibility": "dev-develop",
+        "dealerdirect/phpcodesniffer-composer-installer": "^0.7.1"
     },
     "autoload-dev": {
         "psr-4": {
             "Jtl\\Connector\\Modified\\Tests\\": "tests/src"
         }
+    },
+    "scripts": {
+        "build": [
+            "@composer update",
+            "./vendor/bin/phpcs src/ --extensions=php -p --standard=phpcs.xml.dist",
+            "@composer update --no-dev",
+            "./vendor/bin/phing release",
+            "@composer update"
+        ]
     }
 }

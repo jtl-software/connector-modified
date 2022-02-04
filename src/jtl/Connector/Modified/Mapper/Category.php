@@ -159,7 +159,7 @@ class Category extends AbstractMapper
         array_map('unlink', glob($this->shopConfig['shop']['path'].'templates_c/*'));
     }
 
-    private function getChildren($ids = null, $level = 0, $limit)
+    private function getChildren($ids, $level, $limit)
     {
         if (is_null($ids)) {
             $sql = 'c.parent_id=0';
