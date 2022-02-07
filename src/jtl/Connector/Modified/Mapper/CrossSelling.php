@@ -1,6 +1,8 @@
 <?php
 namespace jtl\Connector\Modified\Mapper;
 
+use jtl\Connector\Model\DataModel;
+
 class CrossSelling extends AbstractMapper
 {
     protected $mapperConfig = [
@@ -19,14 +21,14 @@ class CrossSelling extends AbstractMapper
         ]
     ];
 
-    public function push($data, $dbObj = null)
+    public function push(DataModel $model, \stdClass $dbObj = null)
     {
-        $id = $data->getProductId()->getEndpoint();
+        $id = $model->getProductId()->getEndpoint();
 
         if (!empty($id)) {
             $this->db->query('DELETE FROM products_xsell WHERE products_id='.Product::extractParentId($id));
         
-            foreach ($data->getItems() as $item) {
+            foreach ($model->getItems() as $item) {
                 foreach ($item->getProductIds() as $xsellid) {
                     $xsell = new \stdClass;
                     $xsell->products_id = $id;
@@ -38,10 +40,10 @@ class CrossSelling extends AbstractMapper
             }
         }
 
-        return $data;
+        return $model;
     }
 
-    public function delete($data)
+    public function delete(DataModel $data)
     {
         $id = $data->getProductId()->getEndpoint();
 

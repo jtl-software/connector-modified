@@ -1,6 +1,8 @@
 <?php
 namespace jtl\Connector\Modified\Mapper;
 
+use jtl\Connector\Model\DataModel;
+
 class ProductSpecialPriceItem extends AbstractMapper
 {
     protected $mapperConfig = [
@@ -16,9 +18,9 @@ class ProductSpecialPriceItem extends AbstractMapper
         return [$this->generateModel($data)];
     }
 
-    public function push($parent, $dbObj = null)
+    public function push(DataModel $model, \stdClass $dbObj = null)
     {
-        $prices = $parent->getItems();
+        $prices = $model->getItems();
         $dbObj->specials_new_products_price = $prices[0]->getPriceNet();
     }
 

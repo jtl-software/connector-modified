@@ -1,6 +1,7 @@
 <?php
 namespace jtl\Connector\Modified\Mapper;
 
+use jtl\Connector\Model\DataModel;
 use jtl\Connector\Model\ProductInvisibility as ProductInvisibilityModel;
 use jtl\Connector\Model\Identity;
 
@@ -25,11 +26,11 @@ class ProductInvisibility extends \jtl\Connector\Modified\Mapper\AbstractMapper
         return $return;
     }
 
-    public function push($data, $dbObj = null)
+    public function push(DataModel $model, \stdClass $dbObj = null)
     {
         $inactiveGroups = [];
 
-        foreach ($data->getInvisibilities() as $invisibility) {
+        foreach ($model->getInvisibilities() as $invisibility) {
             $inactiveGroups[] = $invisibility->getCustomerGroupId()->getEndpoint();
         }
 
@@ -42,6 +43,6 @@ class ProductInvisibility extends \jtl\Connector\Modified\Mapper\AbstractMapper
             $dbObj->$property = in_array($groupId, $inactiveGroups) ? 0 : 1;
         }
 
-        return $data->getInvisibilities();
+        return $model->getInvisibilities();
     }
 }

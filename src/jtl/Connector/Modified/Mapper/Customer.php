@@ -2,6 +2,7 @@
 namespace jtl\Connector\Modified\Mapper;
 
 use \jtl\Connector\Core\Utilities\Country;
+use jtl\Connector\Model\DataModel;
 
 class Customer extends AbstractMapper
 {
@@ -113,34 +114,34 @@ class Customer extends AbstractMapper
         return isset($password) ? $password : md5(rand());
     }
 
-    public function push($data, $dbObj = null)
+    public function push(DataModel $model, \stdClass $dbObj = null)
     {
-        $id = $data->getId()->getEndpoint();
+        $id = $model->getId()->getEndpoint();
         
         if (!is_null($id)) {
             $this->db->query('DELETE FROM address_book WHERE customers_id='.$id);
             $this->db->query('DELETE FROM customers_info WHERE customers_info_id='.$id);
         }
 
-        $return = parent::push($data, $dbObj);
+        $return = parent::push($model, $dbObj);
 
-        $dataIso = $data->getCountryIso();
+        $dataIso = $model->getCountryIso();
 
         if (!empty($dataIso)) {
             $countryResult = $this->db->query('SELECT countries_id FROM countries WHERE countries_iso_code_2="'.$dataIso.'"');
         }
 
         $entry = new \stdClass();
-        $entry->customers_id = $data->getId()->getEndpoint();
-        $entry->entry_gender = $data->getSalutation() == 'm' ? 'm' : 'f';
-        $entry->entry_company = $data->getCompany();
-        $entry->entry_firstname = $data->getFirstName();
-        $entry->entry_lastname = $data->getLastName();
-        $entry->entry_street_address = $data->getStreet();
-        $entry->entry_suburb = $data->getExtraAddressLine();
-        $entry->entry_postcode = $data->getZipCode();
-        $entry->entry_city = $data->getCity();
-        $entry->entry_state = $data->getState();
+        $entry->customers_id = $model->getId()->getEndpoint();
+        $entry->entry_gender = $model->getSalutation() == 'm' ? 'm' : 'f';
+        $entry->entry_company = $model->getCompany();
+        $entry->entry_firstname = $model->getFirstName();
+        $entry->entry_lastname = $model->getLastName();
+        $entry->entry_street_address = $model->getStreet();
+        $entry->entry_suburb = $model->getExtraAddressLine();
+        $entry->entry_postcode = $model->getZipCode();
+        $entry->entry_city = $model->getCity();
+        $entry->entry_state = $model->getState();
         $entry->entry_country_id = isset($countryResult[0]['countries_id']) ? $countryResult[0]['countries_id'] : '81';
 
         $address = $this->db->insertRow($entry, 'address_book');
@@ -148,10 +149,10 @@ class Customer extends AbstractMapper
         $customerUpdate = new \stdClass();
         $customerUpdate->customers_default_address_id = $address->getKey();
 
-        $insertResult = $this->db->updateRow($customerUpdate, $this->mapperConfig['table'], 'customers_id', $data->getId()->getEndpoint());
+        $insertResult = $this->db->updateRow($customerUpdate, $this->mapperConfig['table'], 'customers_id', $model->getId()->getEndpoint());
 
         $addressUpdate = new \stdClass();
-        $addressUpdate->customers_id = $data->getId()->getEndpoint();
+        $addressUpdate->customers_id = $model->getId()->getEndpoint();
 
         $this->db->updateRow($addressUpdate, 'address_book', 'address_book_id', $address->getKey());
 
@@ -162,7 +163,7 @@ class Customer extends AbstractMapper
         return $return;
     }
 
-    public function delete($data)
+    public function delete(DataModel $data)
     {
         try {
             $this->db->query('DELETE FROM customers WHERE customers_id='.$data->getId()->getEndpoint());

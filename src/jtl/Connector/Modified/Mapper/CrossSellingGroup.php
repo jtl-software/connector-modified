@@ -1,6 +1,8 @@
 <?php
 namespace jtl\Connector\Modified\Mapper;
 
+use jtl\Connector\Model\DataModel;
+
 class CrossSellingGroup extends AbstractMapper
 {
     protected $mapperConfig = [
@@ -13,12 +15,12 @@ class CrossSellingGroup extends AbstractMapper
             "i18ns" => "CrossSellingGroupI18n|addI18n",
         ],
     ];
-    
-    public function push($data, $dbObj = null)
+
+    public function push(DataModel $model, \stdClass $dbObj = null)
     {
         $result = [];
         $ids = [];
-        foreach ($data->getCrossSellingGroups() as $group) {
+        foreach ($model->getCrossSellingGroups() as $group) {
             $id = $group->getId()->getEndpoint();
             if (empty($id)) {
                 $nextId = $this->db->query('SELECT max(products_xsell_grp_name_id) + 1 AS nextID FROM products_xsell_grp_name');

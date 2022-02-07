@@ -3,6 +3,7 @@
 namespace jtl\Connector\Modified\Mapper;
 
 use jtl\Connector\Core\Logger\Logger;
+use jtl\Connector\Model\DataModel;
 use jtl\Connector\Model\Identity;
 use jtl\Connector\Model\ProductVariationI18n;
 use jtl\Connector\Model\ProductVariation;
@@ -201,21 +202,21 @@ class Product extends AbstractMapper
         return $productResult;
     }
 
-    public function push($data, $dbObj = null)
+    public function push(DataModel $model, \stdClass $dbObj = null)
     {
-        if (isset(static::$idCache[$data->getMasterProductId()->getHost()]['parentId'])) {
-            $data->getMasterProductId()->setEndpoint(static::$idCache[$data->getMasterProductId()->getHost()]['parentId']);
+        if (isset(static::$idCache[$model->getMasterProductId()->getHost()]['parentId'])) {
+            $model->getMasterProductId()->setEndpoint(static::$idCache[$model->getMasterProductId()->getHost()]['parentId']);
         }
 
-        $masterId = $data->getMasterProductId()->getEndpoint();
+        $masterId = $model->getMasterProductId()->getEndpoint();
 
-        if (count($data->getVariations()) > 0 && !$data->getIsMasterProduct() && $data->getMasterProductId()->getHost() !== 0) {
-            $this->addVarCombiAsVariation($data, $masterId);
+        if (count($model->getVariations()) > 0 && !$model->getIsMasterProduct() && $model->getMasterProductId()->getHost() !== 0) {
+            $this->addVarCombiAsVariation($model, $masterId);
             Connector::getSessionHelper()->deleteUnusedVariations = true;
-            return $data;
+            return $model;
         }
 
-        $id = $data->getId()->getEndpoint();
+        $id = $model->getId()->getEndpoint();
 
         if (!empty($id)) {
             foreach ($this->getCustomerGroups() as $group) {
@@ -230,14 +231,14 @@ class Product extends AbstractMapper
             $this->db->query('DELETE FROM specials WHERE products_id=' . $id);
         }
 
-        $savedProduct = parent::push($data, $dbObj);
+        $savedProduct = parent::push($model, $dbObj);
 
-        static::$idCache[$data->getId()->getHost()]['parentId'] = $savedProduct->getId()->getEndpoint();
+        static::$idCache[$model->getId()->getHost()]['parentId'] = $savedProduct->getId()->getEndpoint();
 
         return $savedProduct;
     }
 
-    public function delete($data)
+    public function delete(DataModel $data)
     {
         $id = $data->getId()->getEndpoint();
 

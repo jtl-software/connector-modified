@@ -3,6 +3,7 @@
 namespace jtl\Connector\Modified\Mapper;
 
 use jtl\Connector\Drawing\ImageRelationType;
+use jtl\Connector\Model\DataModel;
 use \jtl\Connector\Model\Image as ImageModel;
 use Nette\Utils\Strings;
 
@@ -81,10 +82,10 @@ class Image extends AbstractMapper
         return $result;
     }
 
-    public function push($data, $dbObj = null)
+    public function push(DataModel $model, \stdClass $dbObj = null)
     {
-        if (get_class($data) === 'jtl\Connector\Model\Image') {
-            switch ($data->getRelationType()) {
+        if (get_class($model) === 'jtl\Connector\Model\Image') {
+            switch ($model->getRelationType()) {
                 case ImageRelationType::TYPE_CATEGORY:
                 case ImageRelationType::TYPE_MANUFACTURER:
 
@@ -93,43 +94,43 @@ class Image extends AbstractMapper
                         ImageRelationType::TYPE_MANUFACTURER => 'manufacturers',
                     ];
 
-                    $subject = $indexMappings[$data->getRelationType()];
+                    $subject = $indexMappings[$model->getRelationType()];
 
                     $oldImage = null;
-                    $oldImageResult = $this->db->query(sprintf('SELECT %s_image FROM %s WHERE %s_id = %d', $subject, $subject, $subject, $data->getForeignKey()->getEndpoint()));
+                    $oldImageResult = $this->db->query(sprintf('SELECT %s_image FROM %s WHERE %s_id = %d', $subject, $subject, $subject, $model->getForeignKey()->getEndpoint()));
 
                     $imageIndex = sprintf('%s_image', $subject);
                     if (isset($oldImageResult[0][$imageIndex]) && $oldImageResult[0][$imageIndex] !== '') {
                         $oldImage = $oldImageResult[0][$imageIndex];
 
-                        $oldImageFilePath = $this->createImageFilePath($oldImage, $data->getRelationType());
+                        $oldImageFilePath = $this->createImageFilePath($oldImage, $model->getRelationType());
                         if (file_exists($oldImageFilePath)) {
                             @unlink($oldImageFilePath);
                         }
                     }
 
-                    $imgFileName = $this->generateImageName($data);
-                    $imageFilePath = $this->createImageFilePath($imgFileName, $data->getRelationType());
-                    if (!rename($data->getFilename(), $imageFilePath)) {
+                    $imgFileName = $this->generateImageName($model);
+                    $imageFilePath = $this->createImageFilePath($imgFileName, $model->getRelationType());
+                    if (!rename($model->getFilename(), $imageFilePath)) {
                         throw new \Exception('Cannot move uploaded image file');
                     }
 
                     $relatedObject = new \stdClass();
                     $relatedObject->{$imageIndex} = $imgFileName;
-                    if ($data->getRelationType() === ImageRelationType::TYPE_MANUFACTURER) {
+                    if ($model->getRelationType() === ImageRelationType::TYPE_MANUFACTURER) {
                         $relatedObject->{$imageIndex} = sprintf('%s/%s', $subject, $imgFileName);
                     }
 
-                    $this->db->updateRow($relatedObject, $subject, sprintf('%s_id', $subject), $data->getForeignKey()->getEndpoint());
+                    $this->db->updateRow($relatedObject, $subject, sprintf('%s_id', $subject), $model->getForeignKey()->getEndpoint());
 
-                    $endpoint = sprintf('%sID_%d', $subject[0], $data->getForeignKey()->getEndpoint());
-                    $data->getId()->setEndpoint($endpoint);
+                    $endpoint = sprintf('%sID_%d', $subject[0], $model->getForeignKey()->getEndpoint());
+                    $model->getId()->setEndpoint($endpoint);
                     break;
                 case ImageRelationType::TYPE_PRODUCT:
-                    if (!Product::isVariationChild($data->getForeignKey()->getEndpoint())) {
+                    if (!Product::isVariationChild($model->getForeignKey()->getEndpoint())) {
                         $oldImage = null;
                         $prevImage = null;
-                        $imgId = $data->getId()->getEndpoint();
+                        $imgId = $model->getId()->getEndpoint();
                         if (!empty($imgId)) {
                             $prevImgQuery = $this->db->query(sprintf('SELECT image_name FROM products_images WHERE image_id = "%s"', $imgId));
                             if (count($prevImgQuery) > 0) {
@@ -137,7 +138,7 @@ class Image extends AbstractMapper
                             }
 
                             if (!empty($prevImage)) {
-                                $prevImagePath = $this->createImageFilePath($prevImage, $data->getRelationType());
+                                $prevImagePath = $this->createImageFilePath($prevImage, $model->getRelationType());
                                 if (is_file($prevImagePath)) {
                                     @unlink($prevImagePath);
                                 }
@@ -153,44 +154,44 @@ class Image extends AbstractMapper
                             $this->db->query(sprintf('DELETE FROM products_images WHERE image_id = "%s"', $imgId));
                         }
 
-                        if ($data->getSort() == 1) {
-                            $oldImageResult = $this->db->query(sprintf('SELECT products_image FROM products WHERE products_id = %s', $data->getForeignKey()->getEndpoint()));
+                        if ($model->getSort() == 1) {
+                            $oldImageResult = $this->db->query(sprintf('SELECT products_image FROM products WHERE products_id = %s', $model->getForeignKey()->getEndpoint()));
                         } else {
-                            $oldImageResult = $this->db->query(sprintf('SELECT image_name products_image FROM products_images WHERE products_id = %s AND image_nr = %d' , $data->getForeignKey()->getEndpoint(), ($data->getSort() - 1)));
+                            $oldImageResult = $this->db->query(sprintf('SELECT image_name products_image FROM products_images WHERE products_id = %s AND image_nr = %d' , $model->getForeignKey()->getEndpoint(), ($model->getSort() - 1)));
                         }
 
                         if (isset($oldImageResult[0]['products_image'])) {
                             $oldImage = $oldImageResult[0]['products_image'];
-                            $oldImageFilePath = $this->createImageFilePath($oldImage, $data->getRelationType());
+                            $oldImageFilePath = $this->createImageFilePath($oldImage, $model->getRelationType());
                             if (is_file($oldImageFilePath)) {
                                 @unlink($oldImageFilePath);
                             }
                         }
 
-                        $imgFileName = $this->generateImageName($data);
-                        $imageFilePath = $this->createImageFilePath($imgFileName, $data->getRelationType());
-                        if (!rename($data->getFilename(), $imageFilePath)) {
+                        $imgFileName = $this->generateImageName($model);
+                        $imageFilePath = $this->createImageFilePath($imgFileName, $model->getRelationType());
+                        if (!rename($model->getFilename(), $imageFilePath)) {
                             throw new \Exception('Cannot move uploaded image file');
                         }
 
                         $this->generateThumbs($imgFileName, $oldImage);
 
-                        if ($data->getSort() == 1) {
+                        if ($model->getSort() == 1) {
                             $productsObj = new \stdClass();
                             $productsObj->products_image = $imgFileName;
 
-                            $this->db->updateRow($productsObj, 'products', 'products_id', $data->getForeignKey()->getEndpoint());
-                            $data->getId()->setEndpoint('pID_' . $data->getForeignKey()->getEndpoint());
+                            $this->db->updateRow($productsObj, 'products', 'products_id', $model->getForeignKey()->getEndpoint());
+                            $model->getId()->setEndpoint('pID_' . $model->getForeignKey()->getEndpoint());
 
-                            $this->db->query(sprintf('DELETE FROM jtl_connector_link_image WHERE endpoint_id = "%s"', $data->getId()->getEndpoint()));
-                            $this->db->query(sprintf('DELETE FROM jtl_connector_link_image WHERE host_id = %d', $data->getId()->getHost()));
-                            $this->db->query(sprintf('INSERT INTO jtl_connector_link_image SET host_id = %d, endpoint_id = "%s"', $data->getId()->getHost(), $data->getId()->getEndpoint()));
+                            $this->db->query(sprintf('DELETE FROM jtl_connector_link_image WHERE endpoint_id = "%s"', $model->getId()->getEndpoint()));
+                            $this->db->query(sprintf('DELETE FROM jtl_connector_link_image WHERE host_id = %d', $model->getId()->getHost()));
+                            $this->db->query(sprintf('INSERT INTO jtl_connector_link_image SET host_id = %d, endpoint_id = "%s"', $model->getId()->getHost(), $model->getId()->getEndpoint()));
                         } else {
                             $imgObj = new \stdClass();
-                            $imgObj->image_id = (int)$data->getId()->getEndpoint();
-                            $imgObj->products_id = $data->getForeignKey()->getEndpoint();
+                            $imgObj->image_id = (int)$model->getId()->getEndpoint();
+                            $imgObj->products_id = $model->getForeignKey()->getEndpoint();
                             $imgObj->image_name = $imgFileName;
-                            $imgObj->image_nr = ($data->getSort() - 1);
+                            $imgObj->image_nr = ($model->getSort() - 1);
 
                             $newIdQuery = $this->db->deleteInsertRow(
                                 $imgObj,
@@ -200,23 +201,23 @@ class Image extends AbstractMapper
                             );
                             $newId = $newIdQuery->getKey();
 
-                            $this->db->query(sprintf('DELETE FROM jtl_connector_link_image WHERE host_id = %d', $data->getId()->getHost()));
-                            $this->db->query(sprintf('INSERT INTO jtl_connector_link_image SET host_id = %d, endpoint_id = "%s"', $data->getId()->getHost(), $newId));
+                            $this->db->query(sprintf('DELETE FROM jtl_connector_link_image WHERE host_id = %d', $model->getId()->getHost()));
+                            $this->db->query(sprintf('INSERT INTO jtl_connector_link_image SET host_id = %d, endpoint_id = "%s"', $model->getId()->getHost(), $newId));
 
-                            $data->getId()->setEndpoint($newId);
+                            $model->getId()->setEndpoint($newId);
                         }
                     }
 
                     break;
             }
 
-            return $data;
+            return $model;
         } else {
             throw new \Exception('Pushed data is not an image object');
         }
     }
 
-    public function delete($data)
+    public function delete(DataModel $data)
     {
         if (get_class($data) === 'jtl\Connector\Model\Image') {
             switch ($data->getRelationType()) {

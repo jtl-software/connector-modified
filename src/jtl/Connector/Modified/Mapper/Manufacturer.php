@@ -2,6 +2,8 @@
 
 namespace jtl\Connector\Modified\Mapper;
 
+use jtl\Connector\Model\DataModel;
+
 class Manufacturer extends AbstractMapper
 {
     protected $mapperConfig = [
@@ -42,7 +44,7 @@ class Manufacturer extends AbstractMapper
         }
     }
 
-    public function delete($data)
+    public function delete(DataModel $data)
     {
         $id = $data->getId()->getEndpoint();
 
@@ -59,17 +61,17 @@ class Manufacturer extends AbstractMapper
         return $data;
     }
 
-    public function push($data, $dbObj = null)
+    public function push(DataModel $model, \stdClass $dbObj = null)
     {
-        $id = $data->getId()->getEndpoint();
+        $id = $model->getId()->getEndpoint();
 
         if (!empty($id) && $id != '') {
             $this->db->query('DELETE FROM manufacturers_info WHERE manufacturers_id=' . $id);
         }
 
-        $url = $data->getWebsiteUrl();
+        $url = $model->getWebsiteUrl();
 
-        $return = parent::push($data, $dbObj);
+        $return = parent::push($model, $dbObj);
 
         $newId = $return->getId()->getEndpoint();
 

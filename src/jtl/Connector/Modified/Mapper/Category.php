@@ -2,6 +2,7 @@
 namespace jtl\Connector\Modified\Mapper;
 
 use jtl\Connector\Core\Database\IDatabase;
+use jtl\Connector\Model\DataModel;
 use jtl\Connector\Modified\Util\ShopVersion;
 
 class Category extends AbstractMapper
@@ -137,19 +138,19 @@ class Category extends AbstractMapper
         return $result;
     }
 
-    public function push($data, $dbObj = null)
+    public function push(DataModel $model, \stdClass $dbObj = null)
     {
-        if (isset(static::$idCache[$data->getParentCategoryId()->getHost()])) {
-            $data->getParentCategoryId()->setEndpoint(static::$idCache[$data->getParentCategoryId()->getHost()]);
+        if (isset(static::$idCache[$model->getParentCategoryId()->getHost()])) {
+            $model->getParentCategoryId()->setEndpoint(static::$idCache[$model->getParentCategoryId()->getHost()]);
         }
 
-        $id = $data->getId()->getEndpoint();
+        $id = $model->getId()->getEndpoint();
 
         if (!empty($id)) {
             $this->db->query('DELETE FROM categories_description WHERE categories_id='.$id);
         }
 
-        return parent::push($data, $dbObj);
+        return parent::push($model, $dbObj);
     }
 
     public function pushDone($model, $dbObj)
@@ -184,7 +185,7 @@ class Category extends AbstractMapper
         }
     }
 
-    public function delete($data)
+    public function delete(DataModel $data)
     {
         $id = $data->getId()->getEndpoint();
 

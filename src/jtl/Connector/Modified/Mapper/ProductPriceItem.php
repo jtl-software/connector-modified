@@ -1,6 +1,8 @@
 <?php
 namespace jtl\Connector\Modified\Mapper;
 
+use jtl\Connector\Model\DataModel;
+
 class ProductPriceItem extends AbstractMapper
 {
     protected $mapperConfig = [
@@ -27,14 +29,14 @@ class ProductPriceItem extends AbstractMapper
         return $return;
     }
 
-    public function push($data, $dbObj = null)
+    public function push(DataModel $model, \stdClass $dbObj = null)
     {
-        $productId = $data->getProductId()->getEndpoint();
+        $productId = $model->getProductId()->getEndpoint();
 
-        foreach ($data->getItems() as $price) {
+        foreach ($model->getItems() as $price) {
             $obj = new \stdClass();
 
-            if (is_null($data->getCustomerGroupId()->getEndpoint()) || $data->getCustomerGroupId()->getEndpoint() == '') {
+            if (is_null($model->getCustomerGroupId()->getEndpoint()) || $model->getCustomerGroupId()->getEndpoint() == '') {
                 if (Product::isVariationChild($productId)) {
                     $productId = Product::extractOptionValueId($productId);
                     $newPrice = $this->db->query(sprintf("SELECT products_price FROM products WHERE products_id = (SELECT products_id FROM products_attributes WHERE options_values_id = %s)", $productId));
@@ -59,11 +61,11 @@ class ProductPriceItem extends AbstractMapper
                 $obj->personal_offer = $price->getNetprice();
                 $obj->quantity = ($price->getQuantity() == 0) ? 1 : $price->getQuantity();
     
-                $this->db->insertRow($obj, 'personal_offers_by_customers_status_'.$data->getCustomerGroupId()->getEndpoint());
+                $this->db->insertRow($obj, 'personal_offers_by_customers_status_'.$model->getCustomerGroupId()->getEndpoint());
             }
         }
 
-        return $data;
+        return $model;
     }
 
     protected function quantity($data)

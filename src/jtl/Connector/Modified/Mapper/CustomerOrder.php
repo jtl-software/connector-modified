@@ -3,6 +3,7 @@ namespace jtl\Connector\Modified\Mapper;
 
 use jtl\Connector\Model\CustomerOrder as CustomerOrderModel;
 use jtl\Connector\Model\CustomerOrderItem;
+use jtl\Connector\Model\DataModel;
 
 class CustomerOrder extends AbstractMapper
 {
@@ -195,19 +196,19 @@ class CustomerOrder extends AbstractMapper
         return 5;
     }
 
-    public function push($data = null, $dbObj = null)
+    public function push(DataModel $model, \stdClass $dbObj = null)
     {
-        $id = $data->getId()->getEndpoint();
+        $id = $model->getId()->getEndpoint();
 
         if (!empty($id)) {
-            $this->clear($data->getId()->getEndpoint());
+            $this->clear($model->getId()->getEndpoint());
         }
 
-        $return = parent::push($data, $dbObj);
+        $return = parent::push($model, $dbObj);
 
         $orderHistory = new \stdClass();
         $orderHistory->orders_id = $id;
-        $orderHistory->orders_status_id = $this->orders_status($data);
+        $orderHistory->orders_status_id = $this->orders_status($model);
         $orderHistory->date_added = date('Y-m-d H:i:s');
 
         $this->db->insertRow($orderHistory, 'orders_status_history');

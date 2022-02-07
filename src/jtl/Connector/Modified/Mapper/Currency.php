@@ -1,6 +1,8 @@
 <?php
 namespace jtl\Connector\Modified\Mapper;
 
+use jtl\Connector\Model\DataModel;
+
 class Currency extends AbstractMapper
 {
     protected $mapperConfig = [
@@ -29,16 +31,16 @@ class Currency extends AbstractMapper
         ]
     ];
 
-    public function push($data, $parent = null)
+    public function push(DataModel $model, \stdClass $dbObj = null)
     {
-        foreach ($data->getCurrencies() as $currency) {
+        foreach ($model->getCurrencies() as $currency) {
             $check = $this->db->query('SELECT currencies_id FROM currencies WHERE code="'.$currency->getIso().'"');
             if (count($check) > 0) {
                 $currency->getId()->setEndpoint($check[0]['currencies_id']);
             }
         }
 
-        return parent::push($data, $parent);
+        return parent::push($model, $dbObj);
     }
 
     protected function isDefault($data)

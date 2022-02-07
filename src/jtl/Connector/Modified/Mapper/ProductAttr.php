@@ -1,6 +1,7 @@
 <?php
 namespace jtl\Connector\Modified\Mapper;
 
+use jtl\Connector\Model\DataModel;
 use jtl\Connector\Model\ProductAttr as ProductAttrModel;
 use jtl\Connector\Model\ProductAttrI18n as ProductAttrI18nModel;
 
@@ -24,7 +25,7 @@ class ProductAttr extends AbstractMapper
         return $attrs;
     }
 
-    public function push($data, $dbObj = null)
+    public function push(DataModel $model, \stdClass $dbObj = null)
     {
         $dbObj->products_status = 1;
         $tableColumns = [];
@@ -34,7 +35,7 @@ class ProductAttr extends AbstractMapper
             array_push($tableColumns, $column['COLUMN_NAME']);
         }
         
-        foreach ($data->getAttributes() as $attr) {
+        foreach ($model->getAttributes() as $attr) {
             $i18ns = $attr->getI18ns();
             $i18n = reset($i18ns);
             $field = array_search($i18n->getName(), $this->additions);
@@ -46,7 +47,7 @@ class ProductAttr extends AbstractMapper
             }
         }
 
-        return $data->getAttributes();
+        return $model->getAttributes();
     }
 
     private function createAttr($id, $name, $value, $data)

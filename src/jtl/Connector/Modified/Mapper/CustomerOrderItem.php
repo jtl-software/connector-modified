@@ -2,6 +2,8 @@
 
 namespace jtl\Connector\Modified\Mapper;
 
+use jtl\Connector\Model\DataModel;
+
 class CustomerOrderItem extends AbstractMapper
 {
     protected $mapperConfig = [
@@ -37,7 +39,7 @@ class CustomerOrderItem extends AbstractMapper
         ]
     ];
 
-    public function push($parent, $dbObj = null)
+    public function push(DataModel $model, \stdClass $dbObj = null)
     {
         $return = [];
 
@@ -45,9 +47,9 @@ class CustomerOrderItem extends AbstractMapper
         $sum = 0;
         $taxes = 0;
 
-        foreach ($parent->getItems() as $itemData) {
+        foreach ($model->getItems() as $itemData) {
             if ($itemData->getType() == "product") {
-                $return[] = $this->generateDbObj($itemData, $dbObj, $parent);
+                $return[] = $this->generateDbObj($itemData, $dbObj, $model);
                 $tax = ($itemData->getPrice() / 100) * $itemData->getVat();
                 $taxes += $tax;
                 $sum += $itemData->getPrice() + $tax;
@@ -61,8 +63,8 @@ class CustomerOrderItem extends AbstractMapper
         $totals = [];
 
         $ot_shipping = new \stdClass();
-        $ot_shipping->title = $parent->getShippingMethodName() . ':';
-        $ot_shipping->text = number_format($shippingCosts, 2, ',', '.') . ' ' . $parent->getCurrencyIso();
+        $ot_shipping->title = $model->getShippingMethodName() . ':';
+        $ot_shipping->text = number_format($shippingCosts, 2, ',', '.') . ' ' . $model->getCurrencyIso();
         $ot_shipping->value = $shippingCosts;
         $ot_shipping->sort_order = 30;
         $ot_shipping->class = 'ot_shipping';
@@ -70,7 +72,7 @@ class CustomerOrderItem extends AbstractMapper
 
         $ot_subtotal = new \stdClass();
         $ot_subtotal->title = 'Zwischensumme:';
-        $ot_subtotal->text = number_format($sum, 2, ',', '.') . ' ' . $parent->getCurrencyIso();
+        $ot_subtotal->text = number_format($sum, 2, ',', '.') . ' ' . $model->getCurrencyIso();
         $ot_subtotal->value = $sum;
         $ot_subtotal->sort_order = 10;
         $ot_subtotal->class = 'ot_subtotal';
@@ -78,7 +80,7 @@ class CustomerOrderItem extends AbstractMapper
 
         $ot_total = new \stdClass();
         $ot_total->title = '<b>Summe</b>:';
-        $ot_total->text = '<b> ' . number_format($sum + $shippingCosts, 2, ',', '.') . ' ' . $parent->getCurrencyIso() . '</b>';
+        $ot_total->text = '<b> ' . number_format($sum + $shippingCosts, 2, ',', '.') . ' ' . $model->getCurrencyIso() . '</b>';
         $ot_total->value = $sum + $shippingCosts;
         $ot_total->sort_order = 99;
         $ot_total->class = 'ot_total';
@@ -86,15 +88,15 @@ class CustomerOrderItem extends AbstractMapper
 
         $ot_tax = new \stdClass();
         $ot_tax->title = 'Steuer:';
-        $ot_tax->text = number_format($taxes, 2, ',', '.') . ' ' . $parent->getCurrencyIso();
+        $ot_tax->text = number_format($taxes, 2, ',', '.') . ' ' . $model->getCurrencyIso();
         $ot_tax->value = $taxes;
         $ot_tax->sort_order = 30;
         $ot_tax->class = 'ot_tax';
         $totals[] = $ot_tax;
 
         foreach ($totals as $total) {
-            $total->orders_id = $parent->getId()->getEndpoint();
-            $this->db->deleteInsertRow($total, 'orders_total', ['orders_id', 'class'], [$parent->getId()->getEndpoint(), $total->class]);
+            $total->orders_id = $model->getId()->getEndpoint();
+            $this->db->deleteInsertRow($total, 'orders_total', ['orders_id', 'class'], [$model->getId()->getEndpoint(), $total->class]);
         }
 
         return $return;

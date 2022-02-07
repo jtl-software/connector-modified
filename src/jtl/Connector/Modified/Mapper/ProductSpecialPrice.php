@@ -1,6 +1,8 @@
 <?php
 namespace jtl\Connector\Modified\Mapper;
 
+use jtl\Connector\Model\DataModel;
+
 class ProductSpecialPrice extends AbstractMapper
 {
     protected $mapperConfig = [
@@ -35,16 +37,14 @@ class ProductSpecialPrice extends AbstractMapper
         return $data['expires_date'] == '0000-00-00 00:00:00' ? null : $data['expires_date'];
     }
 
-    public function push($parent, $dbObj = null)
+    public function push(DataModel $model, \stdClass $dbObj = null)
     {
-        $id = $parent->getId()->getEndpoint();
-
-        if (!is_null($parent->getSpecialPrices())) {
-            foreach ($parent->getSpecialPrices() as $special) {
-                $special->setProductId($parent->getId());
+        if (!is_null($model->getSpecialPrices())) {
+            foreach ($model->getSpecialPrices() as $special) {
+                $special->setProductId($model->getId());
             }
 
-            return parent::push($parent, $dbObj);
+            return parent::push($model, $dbObj);
         }
     }
 }

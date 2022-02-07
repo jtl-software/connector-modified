@@ -1,6 +1,8 @@
 <?php
 namespace jtl\Connector\Modified\Mapper;
 
+use jtl\Connector\Model\DataModel;
+
 class UnitI18n extends AbstractMapper
 {
     protected $mapperConfig = [
@@ -19,11 +21,11 @@ class UnitI18n extends AbstractMapper
         ]
     ];
 
-    public function push($data, $dbObj = null)
+    public function push(DataModel $model, \stdClass $dbObj = null)
     {
         $id = null;
 
-        foreach ($data->getI18ns() as $i18n) {
+        foreach ($model->getI18ns() as $i18n) {
             $language_id = $this->locale2id($i18n->getLanguageISO());
             
             $dbResult = $this->db->query('SELECT code FROM languages WHERE languages_id='.$language_id);
@@ -43,9 +45,9 @@ class UnitI18n extends AbstractMapper
             $this->db->query('DELETE FROM products_vpe WHERE products_vpe_id='.$id);
         }
 
-        $data->getId()->setEndpoint($id);
+        $model->getId()->setEndpoint($id);
 
-        foreach ($data->getI18ns() as $i18n) {
+        foreach ($model->getI18ns() as $i18n) {
             $i18n->getUnitId()->setEndpoint($id);
 
             $vpe = new \stdClass();
@@ -56,7 +58,7 @@ class UnitI18n extends AbstractMapper
             $this->db->insertRow($vpe, 'products_vpe');
         }
 
-        return $data->getI18ns();
+        return $model->getI18ns();
     }
 
     protected function languageISO($data)

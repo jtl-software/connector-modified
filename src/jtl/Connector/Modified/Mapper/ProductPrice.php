@@ -1,6 +1,7 @@
 <?php
 namespace jtl\Connector\Modified\Mapper;
 
+use jtl\Connector\Model\DataModel;
 use jtl\Connector\Model\ProductPrice as ProductPriceModel;
 use jtl\Connector\Model\ProductPriceItem as ProductPriceItemModel;
 
@@ -51,17 +52,17 @@ class ProductPrice extends AbstractMapper
         return $return;
     }
 
-    public function push($parent, $dbObj = null)
+    public function push(DataModel $model, \stdClass $dbObj = null)
     {
-        if (get_class($parent) == 'jtl\Connector\Model\Product') {
-            $productId = $parent->getId();
+        if (get_class($model) == 'jtl\Connector\Model\Product') {
+            $productId = $model->getId();
 
-            foreach ($parent->getPrices() as $price) {
+            foreach ($model->getPrices() as $price) {
                 $price->setProductId($productId);
             }
         } else {
-            $customerGrp = $parent->getCustomerGroupId()->getEndpoint();
-            $endpoint = $parent->getProductId()->getEndpoint();
+            $customerGrp = $model->getCustomerGroupId()->getEndpoint();
+            $endpoint = $model->getProductId()->getEndpoint();
             if (!is_null($customerGrp) && $customerGrp != '' && strpos($endpoint, '_') === false) {
                 $this->db->query(sprintf('DELETE FROM personal_offers_by_customers_status_%d WHERE products_id = %d', $customerGrp, $endpoint));
             }
@@ -69,7 +70,7 @@ class ProductPrice extends AbstractMapper
             unset($this->mapperConfig['getMethod']);
         }
 
-        return parent::push($parent, $dbObj);
+        return parent::push($model, $dbObj);
     }
 
     protected function id($data)

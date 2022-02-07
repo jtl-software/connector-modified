@@ -1,6 +1,8 @@
 <?php
 namespace jtl\Connector\Modified\Mapper;
 
+use jtl\Connector\Model\DataModel;
+
 class CrossSellingGroupI18n extends AbstractMapper
 {
     protected $mapperConfig = [
@@ -17,10 +19,10 @@ class CrossSellingGroupI18n extends AbstractMapper
         ]
     ];
 
-    public function push($data, $dbObj = null)
+    public function push(DataModel $model, \stdClass $dbObj = null)
     {
         /** @var \jtl\Connector\Model\CrossSellingGroupI18n $i18n */
-        $i18n = $data;
+        $i18n = $model;
         
         $grp = new \stdClass();
         $grp->language_id = $this->locale2id($i18n->getLanguageISO());

@@ -3,6 +3,7 @@ namespace jtl\Connector\Modified\Mapper;
 
 use jtl\Connector\Model\CategoryAttr as CategoryAttrModel;
 use jtl\Connector\Model\CategoryAttrI18n as CategoryAttrI18nModel;
+use jtl\Connector\Model\DataModel;
 
 class CategoryAttr extends AbstractMapper
 {
@@ -23,11 +24,11 @@ class CategoryAttr extends AbstractMapper
         return [$attr];
     }
 
-    public function push($data, $dbObj = null)
+    public function push(DataModel $model, \stdClass $dbObj = null)
     {
         $dbObj->categories_status = 1;
 
-        foreach ($data->getAttributes() as $attr) {
+        foreach ($model->getAttributes() as $attr) {
             foreach ($attr->getI18ns() as $i18n) {
                 if ($i18n->getName() == 'Aktiv' && $i18n->getValue() == '0') {
                     $dbObj->categories_status = 0;
@@ -36,6 +37,6 @@ class CategoryAttr extends AbstractMapper
             }
         }
 
-        return $data->getAttributes();
+        return $model->getAttributes();
     }
 }

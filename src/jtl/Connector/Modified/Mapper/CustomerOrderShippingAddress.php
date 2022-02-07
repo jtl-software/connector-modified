@@ -2,6 +2,7 @@
 namespace jtl\Connector\Modified\Mapper;
 
 use jtl\Connector\Core\Utilities\Country;
+use jtl\Connector\Model\DataModel;
 
 class CustomerOrderShippingAddress extends AbstractMapper
 {
@@ -47,9 +48,9 @@ class CustomerOrderShippingAddress extends AbstractMapper
         return "cID_".$data['customers_id'];
     }
 
-    public function push($parent, $dbObj = null)
+    public function push(DataModel $model, \stdClass $dbObj = null)
     {
-        $this->generateDbObj($parent->getShippingAddress(), $dbObj, null, true);
+        $this->generateDbObj($model->getShippingAddress(), $dbObj, null, true);
     }
 
     protected function delivery_name($data)

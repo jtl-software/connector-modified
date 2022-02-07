@@ -1,6 +1,8 @@
 <?php
 namespace jtl\Connector\Modified\Mapper;
 
+use jtl\Connector\Model\DataModel;
+
 class ProductI18n extends AbstractMapper
 {
     protected $mapperConfig = [
@@ -69,18 +71,18 @@ class ProductI18n extends AbstractMapper
         }
     }
 
-    public function push($parent, $dbObj = null)
+    public function push(DataModel $model, \stdClass $dbObj = null)
     {
-        $id = $parent->getId()->getEndpoint();
+        $id = $model->getId()->getEndpoint();
 
         if (!empty($id)) {
             $this->db->query('DELETE FROM products_description WHERE products_id='.$id);
         }
 
-        foreach ($parent->getI18ns() as $i18n) {
-            $i18n->setProductId($parent->getId());
+        foreach ($model->getI18ns() as $i18n) {
+            $i18n->setProductId($model->getId());
         }
 
-        return parent::push($parent, $dbObj);
+        return parent::push($model, $dbObj);
     }
 }

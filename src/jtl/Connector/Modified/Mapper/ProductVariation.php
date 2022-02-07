@@ -5,6 +5,7 @@ namespace jtl\Connector\Modified\Mapper;
 use jtl\Connector\Core\Logger\Logger;
 use jtl\Connector\Formatter\ExceptionFormatter;
 use jtl\Connector\Linker\ChecksumLinker;
+use jtl\Connector\Model\DataModel;
 use jtl\Connector\Modified\Connector;
 
 class ProductVariation extends AbstractMapper
@@ -23,19 +24,19 @@ class ProductVariation extends AbstractMapper
         ]
     ];
 
-    public function push($parent, $dbObj = null)
+    public function push(DataModel $model, \stdClass $dbObj = null)
     {
-        if (count($parent->getVariations()) > 0 && !$parent->getIsMasterProduct() && $parent->getMasterProductId()->getHost() === 0) {
-            $checksum = ChecksumLinker::find($parent, 1);
+        if (count($model->getVariations()) > 0 && !$model->getIsMasterProduct() && $model->getMasterProductId()->getHost() === 0) {
+            $checksum = ChecksumLinker::find($model, 1);
 
             if ($checksum === null || $checksum->hasChanged() === true) {
                 $totalStock = 0;
 
                 // clear existing product variations
-                $this->db->query('DELETE FROM products_attributes WHERE products_id=' . $parent->getId()->getEndpoint());
+                $this->db->query('DELETE FROM products_attributes WHERE products_id=' . $model->getId()->getEndpoint());
 
                 /** @var \jtl\Connector\Model\ProductVariation $variation */
-                foreach ($parent->getVariations() as $variation) {
+                foreach ($model->getVariations() as $variation) {
                     // get variation name in default language
                     $varName = '';
                     foreach ($variation->getI18ns() as $i18n) {
@@ -114,7 +115,7 @@ class ProductVariation extends AbstractMapper
 
                         // insert/update product variation
                         $pVarObj = new \stdClass();
-                        $pVarObj->products_id = $parent->getId()->getEndpoint();
+                        $pVarObj->products_id = $model->getId()->getEndpoint();
                         $pVarObj->options_id = $variationId;
                         $pVarObj->options_values_id = $valueId;
                         $pVarObj->attributes_stock = round($value->getStockLevel());
@@ -141,13 +142,13 @@ class ProductVariation extends AbstractMapper
                     }
                 }
 
-                if ($parent->getStockLevel()->getStockLevel() == 0) {
-                    $this->db->query('UPDATE products SET products_quantity=' . $totalStock . ' WHERE products_id=' . $parent->getId()->getEndpoint());
+                if ($model->getStockLevel()->getStockLevel() == 0) {
+                    $this->db->query('UPDATE products SET products_quantity=' . $totalStock . ' WHERE products_id=' . $model->getId()->getEndpoint());
                 }
             }
 
             Connector::getSessionHelper()->deleteUnusedVariations = true;
-            return $parent->getVariations();
+            return $model->getVariations();
         }
     }
 }
