@@ -1,11 +1,13 @@
 <?php
+
 namespace jtl\Connector\Modified\Installer;
 
-abstract class Module
+abstract class AbstractModule
 {
     protected $db;
     protected $config;
     protected $shopConfig;
+    protected $errorMessages = [];
 
     public static $name = null;
 
@@ -16,7 +18,12 @@ abstract class Module
         $this->shopConfig = $shopConfig;
     }
 
-    abstract public function form();
+    abstract public function form(): string;
 
-    abstract public function save();
+    abstract public function save(): bool;
+
+    public function getErrorMessages(): array
+    {
+        return $this->errorMessages;
+    }
 }

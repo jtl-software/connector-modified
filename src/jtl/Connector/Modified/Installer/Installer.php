@@ -33,7 +33,7 @@ class Installer
     /**
      * @throws DatabaseException
      */
-    public function runAndGetFormData()
+    public function runAndGetFormData(): string
     {
         $shopConfig = $this->readConfigFile();
         $connectorConfig = new Config(CONNECTOR_DIR . '/config/config.json');
@@ -51,6 +51,7 @@ class Installer
 
         $moduleInstances = [];
         $moduleErrors = [];
+        $html = '';
 
         foreach ($this->modules as $id => $module) {
             $className = '\\jtl\\Connector\\Modified\\Installer\\Modules\\' . $module;
@@ -58,33 +59,32 @@ class Installer
         }
 
         if (isset($_REQUEST['save'])) {
-            foreach ($moduleInstances as $class => $instance) {
-                $moduleSave = $instance->save();
-                if ($moduleSave !== true) {
-                    $moduleErrors[] = $class;
+            foreach ($moduleInstances as $instance) {
+                /** @var $instance AbstractModule */
+                if (!$instance->save()) {
+                    $moduleErrors = array_merge($instance->getErrorMessages(), $moduleErrors);
                 }
             }
-        }
 
-        if (isset($_REQUEST['save'])) {
-            if (count($moduleErrors) == 0) {
-                $connectorConfig->save() ? $saveStatus = 'success' : $saveStatus = 'error';
-            } else {
-                $saveStatus = 'fail';
+            $html = '<div class="alert alert-success">Connector Konfiguration wurde gespeichert.</div>
+                              <div class="alert alert-danger"><b>ACHTUNG:</b><br/>
+                              Bitte sorgen Sie nach erfolgreicher Installation des Connectors unbedingt dafür, dass dieser Installer
+                              sowie die Datei config.json im Verzeichnis config nicht öffentlich les- und ausführbar sind!</div>';
+            if (!$connectorConfig->save()) {
+                $html = '<div class="alert alert-danger">Fehler beim Schreiben der config.json Datei.</div>';
+            }
 
-                $errorMessage = '<div class="alert alert-danger">Folgende Fehler traten auf:
-		        		         <br>
-		        		         <ul>';
+            if (!empty($moduleErrors)) {
+                $html = '<div class="alert alert-danger">Folgende Fehler traten auf:<br> <ul>';
 
                 foreach ($moduleErrors as $error) {
-                    $errorMessage .= '<li>' . $error . '</li>';
+                    $html .= '<li>' . $error . '</li>';
                 }
 
-                $errorMessage .= '</ul> </div>';
+                $html .= '</ul> </div>';
             }
         }
 
-        $html = '';
         if ($moduleInstances['check']->hasPassed()) {
             $html .= '<ul class="nav nav-tabs">';
 
@@ -93,9 +93,7 @@ class Installer
                 $html .= '<li class="' . $active . '"><a href="#' . $class . '" data-toggle="tab"><b>' . $instance::$name . '</b></a></li>';
             }
 
-            $html .= '</ul>
-	        	      <br>
-	        	      <div class="tab-content">';
+            $html .= '</ul> <br> <div class="tab-content">';
 
             foreach ($moduleInstances as $class => $instance) {
                 $active = $class == 'check' ? ' active' : '';
@@ -103,23 +101,6 @@ class Installer
                 $html .= '<div class="tab-pane' . $active . '" id="' . $class . '">';
                 $html .= $instance->form();
                 $html .= '</div>';
-            }
-
-            if (isset($saveStatus)) {
-                switch ($saveStatus) {
-                    case 'error':
-                        $html .= '<div class="alert alert-danger">Fehler beim Schreiben der config.json Datei.</div>';
-                        break;
-                    case 'success':
-                        $html .= '<div class="alert alert-success">Connector Konfiguration wurde gespeichert.</div>
-                              <div class="alert alert-danger"><b>ACHTUNG:</b><br/>
-                              Bitte sorgen Sie nach erfolgreicher Installation des Connectors unbedingt dafür, dass dieser Installer
-                              sowie die Datei config.json im Verzeichnis config nicht öffentlich les- und ausführbar sind!</div>';
-                        break;
-                    case 'fail':
-                        echo $errorMessage;
-                        break;
-                }
             }
 
             $html .= '</div><button type="submit" name="save" class="btn btn-primary btn-block"><span class="glyphicon glyphicon-save"></span> Connector Konfiguration speichern</button>';
