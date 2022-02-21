@@ -60,7 +60,7 @@ class DevLogging extends AbstractModule
 
     public function save(): bool
     {
-        $this->config->developer_logging = (bool)$_REQUEST['logging'];
+        $this->config->developer_logging = (bool)$_POST['logging'];
 
         return true;
     }

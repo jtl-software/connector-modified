@@ -4,16 +4,22 @@ namespace jtl\Connector\Modified\Installer;
 
 use jtl\Connector\Core\Database\Mysql;
 use jtl\Connector\Core\Exception\DatabaseException;
+use jtl\Connector\Modified\Installer\Modules\Check;
+use jtl\Connector\Modified\Installer\Modules\Connector;
+use jtl\Connector\Modified\Installer\Modules\DevLogging;
+use jtl\Connector\Modified\Installer\Modules\Status;
+use jtl\Connector\Modified\Installer\Modules\TaxRate;
+use jtl\Connector\Modified\Installer\Modules\ThumbMode;
 
 class Installer
 {
     private $modules = [
-        'check' => 'Check',
-        'connector' => 'Connector',
-        'status' => 'Status',
-        'thumbs' => 'ThumbMode',
-        'tax_rate' => 'TaxRate',
-        'dev_logging' => 'DevLogging'
+        'check' => Check::class,
+        'connector' => Connector::class,
+        'status' => Status::class,
+        'thumbs' => ThumbMode::class,
+        'tax_rate' => TaxRate::class,
+        'dev_logging' => DevLogging::class
     ];
 
     /**
@@ -53,12 +59,11 @@ class Installer
         $moduleErrors = [];
         $html = '';
 
-        foreach ($this->modules as $id => $module) {
-            $className = '\\jtl\\Connector\\Modified\\Installer\\Modules\\' . $module;
+        foreach ($this->modules as $id => $className) {
             $moduleInstances[$id] = new $className($db, $connectorConfig, $shopConfig);
         }
 
-        if (isset($_REQUEST['save'])) {
+        if (isset($_POST['save'])) {
             foreach ($moduleInstances as $instance) {
                 /** @var $instance AbstractModule */
                 if (!$instance->save()) {
@@ -70,9 +75,6 @@ class Installer
                               <div class="alert alert-danger"><b>ACHTUNG:</b><br/>
                               Bitte sorgen Sie nach erfolgreicher Installation des Connectors unbedingt dafür, dass dieser Installer
                               sowie die Datei config.json im Verzeichnis config nicht öffentlich les- und ausführbar sind!</div>';
-            if (!$connectorConfig->save()) {
-                $html = '<div class="alert alert-danger">Fehler beim Schreiben der config.json Datei.</div>';
-            }
 
             if (!empty($moduleErrors)) {
                 $html = '<div class="alert alert-danger">Folgende Fehler traten auf:<br> <ul>';
@@ -82,6 +84,8 @@ class Installer
                 }
 
                 $html .= '</ul> </div>';
+            } elseif (!$connectorConfig->save()) {
+                $html = '<div class="alert alert-danger">Fehler beim Schreiben der config.json Datei.</div>';
             }
         }
 
@@ -89,14 +93,14 @@ class Installer
             $html .= '<ul class="nav nav-tabs">';
 
             foreach ($moduleInstances as $class => $instance) {
-                $active = $class == 'check' ? 'active' : '';
+                $active = $class === 'check' ? 'active' : '';
                 $html .= '<li class="' . $active . '"><a href="#' . $class . '" data-toggle="tab"><b>' . $instance::$name . '</b></a></li>';
             }
 
             $html .= '</ul> <br> <div class="tab-content">';
 
             foreach ($moduleInstances as $class => $instance) {
-                $active = $class == 'check' ? ' active' : '';
+                $active = $class === 'check' ? ' active' : '';
 
                 $html .= '<div class="tab-pane' . $active . '" id="' . $class . '">';
                 $html .= $instance->form();
@@ -115,7 +119,7 @@ class Installer
     /**
      * @return array[]
      */
-    private function readConfigFile()
+    private function readConfigFile(): array
     {
         require_once dirname(CONNECTOR_DIR) . '/includes/configure.php';
 

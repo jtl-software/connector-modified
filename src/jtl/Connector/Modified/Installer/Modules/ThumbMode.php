@@ -26,7 +26,7 @@ class ThumbMode extends AbstractModule
 
     public function save(): bool
     {
-        $this->config->thumbs = $_REQUEST['thumbs'];
+        $this->config->thumbs = $_POST['thumbs'];
 
         return true;
     }

@@ -78,11 +78,11 @@ class Status extends AbstractModule
 
     public function save(): bool
     {
-        if (count(array_unique($_REQUEST['status'])) < count($_REQUEST['status'])) {
+        if (count(array_unique($_POST['status'])) < count($_POST['status'])) {
             $this->errorMessages[] = 'Bitte legen Sie für jeden Status eine eindeutige Shop-Zuweisung fest. Wenn ihr Shop derzeit nicht über genügend Status verfügt, legen Sie bitte die notwendigen zusätzlich an.';
             return false;
         }
-        $this->config->mapping = $_REQUEST['status'];
+        $this->config->mapping = $_POST['status'];
         return true;
     }
 }

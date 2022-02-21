@@ -30,7 +30,7 @@ class TaxRate extends AbstractModule
 
     public function save(): bool
     {
-        $this->config->tax_rate = $_REQUEST['tax_rate'];
+        $this->config->tax_rate = $_POST['tax_rate'];
 
         return true;
     }
