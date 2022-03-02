@@ -3,6 +3,7 @@
 namespace jtl\Connector\Modified\Mapper;
 
 use jtl\Connector\Drawing\ImageRelationType;
+use jtl\Connector\Model\DataModel;
 use \jtl\Connector\Model\Image as ImageModel;
 use Nette\Utils\Strings;
 
@@ -216,42 +217,48 @@ class Image extends AbstractMapper
         }
     }
 
+    /**
+     * @param $data ImageModel
+     * @return DataModel
+     */
     public function delete($data)
     {
-        if (get_class($data) === 'jtl\Connector\Model\Image') {
-            switch ($data->getRelationType()) {
-                case ImageRelationType::TYPE_CATEGORY:
-                    $oldImage = $this->db->query('SELECT categories_image FROM categories WHERE categories_id = "' . $data->getForeignKey()->getEndpoint() . '"');
-                    $oldImage = $oldImage[0]['categories_image'];
+        $clearThumbnailsAndLinking = false;
 
-                    if (isset($oldImage)) {
-                        @unlink($this->shopConfig['shop']['path'] . 'images/categories/' . $oldImage);
-                    }
+        switch ($data->getRelationType()) {
+            case ImageRelationType::TYPE_CATEGORY:
+                $oldImage = $this->db->query('SELECT categories_image FROM categories WHERE categories_id = "' . $data->getForeignKey()->getEndpoint() . '"');
+                $oldImage = $oldImage[0]['categories_image'];
 
-                    $categoryObj = new \stdClass();
-                    $categoryObj->categories_image = null;
+                if (isset($oldImage)) {
+                    @unlink($this->shopConfig['shop']['path'] . 'images/categories/' . $oldImage);
+                }
 
-                    $this->db->updateRow($categoryObj, 'categories', 'categories_id', $data->getForeignKey()->getEndpoint());
+                $categoryObj = new \stdClass();
+                $categoryObj->categories_image = null;
 
-                    break;
+                $this->db->updateRow($categoryObj, 'categories', 'categories_id', $data->getForeignKey()->getEndpoint());
 
-                case ImageRelationType::TYPE_MANUFACTURER:
-                    $oldImage = $this->db->query('SELECT manufacturers_image FROM manufacturers WHERE manufacturers_id = "' . $data->getForeignKey()->getEndpoint() . '"');
-                    $oldImage = $oldImage[0]['manufacturers_image'];
+                $clearThumbnailsAndLinking = true;
+                break;
+            case ImageRelationType::TYPE_MANUFACTURER:
+                $oldImage = $this->db->query('SELECT manufacturers_image FROM manufacturers WHERE manufacturers_id = "' . $data->getForeignKey()->getEndpoint() . '"');
+                $oldImage = $oldImage[0]['manufacturers_image'];
 
-                    if (isset($oldImage)) {
-                        @unlink($this->shopConfig['shop']['path'] . 'images/' . $oldImage);
-                    }
+                if (isset($oldImage)) {
+                    @unlink($this->shopConfig['shop']['path'] . 'images/' . $oldImage);
+                }
 
-                    $manufacturersObj = new \stdClass();
-                    $manufacturersObj->categories_image = null;
+                $manufacturersObj = new \stdClass();
+                $manufacturersObj->categories_image = null;
 
-                    $this->db->updateRow($manufacturersObj, 'manufacturers', 'manufacturers_id', $data->getForeignKey()->getEndpoint());
+                $this->db->updateRow($manufacturersObj, 'manufacturers', 'manufacturers_id', $data->getForeignKey()->getEndpoint());
 
-                    break;
-
-                case ImageRelationType::TYPE_PRODUCT:
-                    if ($data->getSort() == 0) {
+                $clearThumbnailsAndLinking = true;
+                break;
+            case ImageRelationType::TYPE_PRODUCT:
+                if (Product::isVariationChild($data->getForeignKey()->getEndpoint()) === false) {
+                    if ($data->getSort() === 0) {
                         $oldImage = $this->db->query('SELECT products_image FROM products WHERE products_id = "' . $data->getForeignKey()->getEndpoint() . '"');
                         $oldImage = $oldImage[0]['products_image'];
 
@@ -273,7 +280,7 @@ class Image extends AbstractMapper
                         }
 
                         $this->db->query('DELETE FROM products_images WHERE products_id="' . $data->getForeignKey()->getEndpoint() . '"');
-                    } elseif ($data->getSort() == 1) {
+                    } elseif ($data->getSort() === 1) {
                         $oldImage = $this->db->query('SELECT products_image FROM products WHERE products_id = "' . $data->getForeignKey()->getEndpoint() . '"');
                         $oldImage = $oldImage[0]['products_image'];
 
@@ -285,22 +292,23 @@ class Image extends AbstractMapper
                         $productsObj->products_image = null;
 
                         $this->db->updateRow($productsObj, 'products', 'products_id', $data->getForeignKey()->getEndpoint());
-                    } else {
-                        if ($data->getId()->getEndpoint() != '') {
-                            $oldImageQuery = $this->db->query('SELECT image_name FROM products_images WHERE image_id = "' . $data->getId()->getEndpoint() . '"');
+                    } elseif ($data->getId()->getEndpoint() !== '') {
+                        $oldImageQuery = $this->db->query('SELECT image_name FROM products_images WHERE image_id = "' . $data->getId()->getEndpoint() . '"');
 
-                            if (count($oldImageQuery) > 0) {
-                                $oldImage = $oldImageQuery[0]['image_name'];
-                                @unlink($this->shopConfig['shop']['path'] . $this->shopConfig['img']['original'] . $oldImage);
-                            }
-
-                            $this->db->query('DELETE FROM products_images WHERE image_id="' . $data->getId()->getEndpoint() . '"');
+                        if (count($oldImageQuery) > 0) {
+                            $oldImage = $oldImageQuery[0]['image_name'];
+                            @unlink($this->shopConfig['shop']['path'] . $this->shopConfig['img']['original'] . $oldImage);
                         }
+
+                        $this->db->query('DELETE FROM products_images WHERE image_id="' . $data->getId()->getEndpoint() . '"');
                     }
 
+                    $clearThumbnailsAndLinking = true;
                     break;
-            }
+                }
+        }
 
+        if ($clearThumbnailsAndLinking === true) {
             foreach ($this->thumbConfig as $folder => $sizes) {
                 if (!is_null($oldImage)) {
                     unlink($this->shopConfig['shop']['path'] . $this->shopConfig['img'][$folder] . $oldImage);
@@ -308,11 +316,9 @@ class Image extends AbstractMapper
             }
 
             $this->db->query('DELETE FROM jtl_connector_link_image WHERE endpoint_id="' . $data->getId()->getEndpoint() . '"');
-
-            return $data;
-        } else {
-            throw new \Exception('Pushed data is not an image object');
         }
+
+        return $data;
     }
 
     public function statistic(): int
