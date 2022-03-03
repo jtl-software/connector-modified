@@ -248,7 +248,7 @@ class Check extends AbstractModule
 
         static::$checks['additionalImages']['info'] = sprintf(static::$checks['additionalImages']['info'], $this->shopConfig['shop']['fullUrl']);
 
-        return [intval($additionalImages[0]['configuration_value']) > 0, $additionalImages[0]['configuration_value']];
+        return [(int)$additionalImages[0]['configuration_value'] > 0, $additionalImages[0]];
     }
 
     private function groups()

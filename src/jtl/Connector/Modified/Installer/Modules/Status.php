@@ -61,7 +61,8 @@ class Status extends AbstractModule
             $stats = '';
 
             foreach ($this->modifiedStats as $modified) {
-                $selected = ($mapping[$key] == $modified['orders_status_id']) ? ' selected="selected"' : '';
+                $mappedStatus = $mapping[$key] ?? '';
+                $selected = ($mappedStatus == $modified['orders_status_id']) ? ' selected="selected"' : '';
                 $stats .= '<option value="' . $modified['orders_status_id'] . '"' . $selected . '>' . $modified['orders_status_name'] . '</option>';
             }
 
