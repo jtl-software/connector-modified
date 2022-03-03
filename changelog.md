@@ -1,3 +1,9 @@
+3.11.0
+------
+- CO-1344 - Refactored installer classes
+- CO-1553 - Fixed problem with image deletion
+- CO-1936 - Fixed customer order import query 
+
 3.10.0
 ------
 - CO-1863 - Fixed problem with createImageFilePath and other minor bugs
