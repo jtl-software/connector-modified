@@ -1,9 +1,10 @@
 <?php
+
 namespace jtl\Connector\Modified\Installer\Modules;
 
-use jtl\Connector\Modified\Installer\Module;
+use jtl\Connector\Modified\Installer\AbstractModule;
 
-class Check extends Module
+class Check extends AbstractModule
 {
     public static $name = '<span class="glyphicon glyphicon-check"></span> System Check';
 
@@ -95,14 +96,14 @@ class Check extends Module
         }
     }
 
-    public function form()
+    public function form(): string
     {
         $html = '<table class="table table-striped"><tbody>';
         foreach (self::$checks as $check => $data) {
             $result = $this->checkResults[$check];
 
-            $html .= '<tr class="'.($result[0] === true ? '' : 'danger').'"><td><b>'.$data['title'].'</b><br/>'.vsprintf($data['info'], $result[1] ?? []).'</td><td><h4 class="pull-right">';
-            $html .= $result[0] ? '<span class="label label-success"><span class="glyphicon glyphicon-ok"></span> '.vsprintf($data['ok'], $result[1] ?? []).'</span>' : '<span class="label label-danger"><span class="glyphicon glyphicon-warning-sign"></span> '.vsprintf($data['fault'], $result[1] ?? []).'</span>';
+            $html .= '<tr class="' . ($result[0] === true ? '' : 'danger') . '"><td><b>' . $data['title'] . '</b><br/>' . vsprintf($data['info'], $result[1] ?? []) . '</td><td><h4 class="pull-right">';
+            $html .= $result[0] ? '<span class="label label-success"><span class="glyphicon glyphicon-ok"></span> ' . vsprintf($data['ok'], $result[1] ?? []) . '</span>' : '<span class="label label-danger"><span class="glyphicon glyphicon-warning-sign"></span> ' . vsprintf($data['fault'], $result[1] ?? []) . '</span>';
             $html .= '</h4></td></tr>';
         }
         $html .= '</tbody></table>';
@@ -112,7 +113,7 @@ class Check extends Module
 
     private function phpVersion()
     {
-        return [(version_compare(PHP_VERSION, '7.1.3') >= 0),[PHP_VERSION]];
+        return [(version_compare(PHP_VERSION, '7.1.3') >= 0), [PHP_VERSION]];
     }
 
     private function gdlib()
@@ -127,9 +128,9 @@ class Check extends Module
 
     private function configFile()
     {
-        $path = CONNECTOR_DIR.'/config';
-        if (file_exists($path.'/config.json')) {
-            $path = $path.'/config.json';
+        $path = CONNECTOR_DIR . '/config';
+        if (file_exists($path . '/config.json')) {
+            $path = $path . '/config.json';
         }
 
         return [is_writable($path), [$path]];
@@ -137,14 +138,14 @@ class Check extends Module
 
     private function dbFile()
     {
-        $path = CONNECTOR_DIR.'/db/connector.s3db';
+        $path = CONNECTOR_DIR . '/db/connector.s3db';
 
         return [!file_exists($path) && is_writable(dirname($path)) || is_writable($path), [$path]];
     }
 
     private function connectorLog()
     {
-        $path = CONNECTOR_DIR.'/logs';
+        $path = CONNECTOR_DIR . '/logs';
 
         return [is_writable($path), [$path]];
     }
@@ -180,9 +181,9 @@ class Check extends Module
 
         foreach ($types as $id => $name) {
             if ($id == 16 || $id == 64) {
-                $this->db->query(sprintf($queryChar, 'jtl_connector_link_'.$name));
+                $this->db->query(sprintf($queryChar, 'jtl_connector_link_' . $name));
             } else {
-                $this->db->query(sprintf($queryInt, 'jtl_connector_link_'.$name));
+                $this->db->query(sprintf($queryInt, 'jtl_connector_link_' . $name));
             }
         }
 
@@ -247,7 +248,7 @@ class Check extends Module
 
         static::$checks['additionalImages']['info'] = sprintf(static::$checks['additionalImages']['info'], $this->shopConfig['shop']['fullUrl']);
 
-        return [intval($additionalImages[0]['configuration_value']) > 0, $additionalImages[0]['configuration_value']];
+        return [(int)$additionalImages[0]['configuration_value'] > 0, $additionalImages[0]];
     }
 
     private function groups()
@@ -259,7 +260,7 @@ class Check extends Module
         return [$groups[0]['configuration_value'] == 'true'];
     }
 
-    public function save()
+    public function save(): bool
     {
         return true;
     }

@@ -250,7 +250,7 @@ class CustomerOrder extends AbstractMapper
     {
         $defaultTaxRate = $this->determineDefaultTaxRate($data['orders_id']);
 
-        $totalData = $this->db->query('SELECT class,value,title FROM orders_total WHERE orders_id=' . $data['orders_id'].' ORDER BY sort_order ASC');
+        $totalData = $this->db->query('SELECT class,value,title,orders_total_id FROM orders_total WHERE orders_id=' . $data['orders_id'].' ORDER BY sort_order ASC');
         foreach ($totalData as $total) {
             switch ($total['class']) {
                 case 'ot_total':

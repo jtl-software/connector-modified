@@ -1,18 +1,25 @@
 <?php
+
 namespace jtl\Connector\Modified\Installer;
 
 use jtl\Connector\Core\Database\Mysql;
 use jtl\Connector\Core\Exception\DatabaseException;
+use jtl\Connector\Modified\Installer\Modules\Check;
+use jtl\Connector\Modified\Installer\Modules\Connector;
+use jtl\Connector\Modified\Installer\Modules\DevLogging;
+use jtl\Connector\Modified\Installer\Modules\Status;
+use jtl\Connector\Modified\Installer\Modules\TaxRate;
+use jtl\Connector\Modified\Installer\Modules\ThumbMode;
 
 class Installer
 {
     private $modules = [
-        'check' => 'Check',
-        'connector' => 'Connector',
-        'status' => 'Status',
-        'thumbs' => 'ThumbMode',
-        'tax_rate' => 'TaxRate',
-        'dev_logging' => 'DevLogging'
+        'check' => Check::class,
+        'connector' => Connector::class,
+        'status' => Status::class,
+        'thumbs' => ThumbMode::class,
+        'tax_rate' => TaxRate::class,
+        'dev_logging' => DevLogging::class
     ];
 
     /**
@@ -32,108 +39,75 @@ class Installer
     /**
      * @throws DatabaseException
      */
-    public function runAndGetFormData()
+    public function runAndGetFormData(): string
     {
         $shopConfig = $this->readConfigFile();
-        $connectorConfig = new Config(CONNECTOR_DIR.'/config/config.json');
+        $connectorConfig = new Config(CONNECTOR_DIR . '/config/config.json');
 
         $db = Mysql::getInstance();
 
-        if (!$db->isConnected()) {
-            $db->connect([
-                "host" => $shopConfig['db']["host"],
-                "user" => $shopConfig['db']["user"],
-                "password" => $shopConfig['db']["pass"],
-                "name" => $shopConfig['db']["name"],
-            ]);
-        }
+        $db->connect([
+            "host" => $shopConfig['db']["host"],
+            "user" => $shopConfig['db']["user"],
+            "password" => $shopConfig['db']["pass"],
+            "name" => $shopConfig['db']["name"],
+        ]);
 
         $db->setNames();
 
         $moduleInstances = [];
         $moduleErrors = [];
+        $html = '';
 
-        foreach ($this->modules as $id => $module) {
-            $className = '\\jtl\\Connector\\Modified\\Installer\\Modules\\'.$module;
+        foreach ($this->modules as $id => $className) {
             $moduleInstances[$id] = new $className($db, $connectorConfig, $shopConfig);
         }
-    
-        if (isset($_REQUEST['save'])) {
-            foreach ($moduleInstances as $class => $instance) {
-                $moduleSave = $instance->save();
-                if ($moduleSave !== true) {
-                    $moduleErrors[] = $moduleSave;
+
+        if (isset($_POST['save'])) {
+            foreach ($moduleInstances as $instance) {
+                /** @var $instance AbstractModule */
+                if (!$instance->save()) {
+                    $moduleErrors = array_merge($instance->getErrorMessages(), $moduleErrors);
                 }
             }
-        }
-        
-        if (isset($_REQUEST['save'])) {
-            if (count($moduleErrors) == 0) {
-                if (!$connectorConfig->save()) {
-                    $_SESSION['error'] = true;
-                    header("Location: " . $_SERVER['HTTP_REFERER']);
-                    exit();
-                } else {
-                    $_SESSION['success'] = true;
-                    header("Location: " . $_SERVER['HTTP_REFERER']);
-                    exit();
-                }
-            } else {
-                $html = '<div class="alert alert-danger">Folgende Fehler traten auf:
-		        		<br>
-		        		<ul>';
-            
+
+            $html = '<div class="alert alert-success">Connector Konfiguration wurde gespeichert.</div>
+                              <div class="alert alert-danger"><b>ACHTUNG:</b><br/>
+                              Bitte sorgen Sie nach erfolgreicher Installation des Connectors unbedingt dafür, dass dieser Installer
+                              sowie die Datei config.json im Verzeichnis config nicht öffentlich les- und ausführbar sind!</div>';
+
+            if (!empty($moduleErrors)) {
+                $html = '<div class="alert alert-danger">Folgende Fehler traten auf:<br> <ul>';
+
                 foreach ($moduleErrors as $error) {
-                    $html .= '<li>'.$error.'</li>';
+                    $html .= '<li>' . $error . '</li>';
                 }
-            
-                $html .= '</ul>
-		        		</div>';
-                
-                $_SESSION['fail'] = $html;
-                header("Location: " . $_SERVER['HTTP_REFERER']);
-                exit();
+
+                $html .= '</ul> </div>';
+            } elseif (!$connectorConfig->save()) {
+                $html = '<div class="alert alert-danger">Fehler beim Schreiben der config.json Datei.</div>';
             }
         }
 
-        $html = '';
         if ($moduleInstances['check']->hasPassed()) {
             $html .= '<ul class="nav nav-tabs">';
 
             foreach ($moduleInstances as $class => $instance) {
-                $active = $class == 'check' ? 'active' : '';
-                $html .= '<li class="'.$active.'"><a href="#'.$class.'" data-toggle="tab"><b>'.$instance::$name.'</b></a></li>';
+                $active = $class === 'check' ? 'active' : '';
+                $html .= '<li class="' . $active . '"><a href="#' . $class . '" data-toggle="tab"><b>' . $instance::$name . '</b></a></li>';
             }
 
-            $html .= '</ul>
-	        	<br>
-	        	<div class="tab-content">';
+            $html .= '</ul> <br> <div class="tab-content">';
 
             foreach ($moduleInstances as $class => $instance) {
-                $active = $class == 'check' ? ' active' : '';
+                $active = $class === 'check' ? ' active' : '';
 
-                $html .= '<div class="tab-pane'.$active.'" id="'.$class.'">';
+                $html .= '<div class="tab-pane' . $active . '" id="' . $class . '">';
                 $html .= $instance->form();
                 $html .= '</div>';
             }
-            
-            if (isset($_SESSION['error'])) {
-                $html .= '<div class="alert alert-danger">Fehler beim Schreiben der config.json Datei.</div>';
-                unset($_SESSION['error']);
-            } elseif (isset($_SESSION['success'])) {
-                $html .= '<div class="alert alert-success">Connector Konfiguration wurde gespeichert.</div>';
-                $html .= '<div class="alert alert-danger"><b>ACHTUNG:</b><br/>
-                            Bitte sorgen Sie nach erfolgreicher Installation des Connectors unbedingt dafür, dass dieser Installer
-                            sowie die Datei config.json im Verzeichnis config nicht öffentlich les- und ausführbar sind!</div>';
-                unset($_SESSION['success']);
-            } elseif (isset($_SESSION['fail'])) {
-                echo $_SESSION['fail'];
-                unset($_SESSION['fail']);
-            }
 
-            $html .= '</div>';
-
-            $html .= '<button type="submit" name="save" class="btn btn-primary btn-block"><span class="glyphicon glyphicon-save"></span> Connector Konfiguration speichern</button>';
+            $html .= '</div><button type="submit" name="save" class="btn btn-primary btn-block"><span class="glyphicon glyphicon-save"></span> Connector Konfiguration speichern</button>';
         } else {
             $html .= '<div class="alert alert-danger">Bitte beheben Sie die angezeigten Fehler bevor Sie mit der Konfiguration fortfahren können.</div>';
             $html .= $moduleInstances['check']->form();
@@ -145,15 +119,15 @@ class Installer
     /**
      * @return array[]
      */
-    private function readConfigFile()
+    private function readConfigFile(): array
     {
-        require_once dirname(CONNECTOR_DIR).'/includes/configure.php';
+        require_once dirname(CONNECTOR_DIR) . '/includes/configure.php';
 
         return [
             'shop' => [
                 'url' => HTTP_SERVER,
                 'folder' => DIR_WS_CATALOG,
-                'fullUrl' => HTTP_SERVER.DIR_WS_CATALOG,
+                'fullUrl' => HTTP_SERVER . DIR_WS_CATALOG,
             ],
             'db' => [
                 'host' => DB_SERVER,

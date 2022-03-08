@@ -23,7 +23,7 @@ class Config
 
     public function __get($name)
     {
-        return $this->data[$name];
+        return $this->data[$name] ?? null;
     }
 
     public function save()

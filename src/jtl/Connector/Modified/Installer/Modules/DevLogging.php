@@ -2,13 +2,13 @@
 
 namespace jtl\Connector\Modified\Installer\Modules;
 
-use jtl\Connector\Modified\Installer\Module;
+use jtl\Connector\Modified\Installer\AbstractModule;
 
-class DevLogging extends Module
+class DevLogging extends AbstractModule
 {
     public static $name = '<span class="glyphicon glyphicon-edit"></span> DevLogging';
-    
-    public function form()
+
+    public function form(): string
     {
         $html = '
         <div>
@@ -28,7 +28,7 @@ class DevLogging extends Module
             <label for="clear" class="col-xs-2 control-label">Logs löschen</label>
             <div class="col-xs-6">
             ';
-        
+
         if (count(scandir($this->config->platform_root . '/jtlconnector/logs')) > 3) {
             $html .= '<button formmethod="post" formaction="/jtlconnector/install/loggingConfig.php" name="clear" class="btn btn-default btn-sm btn-block">Clear</button>';
         } else {
@@ -36,32 +36,32 @@ class DevLogging extends Module
                 <button disabled class="btn btn-default btn-sm btn-block">Clear</button>
             </div>';
         }
-        
-        $html .='</div>
+
+        $html .= '</div>
         </div>
         <div class="form-group">
             <label for="download" class="col-xs-2 control-label">Logs herunterladen</label>
             <div class="col-xs-6">';
-        
+
         if (count(scandir($this->config->platform_root . '/jtlconnector/logs')) > 3) {
-            $html .='<button formmethod="post" formaction="/jtlconnector/install/loggingConfig.php" name="download" class="btn btn-default btn-sm btn-block">Download</button>';
+            $html .= '<button formmethod="post" formaction="/jtlconnector/install/loggingConfig.php" name="download" class="btn btn-default btn-sm btn-block">Download</button>';
         } else {
             $html .= '<div data-toggle="tooltip" data-placement="top" title="Es wurden keine Logs gefunden!">
                 <button disabled class="btn btn-default btn-sm btn-block">Download</button>
             </div>';
         }
-        
+
         $html .= '</div>
         </div>
         </div>';
-        
+
         return $html;
     }
-    
-    public function save()
+
+    public function save(): bool
     {
-        $this->config->developer_logging = (bool)$_REQUEST['logging'];
-        
+        $this->config->developer_logging = (bool)$_POST['logging'];
+
         return true;
     }
 }
